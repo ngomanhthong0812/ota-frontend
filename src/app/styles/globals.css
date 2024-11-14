@@ -15,7 +15,7 @@ body svg {
 }
 
 .menu-item-container {
-  @apply bg-[var(--menu-item-color-)] fixed left-0 top-[50px] h-full w-[200px] z-50 pb-[90px];
+  @apply bg-[var(--menu-item-color-)] fixed left-0 top-[50px] h-full w-[210px] z-50 pb-[90px];
 }
 
 .menu-item {

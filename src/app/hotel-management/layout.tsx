@@ -18,7 +18,9 @@ export default function RootLayout({
                 <HotelHeader />
                 <div className="flex">
                     <HotelSidebar />
-                    {children}
+                    <main className="container-body ml-[210px] mt-[50px] w-[100%] p-3 text-sm text-[var(--color-menu-icon-)]">
+                        {children}
+                    </main>
                 </div>
             </body>
         </html>
