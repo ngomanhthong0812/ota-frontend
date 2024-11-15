@@ -1,264 +1,253 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
 
 body {
-    font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 :root {
-    --ht-body-bg-: #f0f1f3;
-    --navbar-color-: #279656;
-    --menu-item-color-: rgb(255, 255, 255);
-    --color-menu-icon-: #5d6877;
-    --room-empty-color-: #279656;
-    --room-booked-color-: #1877F2;
-    --room-not-arrived-color-: #d147a3;
-    --room-occupied-color-: #005254;
-    --room-not-checked-out-color-: #f80;
-    --room-dirty-color-: #c00;
+  --ht-body-bg-: #f0f1f3;
+  --navbar-color-: #279656;
+  --menu-item-color-: rgb(255, 255, 255);
+  --color-menu-icon-: #5d6877;
+  --room-empty-color-: #279656;
+  --room-booked-color-: #1877f2;
+  --room-not-arrived-color-: #d147a3;
+  --room-occupied-color-: #005254;
+  --room-not-checked-out-color-: #f80;
+  --room-out-of-service-color-: #f80;
+  --room-dirty-color-: #c00;
 
-    --room-empty-color-200-: #54ca85;
-    --room-empty-color-100-: #bdf6d4;
-    --room-empty-color-hover-: #177f42;
+  --room-empty-color-200-: #54ca85;
+  --room-empty-color-100-: #bdf6d4;
+  --room-empty-color-hover-: #177f42;
 
-    --room-booked-color-200-: #3a99e6;
-    --room-booked-color-100-: #90bfff;
+  --room-booked-color-200-: #3a99e6;
+  --room-booked-color-100-: #90bfff;
 
-    --room-not-arrived-color-200-: #e38dcb;
-    --room-not-arrived-color-100-: #fde3f7;
+  --room-not-arrived-color-200-: #e38dcb;
+  --room-not-arrived-color-100-: #fde3f7;
 
-    --room-occupied-color-200-: #007c6e;
-    --room-occupied-color-100-: #ace7df;
+  --room-occupied-color-200-: #007c6e;
+  --room-occupied-color-100-: #ace7df;
 
-    --room-not-checked-out-color-200-: #ffb74d;
-    --room-not-checked-out-color-100-: #f4e5c4;
+  --room-not-checked-out-color-200-: #ffb74d;
+  --room-not-checked-out-color-100-: #f4e5c4;
 
-    --room-dirty-color-200-: #ffe6e6;
-    --room-dirty-color-100-: #ffcccc;
+  --room-dirty-color-200-: #ffe6e6;
+  --room-dirty-color-100-: #ffcccc;
 
-    --ht-neutral-100-: #e6e8eb;
-    --ht-neutral-200-: #cacaca;
-    --ht-neutral-300-: #aaaaaa;
+  --ht-neutral-100-: #e6e8eb;
+  --ht-neutral-200-: #cacaca;
+  --ht-neutral-300-: #aaaaaa;
 }
 
 .body_content-line::after {
-    position: absolute;
-    content: "";
-    left: 0;
-    top: 50%;
-    width: 100%;
-    height: 1px;
-    background-color: var(--ht-neutral-100-);
+  position: absolute;
+  content: "";
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background-color: var(--ht-neutral-100-);
 }
 
-
 .room-item-empty:hover {
-    box-shadow:
-        var(--room-empty-color-100-) 0px 1px 10px 0px;
+  box-shadow: var(--room-empty-color-100-) 0px 1px 10px 0px;
 }
 
 .room-item-booked:hover {
-    box-shadow:
-        var(--room-booked-color-100-) 0px 1px 10px 0px;
+  box-shadow: var(--room-booked-color-100-) 0px 1px 10px 0px;
 }
 
 .room-item-not-arrived:hover {
-    box-shadow:
-        var(--room-not-arrived-color-100-) 0px 1px 10px 0px;
+  box-shadow: var(--room-not-arrived-color-100-) 0px 1px 10px 0px;
 }
 
 .room-item-occupied:hover {
-    box-shadow:
-        var(--room-occupied-color-100-) 0px 1px 10px 0px;
+  box-shadow: var(--room-occupied-color-100-) 0px 1px 10px 0px;
 }
 
 .room-item-out-of-service:hover {
-    box-shadow:
-        var(--room-not-checked-out-color-100-) 0px 1px 10px 0px;
+  box-shadow: var(--room-not-checked-out-color-100-) 0px 1px 10px 0px;
 }
 
-
-.room-item-empty>p {
-    background-color: var(--room-empty-color-);
+.room-item-empty > p {
+  background-color: var(--room-empty-color-);
 }
 
-.room-item-booked>p {
-    background-color: var(--room-booked-color-);
+.room-item-booked > p {
+  background-color: var(--room-booked-color-);
 }
 
-.room-item-not-arrived>p {
-    background-color: var(--room-not-arrived-color-);
+.room-item-not-arrived > p {
+  background-color: var(--room-not-arrived-color-);
 }
 
-.room-item-occupied>p {
-    background-color: var(--room-occupied-color-);
+.room-item-occupied > p {
+  background-color: var(--room-occupied-color-);
 }
 
-.room-item-out-of-service>p {
-    background-color: var(--room-not-checked-out-color-);
+.room-item-out-of-service > p {
+  background-color: var(--room-not-checked-out-color-);
 }
-
-
 
 .room-item-empty .time-check-out {
-    background-color: var(--room-empty-color-200-);
+  background-color: var(--room-empty-color-200-);
 }
 
 .room-item-booked .time-check-out {
-    background-color: var(--room-booked-color-200-);
+  background-color: var(--room-booked-color-200-);
 }
 
 .room-item-not-arrived .time-check-out {
-    background-color: var(--room-not-arrived-color-200-);
+  background-color: var(--room-not-arrived-color-200-);
 }
 
 .room-item-occupied .time-check-out {
-    background-color: var(--room-occupied-color-200-);
+  background-color: var(--room-occupied-color-200-);
 }
 
 .room-item-out-of-service .time-check-out {
-    background-color: var(--room-not-checked-out-color-200-);
+  background-color: var(--room-not-checked-out-color-200-);
 }
 
 /* cash_fund */
 .btn-confirm-comparison,
 .btn-receipt,
 .btn-payment-slip {
-    position: relative;
+  position: relative;
 }
 
 .btn-confirm-comparison::before,
 .btn-payment-slip::before,
 .btn-receipt::before {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 3px;
-    color: white;
-    transform: translateX(-50%);
-    font-size: 11px;
-    white-space: nowrap;
-    padding: 0 5px;
-    visibility: hidden;
-    animation-delay: 0.1s;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  color: white;
+  transform: translateX(-50%);
+  font-size: 11px;
+  white-space: nowrap;
+  padding: 0 5px;
+  visibility: hidden;
+  animation-delay: 0.1s;
 }
 
 .btn-payment-slip::before {
-    content: "Phiếu chi";
-    bottom: -25px;
-    left: 50%;
+  content: "Phiếu chi";
+  bottom: -25px;
+  left: 50%;
 }
 
 .btn-receipt::before {
-    content: "Phiếu thu";
-    bottom: -25px;
-    left: 50%;
+  content: "Phiếu thu";
+  bottom: -25px;
+  left: 50%;
 }
 
 .btn-confirm-comparison::before {
-    content: "Xác nhận";
-    top: -25px;
-    left: 50%;
+  content: "Xác nhận";
+  top: -25px;
+  left: 50%;
 }
 
 .btn-confirm-comparison:hover::before,
 .btn-payment-slip:hover::before,
 .btn-receipt:hover::before {
-    visibility: visible;
+  visibility: visible;
 }
-
 
 /* CSS để ẩn mũi tên của select */
 .custom-select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background: none;
-    outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+  outline: none;
 }
-
 
 /* start Thêm hiển thị nội dung khi hover vào icon trong tình trạng menu thu gọn */
 .hidden-title {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border-radius: 3px;
-    background-color: var(--room-empty-color-200-);
-    color: white;
-    font-size: 12px;
-    text-align: center;
-    padding: 4px;
-    padding-right: 6px;
-    transform: translate(15px, -50%);
-    transition: 0.3s ease-in-out;
-    display: none;
-    white-space: nowrap;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 3px;
+  background-color: var(--room-empty-color-200-);
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px;
+  padding-right: 6px;
+  transform: translate(15px, -50%);
+  transition: 0.3s ease-in-out;
+  display: none;
+  white-space: nowrap;
 }
 
 .hidden-title::before {
-    position: absolute;
-    top: 50%;
-    left: -4px;
-    content: "";
-    width: 10px;
-    height: 10px;
-    background-color: var(--room-empty-color-200-);
-    transform: translateY(-50%) rotate(45deg);
-    z-index: -1;
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: var(--room-empty-color-200-);
+  transform: translateY(-50%) rotate(45deg);
+  z-index: -1;
 }
 
 .menu-item-container_toggle .hidden-title {
-    display: block;
-    visibility: hidden;
+  display: block;
+  visibility: hidden;
 }
 
 .menu-item-container_toggle .menu-item:hover .hidden-title {
-    visibility: visible;
-    transform: translate(30px, -50%);
+  visibility: visible;
+  transform: translate(30px, -50%);
 }
 
 /* end Thêm hiển thị nội dung khi hover vào icon trong tình trạng menu thu gọn */
 
 /*start submenu */
 .submenu {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .submenu li .menu-item {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
-
 .menu-item-container_toggle .submenu li .menu-item {
-    padding-left: 0.75rem;
+  padding-left: 0.75rem;
 }
 
 .menu-item-container li {
-    max-height: 44px;
-    transition: max-height 0.3s ease-in-out;
+  max-height: 44px;
+  transition: max-height 0.3s ease-in-out;
 }
 
 /*end submenu */
 
 /* start show submenu */
 .menu-item span .menu-item_icon {
-    transition: 0.3s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 
 .show-submenu .menu-item span .menu-item_icon {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .show-submenu .submenu {
-    visibility: visible;
+  visibility: visible;
 }
 
 .show-submenu {
-    max-height: 200px !important;
+  max-height: 200px !important;
 }
 
 .menu-item-container_toggle .show-submenu:has(.submenu) {
-    border-top: 1px solid var(--ht-neutral-200-);
-    border-bottom: 1px solid var(--ht-neutral-200-);
+  border-top: 1px solid var(--ht-neutral-200-);
+  border-bottom: 1px solid var(--ht-neutral-200-);
 }
 
 /* end show submenu */
