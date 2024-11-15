@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import '@/app/styles/style.css';
 import '@/app/styles/globals.css';
+import { ToolbarProvider } from "@/context/toolbarContext";
 
 export const metadata: Metadata = {
   title: "Ota App",
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <ToolbarProvider>
+          {children}
+        </ToolbarProvider>
       </body>
     </html>
   )

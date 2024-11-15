@@ -6,7 +6,7 @@ import {
     BiChevronRight,
     BiChevronLeftCircle
 } from "react-icons/bi";
-import { HotelSIDEBAR_NAV } from "@/constants/hotel-sidebar";
+import { HOTELSIDEBAR_NAV } from "@/constants/hotel-sidebar";
 import { useCallback, useEffect, useState } from "react";
 import { MenuItem } from "@/types/backend";
 import { usePathname } from 'next/navigation'
@@ -15,7 +15,7 @@ import { usePathname } from 'next/navigation'
 interface IProps { }
 
 const HotelSidebar: React.FC<IProps> = () => {
-    const [menus, setMenus] = useState<MenuItem[]>(HotelSIDEBAR_NAV);
+    const [menus, setMenus] = useState<MenuItem[]>(HOTELSIDEBAR_NAV);
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
     const pathname = usePathname()
 

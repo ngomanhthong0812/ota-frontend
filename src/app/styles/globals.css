@@ -96,7 +96,7 @@ body svg {
 }
 
 .status-item {
-  @apply flex gap-1 items-center justify-center border-[1.5px] font-[600] px-2 py-[3px] rounded-full whitespace-nowrap select-none
+  @apply flex gap-1 items-center justify-center border-[1.5px] font-[500] px-2 py-[3px] rounded-full whitespace-nowrap select-none
 }
 
 .toolbar-top-type .active {
@@ -114,7 +114,7 @@ body svg {
 
 
 .popup-container {
-  @apply absolute hidden w-56 bg-white shadow-lg border border-[var(--ht-neutral-100-)] z-50 rounded-lg;
+  @apply absolute w-56 bg-white shadow-lg border border-[var(--ht-neutral-100-)] z-50 rounded-lg;
 }
 
 .popup-container ul:not(:last-child) {
@@ -126,7 +126,7 @@ body svg {
 }
 
 .popup-container ul .popup-item {
-  @apply p-2 flex items-center gap-2 font-[400] text-sm text-[var(--color-menu-icon-)] cursor-pointer rounded-lg hover:bg-[var(--ht-neutral-100-)] duration-100;
+  @apply p-2 flex items-center gap-2 font-[400] text-sm text-[var(--color-menu-icon-)] cursor-pointer rounded-lg hover:bg-[var(--ht-neutral-100-)] transition-colors duration-100;
 }
 
 .popup-container .popup-item svg {

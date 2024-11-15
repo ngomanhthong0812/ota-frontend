@@ -14,7 +14,7 @@ import {
 } from "react-icons/bi";
 import { MenuItem } from '@/types/backend';
 
-export const HotelSIDEBAR_NAV: MenuItem[] = [
+export const HOTELSIDEBAR_NAV: MenuItem[] = [
     {
         id: uuid(),
         name: 'Thông tin chung',
