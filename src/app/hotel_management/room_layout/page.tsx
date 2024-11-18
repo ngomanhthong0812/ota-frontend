@@ -1,5 +1,5 @@
-import RoomList from "@/components/room/room-list";
-import ToolbarTop from "@/components/room/toolbar-top";
+import RoomList from "@/components/room/room_list";
+import ToolbarTop from "@/components/room/toolbar_top";
 
 interface IProps { }
 const RoomLayoutPage: React.FC<IProps> = () => {

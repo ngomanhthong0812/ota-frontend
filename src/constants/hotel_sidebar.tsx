@@ -18,7 +18,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
     {
         id: uuid(),
         name: 'Thông tin chung',
-        href: '/hotel-management',
+        href: '/hotel_management',
         icon: <BiSolidWidget size={20} />,
         active: true,
         subMenus: []
@@ -33,7 +33,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Sơ đồ phòng',
-                href: '/hotel-management/room-layout',
+                href: '/hotel_management/room_layout',
                 icon: <BiSolidHome size={20} />,
                 active: false,
                 subMenus: []
@@ -41,7 +41,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Tạo đặt phòng',
-                href: '/hotel-management/create-booking',
+                href: '/hotel_management/create_booking',
                 icon: <BiUserPlus size={20} />,
                 active: false,
                 subMenus: []
@@ -58,7 +58,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Quỹ tiền mặt',
-                href: '/hotel-management/cash-fund',
+                href: '/hotel_management/cash_fund',
                 icon: <BiWallet size={20} />,
                 active: false,
                 subMenus: []
@@ -66,7 +66,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Quỹ tiền gửi',
-                href: '/hotel-management/deposit-fund',
+                href: '/hotel_management/deposit_fund',
                 icon: <BiCreditCard size={20} />,
                 active: false,
                 subMenus: []
@@ -83,7 +83,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Tạo hoá đơn',
-                href: '/hotel-management/sales-invoice-creation',
+                href: '/hotel_management/sales_invoice_creation',
                 icon: <BiWallet size={20} />,
                 active: false,
                 subMenus: []
@@ -91,7 +91,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Tìm hoá đơn',
-                href: '/hotel-management/sales-invoice-search',
+                href: '/hotel_management/sales_invoice_search',
                 icon: <BiCreditCard size={20} />,
                 active: false,
                 subMenus: []
@@ -101,7 +101,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
     {
         id: uuid(),
         name: 'Buồng phòng',
-        href: '/hotel-management/buong-phong',
+        href: '/hotel_management/buong_phong',
         icon: <BiSolidBuildings size={20} />,
         active: false,
         subMenus: []
@@ -109,7 +109,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
     {
         id: uuid(),
         name: 'Email marketing',
-        href: '/hotel-management/email-marketing',
+        href: '/hotel_management/email_marketing',
         icon: <BiSolidEnvelope size={20} />,
         active: false,
         subMenus: []
@@ -117,7 +117,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
     {
         id: uuid(),
         name: 'Quản lý kho',
-        href: '/hotel-management/quan-ly-kho',
+        href: '/hotel_management/quan_ly_kho',
         icon: <BiSolidStoreAlt size={20} />,
         active: false,
         subMenus: []
@@ -125,7 +125,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
     {
         id: uuid(),
         name: 'Báo cáo',
-        href: '/hotel-management/bao-cao',
+        href: '/hotel_management/bao_cao',
         icon: <BiSolidFileBlank size={20} />,
         active: false,
         subMenus: []

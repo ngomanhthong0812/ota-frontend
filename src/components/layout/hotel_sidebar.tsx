@@ -6,7 +6,7 @@ import {
     BiChevronRight,
     BiChevronLeftCircle
 } from "react-icons/bi";
-import { HOTELSIDEBAR_NAV } from "@/constants/hotel-sidebar";
+import { HOTELSIDEBAR_NAV } from "@/constants/hotel_sidebar";
 import { useCallback, useEffect, useState } from "react";
 import { MenuItem } from "@/types/backend";
 import { usePathname } from 'next/navigation'

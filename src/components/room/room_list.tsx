@@ -1,18 +1,20 @@
 "use client"
 
 import useSWR from 'swr';
-import RoomCard from "./room-card";
+import RoomCard from "./room_card";
 import { useEffect, useState } from 'react';
 import { Floor, TypeRoomCard } from '@/types/backend';
 import { useToolbar } from '@/context/toolbarContext';
+import { useAuth } from '@/context/authContext';
+import { parseCookies } from 'nookies';
 
 interface IProps { }
 
-const fetcher = (url: string) =>
+const fetcher = (url: string, token: string | null) =>
     fetch(url,
         {
             headers: {
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRob25nQGdtYWlsLmNvbSIsInN1YiI6MSwiaWF0IjoxNzMxNjg2OTcxLCJleHAiOjE3MzE2OTA1NzF9.e1K9PMBKXqmKnGMSSQzz8TrOiiWSHs_TDueUB9HPwI8',
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         }).then((res) => res.json());
@@ -21,9 +23,12 @@ const RoomList: React.FC<IProps> = () => {
     const [floors, setFloors] = useState<Floor[]>();
     const [categories, setCategories] = useState<string[]>();
     const { selectedToolbar } = useToolbar();
+
+    const cookies = parseCookies();
+    const token = cookies.access_token;
     const { data, error, isLoading } = useSWR(
-        "http://localhost:8080/api/room/info-bookingsToday",
-        fetcher,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday`,
+        (url) => fetcher(url, token),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -59,14 +64,6 @@ const RoomList: React.FC<IProps> = () => {
         setFloors(uniqueFloors);
         setCategories(uniqueCategories);
     }, [data])
-
-    console.log(categories);
-
-
-    useEffect(() => {
-        console.log(selectedToolbar);
-
-    }, [selectedToolbar])
 
     if (error) return "An error has occurred.";
     if (isLoading) return "Loading...";

@@ -1,18 +1,19 @@
 'use client'
-import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel-room-status";
+import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel_room-status";
+import { useAuth } from "@/context/authContext";
 import { useToolbar } from "@/context/toolbarContext";
 import { RoomStatus, TypeRoomCard } from "@/types/backend";
-import { count } from "console";
+import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 interface IProps { }
 
-const fetcher = (url: string) =>
+const fetcher = (url: string, token: string | null) =>
     fetch(url,
         {
             headers: {
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRob25nQGdtYWlsLmNvbSIsInN1YiI6MSwiaWF0IjoxNzMxNjg2OTcxLCJleHAiOjE3MzE2OTA1NzF9.e1K9PMBKXqmKnGMSSQzz8TrOiiWSHs_TDueUB9HPwI8',
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         }).then((res) => res.json());
@@ -20,9 +21,12 @@ const fetcher = (url: string) =>
 const ToolbarTop: React.FC<IProps> = () => {
     const [toolbarList, setToolbarList] = useState<RoomStatus[]>(HOTEL_ROOMSTATUS_NAV);
     const { selectedToolbar, handleSelectedToobar } = useToolbar();
+
+    const cookies = parseCookies();
+    const token = cookies.access_token;
     const { data, error, isLoading } = useSWR(
-        "http://localhost:8080/api/room/info-bookingsToday",
-        fetcher,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday`,
+        (url) => fetcher(url, token),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,

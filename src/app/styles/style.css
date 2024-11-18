@@ -71,23 +71,23 @@ body {
   box-shadow: var(--room-not-checked-out-color-100-) 0px 1px 10px 0px;
 }
 
-.room-item-empty > p {
+.room-item-empty>p {
   background-color: var(--room-empty-color-);
 }
 
-.room-item-booked > p {
+.room-item-booked>p {
   background-color: var(--room-booked-color-);
 }
 
-.room-item-not-arrived > p {
+.room-item-not-arrived>p {
   background-color: var(--room-not-arrived-color-);
 }
 
-.room-item-occupied > p {
+.room-item-occupied>p {
   background-color: var(--room-occupied-color-);
 }
 
-.room-item-out-of-service > p {
+.room-item-out-of-service>p {
   background-color: var(--room-not-checked-out-color-);
 }
 
@@ -251,3 +251,48 @@ body {
 }
 
 /* end show submenu */
+.bg-login {
+  width: 100%;
+  height: 100vh;
+  background-image: url(/Radisson-Blue-Camranh.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center bottom;
+}
+
+.banner-register {
+  background-image: url(/background-register1-1.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hotline {
+  position: relative;
+  padding: 4px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.hotline::before {
+  position: absolute;
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  top: 0;
+  left: 0;
+}
+
+.hotline::after {
+  position: absolute;
+  content: "";
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  border-bottom: 1px solid white;
+  border-right: 1px solid white;
+  bottom: 0;
+  right: 0;
+}

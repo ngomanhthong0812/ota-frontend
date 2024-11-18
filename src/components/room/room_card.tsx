@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from "react";
-import UnusedRoomPopup from "./unused-room-popup";
+import UnusedRoomPopup from "./unused_room_popup";
 import InusedRoomPopup from "./inused-room-popup";
 import { TypeRoomCard } from "@/types/backend";
-import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel-room-status";
+import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel_room-status";
 
 interface IProps {
     data: TypeRoomCard
@@ -46,7 +46,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
             }
         }
     };
-    
+
     useEffect(() => {
         document.addEventListener('click', handleClickOutside);
         document.addEventListener('contextmenu', handleRightClickOutside);

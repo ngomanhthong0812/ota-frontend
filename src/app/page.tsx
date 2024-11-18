@@ -1,7 +1,11 @@
+import AppBanner from "@/components/layout/app_banner";
+import AppHeader from "@/components/layout/app_header";
+
 export default function Home() {
   return (
-    <div>
-      Hello World
+    <div className="bg-white min-h-screen">
+      <AppHeader />
+      <AppBanner />
     </div>
   );
 }

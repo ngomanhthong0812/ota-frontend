@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
 
-import ReceiptAndPaymentSlipPage from "../deposit-fund/receipt-and-payment-slip/page";
+import ReceiptAndPaymentSlipPage from "./receipt-and-payment-slip/page";
 import InventoryPage from "./inventory/page";
 import CashDetailsPage from "./cash_details/page";
 interface Page {
   title: string;
   component: React.ReactNode;
 }
-interface IProps {}
+interface IProps { }
 const DepositFundPage: React.FC<IProps> = () => {
   const pages: Page[] = [
     { title: "Lập phiếu thu chi", component: <ReceiptAndPaymentSlipPage /> },
@@ -33,11 +33,10 @@ const DepositFundPage: React.FC<IProps> = () => {
               <div
                 key={page.title}
                 onClick={() => handlePageChange(page.title)}
-                className={`toolbar-top-type_item ${
-                  activePage === page.title ? "active" : ""
-                }`}
+                className={`toolbar-top-type_item ${activePage === page.title ? "active" : ""
+                  }`}
               >
-                {page.title} 
+                {page.title}
               </div>
             ))}
           </div>
