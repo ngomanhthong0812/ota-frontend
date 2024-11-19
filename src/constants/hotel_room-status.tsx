@@ -1,10 +1,18 @@
 import { v4 as uuid } from 'uuid';
 import { RoomStatus } from '@/types/backend';
 
+export const ROOM_STATUS = {
+    EMPTY: 'Trống',
+    BOOKED: 'Đã đặt',
+    NOT_ARRIVED: 'Chưa đến',
+    OCCUPIED: 'Có khách',
+    NOT_CHECKED_OUT: 'Chưa đi'
+};
+
 export const HOTEL_ROOMSTATUS_NAV: RoomStatus[] = [
     {
         id: uuid(),
-        name: 'Trống',
+        name: ROOM_STATUS.EMPTY,
         count: 0,
         class: 'room-empty',
         classCard: 'room-item-empty',
@@ -12,7 +20,7 @@ export const HOTEL_ROOMSTATUS_NAV: RoomStatus[] = [
     },
     {
         id: uuid(),
-        name: 'Đã đặt',
+        name: ROOM_STATUS.BOOKED,
         count: 0,
         class: 'room-booked',
         classCard: 'room-item-booked',
@@ -20,7 +28,7 @@ export const HOTEL_ROOMSTATUS_NAV: RoomStatus[] = [
     },
     {
         id: uuid(),
-        name: 'Chưa đến',
+        name: ROOM_STATUS.NOT_ARRIVED,
         count: 0,
         class: 'room-not-arrived',
         classCard: 'room-item-not-arrived',
@@ -28,7 +36,7 @@ export const HOTEL_ROOMSTATUS_NAV: RoomStatus[] = [
     },
     {
         id: uuid(),
-        name: 'Có khách',
+        name: ROOM_STATUS.OCCUPIED,
         count: 0,
         class: 'room-occupied',
         classCard: 'room-item-occupied',
@@ -36,7 +44,7 @@ export const HOTEL_ROOMSTATUS_NAV: RoomStatus[] = [
     },
     {
         id: uuid(),
-        name: 'Chưa đi',
+        name: ROOM_STATUS.NOT_CHECKED_OUT,
         count: 0,
         class: 'room-not-checked-out',
         classCard: 'room-item-out-of-service',
