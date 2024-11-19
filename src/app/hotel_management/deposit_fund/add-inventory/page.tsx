@@ -2,7 +2,7 @@ import { NextPage } from "next";
 
 interface Props {}
 
-const AddInventoryPage: NextPage<Props> = ({}) => {
+const AddInventoryPage: React.FC = ({}) => {
   return (
     <div>
       {/* <!-- start Toolbar Top --> */}
