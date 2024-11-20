@@ -1,19 +1,24 @@
 "use client";
 import { useState } from "react";
+import ReceiptAndPaymentSlipPage from "./receipt_and_payment_slip/page";
+import ComparePage from "./compare/page";
+import TransferDetailsPage from "./transfer_details/page";
 
-import ReceiptAndPaymentSlipPage from "./receipt-and-payment-slip/page";
+interface IProps {}
+
+import ReceiptAndPaymentSlipPage from "../deposit-fund/receipt-and-payment-slip/page";
 import InventoryPage from "./inventory/page";
 import CashDetailsPage from "./cash_details/page";
 interface Page {
-  title: string;
+  title: string; // Thay name thành title
   component: React.ReactNode;
 }
-interface IProps { }
+interface IProps {}
 const DepositFundPage: React.FC<IProps> = () => {
   const pages: Page[] = [
     { title: "Lập phiếu thu chi", component: <ReceiptAndPaymentSlipPage /> },
-    { title: "Kiểm kê", component: <InventoryPage /> },
-    { title: "Sổ chi tiết tiền mặt", component: <CashDetailsPage /> },
+    { title: "Đối chiếu", component: <ComparePage /> },
+    { title: "Sổ chi tiết tiền gửi", component: <TransferDetailsPage /> },
   ];
 
   // State để theo dõi nội dung trang đang được hiển thị
@@ -23,6 +28,7 @@ const DepositFundPage: React.FC<IProps> = () => {
   const handlePageChange = (pageTitle: string) => {
     setActivePage(pageTitle);
   };
+
   return (
     <div>
       {/* start Toolbar Top */}
@@ -36,13 +42,14 @@ const DepositFundPage: React.FC<IProps> = () => {
                 className={`toolbar-top-type_item ${activePage === page.title ? "active" : ""
                   }`}
               >
-                {page.title}
+                {page.title} 
               </div>
             ))}
           </div>
         </div>
       </div>
       {/* end Toolbar Top */}
+
       {/* Nội dung thay đổi dựa trên activePage */}
       <div>
         {pages.find((page) => page.title === activePage)?.component}{" "}
@@ -52,4 +59,4 @@ const DepositFundPage: React.FC<IProps> = () => {
   );
 };
 
-export default DepositFundPage;
+export default CashFundPage;
