@@ -52,9 +52,7 @@ const AddInventoryPage: NextPage<Props> = ({}) => {
               Thông tin chung
             </h2>
             <select className="custom-select btn mb-4">
-              <option value="" selected>
-                Tìm kiếm khách hàng...
-              </option>
+              <option value="">Tìm kiếm khách hàng...</option>
               <option value="">Cristiano Ronado</option>
               <option value="">Nguyễn Văn A</option>
               <option value="">Lê Thi B</option>
@@ -69,9 +67,7 @@ const AddInventoryPage: NextPage<Props> = ({}) => {
             <div className="flex items-center gap-3 mb-4">
               <span>Nội dung chi</span>
               <select className="btn flex-1">
-                <option value="" selected>
-                  Nội dung...
-                </option>
+                <option value="">Nội dung...</option>
                 <option value="">Chi từ phòng</option>
                 <optgroup label="Dịch vụ sinh hoạt">
                   <option value="">--Điện</option>
@@ -129,15 +125,11 @@ const AddInventoryPage: NextPage<Props> = ({}) => {
             <div className="center !justify-between mb-4 ml-3">
               <label>Phiếu chi tiền</label>
               <select className="btn !w-auto">
-                <option value="" selected>
-                  Chi khác
-                </option>
+                <option value="">Chi khác</option>
               </select>
             </div>
             <select className="custom-select btn mb-4">
-              <option value="" selected>
-                Tìm kiếm nhân viên...
-              </option>
+              <option value="">Tìm kiếm nhân viên...</option>
               <option value="">Mạnh Thông</option>
               <option value="">Đình Hoài</option>
               <option value="">Ngọc Quang</option>
@@ -229,9 +221,7 @@ const AddInventoryPage: NextPage<Props> = ({}) => {
               <td className="p-2">
                 <div className="flex gap-2">
                   <select className="btn !w-auto">
-                    <option value="" selected>
-                      VND
-                    </option>
+                    <option value="">VND</option>
                   </select>
                   <div className="flex-1">
                     <input

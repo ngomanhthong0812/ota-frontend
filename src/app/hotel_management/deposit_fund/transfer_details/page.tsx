@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import { parseCookies } from "nookies";
 import { useState } from "react";
 import useSWR from "swr";
 
@@ -16,14 +17,14 @@ interface Transaction {
   ReceiverName: string;
   ReceiverAccount: string;
 }
-
+const cookies = parseCookies();
+const token = cookies.access_token;
 const TransferDetailsPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
   const fetcher = (url: string) =>
     fetch(url, {
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     })
@@ -35,12 +36,13 @@ const TransferDetailsPage: React.FC = ({}) => {
         console.error("Fetch error:", error);
       });
   const { data, error } = useSWR(
-    `http://localhost:8080/api/transaction/details/bank?page=${page}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/details/bank?page=${page}`,
     fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
+      refreshInterval: 1000,
     }
   );
 

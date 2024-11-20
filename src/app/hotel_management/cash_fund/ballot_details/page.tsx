@@ -2,14 +2,13 @@ import { NextPage } from "next";
 
 interface Props {}
 
-const AddPaymentSlipPage: NextPage<Props> = ({}) => {
+const AddInventoryPage: NextPage<Props> = ({}) => {
   return (
     <div>
-      {/* <!-- start Toolbar Top --> */}
       <div className="toolbar-top pb-2 flex items-center justify-between text-xs">
         <div className="flex items-center justify-between px-3 w-full rounded-md">
           <h1 className="text-base font-[600] flex items-center gap-1">
-            Phiếu chi tiền mặt
+            Phiếu chi tiền gửi
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 576 512"
@@ -32,8 +31,6 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
           </button>
         </div>
       </div>
-      {/* <!-- end Toolbar Top --> */}
-
       {/* <!-- start Body Content --> */}
       <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex items-center gap-1 pb-3">
@@ -55,9 +52,7 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
               Thông tin chung
             </h2>
             <select className="custom-select btn mb-4">
-              <option value="" selected>
-                Tìm kiếm khách hàng...
-              </option>
+              <option value="">Tìm kiếm khách hàng...</option>
               <option value="">Cristiano Ronado</option>
               <option value="">Nguyễn Văn A</option>
               <option value="">Lê Thi B</option>
@@ -69,12 +64,10 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
             <p className="text-[#b2b2b2] border-b border-dashed border-[var(--ht-neutral-100-)] py-1 mb-8 ml-3">
               Địa chị
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-4">
               <span>Nội dung chi</span>
               <select className="btn flex-1">
-                <option value="" selected>
-                  Nội dung...
-                </option>
+                <option value="">Nội dung...</option>
                 <option value="">Chi từ phòng</option>
                 <optgroup label="Dịch vụ sinh hoạt">
                   <option value="">--Điện</option>
@@ -109,6 +102,12 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
                 />
               </div>
             </div>
+            <div className="flex items-center">
+              <label>Tài khoản ngân hàng</label>
+              <select className="btn !py-1 !px-2 !w-auto ml-2 max-w-[350px]">
+                <option>MB - NGO MANH THONG(483920584311111)</option>
+              </select>
+            </div>
           </div>
           <div className="flex-1 p-2 pb-5 border-x border-b border-[var(--ht-neutral-100-)] rounded-md lg:mt-0 md:mt-3">
             <h2 className="uppercase font-[500] text-[13px] border-b !border-[var(--ht-neutral-100-)] pb-2 mb-2">
@@ -126,20 +125,23 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
             <div className="center !justify-between mb-4 ml-3">
               <label>Phiếu chi tiền</label>
               <select className="btn !w-auto">
-                <option value="" selected>
-                  Chi khác
-                </option>
+                <option value="">Chi khác</option>
               </select>
             </div>
             <select className="custom-select btn mb-4">
-              <option value="" selected>
-                Tìm kiếm nhân viên...
-              </option>
+              <option value="">Tìm kiếm nhân viên...</option>
               <option value="">Mạnh Thông</option>
               <option value="">Đình Hoài</option>
               <option value="">Ngọc Quang</option>
               <option value="">Bảo nguyên</option>
             </select>
+            <div className="flex-1">
+              <input
+                type="text"
+                className="p-2 w-full border-b outline-none focus:!border-[var(--room-empty-color-)]"
+                placeholder="Số tài khoản người nhận"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -183,9 +185,9 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
                     >
                       <path
                         stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M5 12h14m-7 7V5"
                       ></path>
                     </svg>
@@ -200,9 +202,9 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
                     >
                       <path
                         stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M5 12h14m-7 7V5"
                       ></path>
                     </svg>
@@ -219,9 +221,7 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
               <td className="p-2">
                 <div className="flex gap-2">
                   <select className="btn !w-auto">
-                    <option value="" selected>
-                      VND
-                    </option>
+                    <option value="">VND</option>
                   </select>
                   <div className="flex-1">
                     <input
@@ -246,4 +246,4 @@ const AddPaymentSlipPage: NextPage<Props> = ({}) => {
   );
 };
 
-export default AddPaymentSlipPage;
+export default AddInventoryPage;

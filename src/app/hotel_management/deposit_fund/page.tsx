@@ -1,14 +1,9 @@
 "use client";
 import { useState } from "react";
-import ReceiptAndPaymentSlipPage from "./receipt_and_payment_slip/page";
+import ReceiptAndPaymentSlipPage from "./receipt-and-payment-slip/page";
 import ComparePage from "./compare/page";
 import TransferDetailsPage from "./transfer_details/page";
 
-interface IProps {}
-
-import ReceiptAndPaymentSlipPage from "../deposit-fund/receipt-and-payment-slip/page";
-import InventoryPage from "./inventory/page";
-import CashDetailsPage from "./cash_details/page";
 interface Page {
   title: string; // Thay name thành title
   component: React.ReactNode;
@@ -39,10 +34,11 @@ const DepositFundPage: React.FC<IProps> = () => {
               <div
                 key={page.title}
                 onClick={() => handlePageChange(page.title)}
-                className={`toolbar-top-type_item ${activePage === page.title ? "active" : ""
-                  }`}
+                className={`toolbar-top-type_item ${
+                  activePage === page.title ? "active" : ""
+                }`}
               >
-                {page.title} 
+                {page.title}
               </div>
             ))}
           </div>
@@ -59,4 +55,4 @@ const DepositFundPage: React.FC<IProps> = () => {
   );
 };
 
-export default CashFundPage;
+export default DepositFundPage;
