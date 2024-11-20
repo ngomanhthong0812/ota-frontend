@@ -1,22 +1,19 @@
 "use client";
 import { useState } from "react";
-import ReceiptAndPaymentSlipPage from "./receipt-and-payment-slip/page";
-import ComparePage from "./compare/page";
-import TransferDetailsPage from "./transfer-details/page";
 
-interface IProps {}
-
+import ReceiptAndPaymentSlipPage from "./receipt_and_payment_slip/page";
+import InventoryPage from "./inventory/page";
+import CashDetailsPage from "./cash_details/page";
 interface Page {
-  title: string; // Thay name thành title
+  title: string;
   component: React.ReactNode;
 }
-
-const CashFundPage: React.FC<IProps> = () => {
-  // Mảng chứa tất cả các trang, giúp việc mở rộng dễ dàng hơn
+interface IProps {}
+const DepositFundPage: React.FC<IProps> = () => {
   const pages: Page[] = [
     { title: "Lập phiếu thu chi", component: <ReceiptAndPaymentSlipPage /> },
-    { title: "Đối chiếu", component: <ComparePage /> },
-    { title: "Sổ chi tiết tiền gửi", component: <TransferDetailsPage /> },
+    { title: "Kiểm kê", component: <InventoryPage /> },
+    { title: "Sổ chi tiết tiền mặt", component: <CashDetailsPage /> },
   ];
 
   // State để theo dõi nội dung trang đang được hiển thị
@@ -26,7 +23,6 @@ const CashFundPage: React.FC<IProps> = () => {
   const handlePageChange = (pageTitle: string) => {
     setActivePage(pageTitle);
   };
-
   return (
     <div>
       {/* start Toolbar Top */}
@@ -41,14 +37,13 @@ const CashFundPage: React.FC<IProps> = () => {
                   activePage === page.title ? "active" : ""
                 }`}
               >
-                {page.title} {/* Thay name bằng title */}
+                {page.title}
               </div>
             ))}
           </div>
         </div>
       </div>
       {/* end Toolbar Top */}
-
       {/* Nội dung thay đổi dựa trên activePage */}
       <div>
         {pages.find((page) => page.title === activePage)?.component}{" "}
@@ -58,4 +53,4 @@ const CashFundPage: React.FC<IProps> = () => {
   );
 };
 
-export default CashFundPage;
+export default DepositFundPage;

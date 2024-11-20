@@ -1,8 +1,65 @@
 import { NextPage } from "next";
+import { useState } from "react";
+import useSWR from "swr";
 
-interface Props {}
+interface Transaction {
+  id: number;
+  ExpenseVoucherCode: string;
+  ExpenseAmount: number;
+  IncomeAmount: number;
+  IncomeVoucherCode: string;
+  TransactionType: string;
+  CreatedBy: string;
+  Date: Date;
+  type: string;
+  content: number;
+  ReceiverName: string;
+  ReceiverAccount: string;
+}
 
-const TransferDetailsPage: NextPage<Props> = ({}) => {
+const TransferDetailsPage: React.FC = ({}) => {
+  const [page, setPage] = useState(1);
+  const fetcher = (url: string) =>
+    fetch(url, {
+      headers: {
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        return res.json();
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      });
+  const { data, error } = useSWR(
+    `http://localhost:8080/api/transaction/details/bank?page=${page}`,
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  if (error) {
+    console.error("Error fetching data:", error);
+    return <div>Error loading data...</div>;
+  }
+
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
+  const tableData: Transaction[] = data?.data.transactions;
+  const totalPages = data?.data.totalPages;
+  const totalIncome = data?.data.totalIncome;
+  const totalExpense = data?.data.totalExpense;
+  console.log(totalPages);
+
+  const formatter = new Intl.NumberFormat("en-US");
   return (
     <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
       <div className="flex justify-between">
@@ -55,6 +112,7 @@ const TransferDetailsPage: NextPage<Props> = ({}) => {
           Xuất file excel
         </button>
       </div>
+
       <table className="w-full rounded-t-[3px] overflow-hidden mt-3">
         <thead className="relative border border-[var(--ht-neutral-100-)] font-[500] text-[var(--color-menu-icon-)]">
           <tr className="bg-[var(--ht-neutral-100-)]">
@@ -69,53 +127,54 @@ const TransferDetailsPage: NextPage<Props> = ({}) => {
           </tr>
         </thead>
         <tbody className="text-[14px]">
-          <tr className="group border-b !border-[var(--ht-neutral-100-)]">
-            <td className="p-2">1</td>
-            <td className="p-2">08/04/2024 08:29:10</td>
-            <td>
-              <a
-                href="./add_receipt.html"
-                className="p-2 text-[var(--room-empty-color-)]"
-              >
-                PTTG01
-              </a>
-            </td>
-            <td className="p-2"></td>
-            <td className="p-2">Nhập quỹ tiền gửi</td>
-            <td className="p-2 border-x !border-[var(--ht-neutral-100-)] text-center">
-              500,000
-            </td>
-            <td className="p-2 border-x !border-[var(--ht-neutral-100-)] text-center">
-              0
-            </td>
-            <td className="p-2 text-center">thonngo@123</td>
-          </tr>
-          <tr className="group border-b !border-[var(--ht-neutral-100-)]">
-            <td className="p-2">2</td>
-            <td className="p-2">08/04/2024 08:29:10</td>
-            <td className="p-2"></td>
-            <td>
-              <a
-                href="./add_payment_slip.html"
-                className="p-2 text-[var(--room-out-of-service-color-)]"
-              >
-                PCTG01
-              </a>
-            </td>
-            <td className="p-2">Kết chuyển tiền</td>
-            <td className="p-2 border-x border-[var(--ht-neutral-100-)] text-center">
-              0
-            </td>
-            <td className="p-2 border-x border-[var(--ht-neutral-100-)] text-center">
-              5,000,000
-            </td>
-            <td className="p-2 text-center">thonngo@123</td>
-          </tr>
+          {tableData.map((transaction, index) => (
+            <tr
+              key={index}
+              className="group border-b !border-[var(--ht-neutral-100-)]"
+            >
+              <td className="p-2">{index + 1}</td>
+              <td className="p-2">
+                {new Date(transaction.Date).toLocaleDateString()}{" "}
+                {new Date(transaction.Date).toLocaleTimeString()}
+              </td>
+              <td>
+                <a
+                  href="./add_receipt.html"
+                  className="p-2 text-[var(--room-empty-color-)]"
+                >
+                  {transaction.IncomeVoucherCode}
+                </a>
+              </td>
+              <td>
+                <a
+                  href="./add_payment_slip.html"
+                  className="p-2 text-[var(--room-out-of-service-color-)]"
+                >
+                  {transaction.ExpenseVoucherCode}
+                </a>
+              </td>
+
+              <td className="p-2">{transaction.content}</td>
+              <td className="p-2 border-x !border-[var(--ht-neutral-100-)] text-center">
+                {formatter.format(transaction.IncomeAmount)}
+              </td>
+              <td className="p-2 border-x !border-[var(--ht-neutral-100-)] text-center">
+                {formatter.format(transaction.ExpenseAmount)}
+              </td>
+              <td className="p-2 text-center">{transaction.CreatedBy}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
       <div className="pagination center !justify-end p-4 gap-3">
-        <span>1-10 trên 15</span>
-        <div className="group center border p-[7px] rounded-[3px] cursor-pointer duration-75 hover:bg-[var(--room-empty-color-)]">
+        <span>
+          1-{totalPages} trên {page}
+        </span>
+        <button
+          onClick={() => setPage(page > 1 ? page - 1 : 1)}
+          disabled={page === 1}
+          className="group center border p-[7px] rounded-[3px] cursor-pointer duration-75 hover:bg-[var(--room-empty-color-)]"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 320 512"
@@ -125,8 +184,12 @@ const TransferDetailsPage: NextPage<Props> = ({}) => {
             {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
             <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z" />
           </svg>
-        </div>
-        <div className="group center border p-[7px] rounded-[3px] cursor-pointer duration-75 hover:bg-[var(--room-empty-color-)]">
+        </button>
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages}
+          className="group center border p-[7px] rounded-[3px] cursor-pointer duration-75 hover:bg-[var(--room-empty-color-)]"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 320 512"
@@ -135,7 +198,7 @@ const TransferDetailsPage: NextPage<Props> = ({}) => {
             {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
             <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z" />
           </svg>
-        </div>
+        </button>
       </div>
       <div className="total flex justify-end py-2 border-t border-[var(--ht-neutral-100-)]">
         <div className="w-[450px]">
@@ -143,13 +206,16 @@ const TransferDetailsPage: NextPage<Props> = ({}) => {
             <span>I. Số dư đầu kỳ ngày:</span>VND 11,105,350
           </p>
           <p className="flex items-center justify-between font-[500] p-1">
-            <span>II. Tổng tiền thu đối chiếu trong kỳ:</span>VND 500,000
+            <span>II. Tổng tiền thu đối chiếu trong kỳ:</span>VND{" "}
+            {formatter.format(totalIncome)}
           </p>
           <p className="flex items-center justify-between font-[500] p-1">
-            <span>III. Tổng tiền chi đối chiếu trong kỳ:</span>VND 5,000,000
+            <span>III. Tổng tiền chi đối chiếu trong kỳ:</span>VND{" "}
+            {formatter.format(totalExpense)}
           </p>
           <p className="flex items-center justify-between font-[500] p-1">
-            <span>Cuối kỳ (I+II-III)</span>VND 6,605,350
+            <span>Cuối kỳ (I+II-III)</span>VND{" "}
+            {formatter.format(totalIncome - totalExpense)}
           </p>
         </div>
       </div>

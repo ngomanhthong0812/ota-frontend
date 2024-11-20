@@ -24,14 +24,14 @@ const tableData: Transaction[] = [
     description: "Kiểm kê",
   },
 ];
-const InventoryPage: NextPage<Props> = ({}) => {
+const InventoryPage: React.FC = ({}) => {
   return (
     <div>
       {/* <!-- start Body Content --> */}
       <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex items-center justify-end gap-8">
           <a
-            href="/hotel-management/deposit-fund/add-inventory"
+            href="/hotel-management/cash-fund/add_inventory"
             className="sbm !p-[6px] uppercase bg-[var(--room-empty-color-)] !text-white !text-xs hover:bg-[var(--room-empty-color-hover-)]"
           >
             <svg
