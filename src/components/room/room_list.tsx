@@ -5,10 +5,16 @@ import RoomCard from "./room_card";
 import { useEffect, useState } from 'react';
 import { Floor, TypeRoomCard } from '@/types/backend';
 import { useToolbar } from '@/context/toolbarContext';
-import { useAuth } from '@/context/authContext';
 import { parseCookies } from 'nookies';
+import { ROOM_STATUS } from '@/constants/hotel_room-status';
 
 interface IProps { }
+
+const ROOM_BOOKINGS = {
+    EMPTY_ROOM: "Phòng trống",
+    OUT_TODAY: "Khách đi hôm nay",
+    GUESTS_STAYING_OVER: "Khách ở qua ngày",
+}
 
 const fetcher = (url: string, token: string | null) =>
     fetch(url,
@@ -22,6 +28,12 @@ const fetcher = (url: string, token: string | null) =>
 const RoomList: React.FC<IProps> = () => {
     const [floors, setFloors] = useState<Floor[]>();
     const [categories, setCategories] = useState<string[]>();
+    const [roomBookings, setRoomBookings] = useState<string[]>([
+        ROOM_BOOKINGS.EMPTY_ROOM,
+        ROOM_BOOKINGS.OUT_TODAY,
+        ROOM_BOOKINGS.GUESTS_STAYING_OVER
+    ]);
+
     const { selectedToolbar } = useToolbar();
 
     const cookies = parseCookies();
@@ -71,6 +83,11 @@ const RoomList: React.FC<IProps> = () => {
 
     return (
         <div>
+            {selectedToolbar === 'Đặt phòng'
+                && roomBookings?.map((roomBooking, index) => (
+                    <RoomBookingSection key={roomBooking + index} roomBooking={roomBooking} data={data?.data || []} />
+                ))
+            }
             {selectedToolbar === 'Tầng'
                 && floors?.map((floor) => (
                     <FloorSection key={floor.id} floor={floor} data={data?.data || []} />
@@ -78,7 +95,7 @@ const RoomList: React.FC<IProps> = () => {
             }
             {selectedToolbar === 'Loại'
                 && categories?.map((category, index) => (
-                    <CategoriesSection key={index} category={category} data={data?.data || []} />
+                    <CategoriesSection key={category + index} category={category} data={data?.data || []} />
                 ))
             }
             {selectedToolbar === 'Phòng'
@@ -87,6 +104,61 @@ const RoomList: React.FC<IProps> = () => {
         </div>
     )
 }
+
+interface RoomBookingSectionProps {
+    roomBooking: string;
+    data: TypeRoomCard[];
+}
+
+const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, data }) => {
+    const [newData, setNewData] = useState<TypeRoomCard[]>(data);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    useEffect(() => {
+        let dataFilter: TypeRoomCard[] = [];
+        if (roomBooking === ROOM_BOOKINGS.EMPTY_ROOM) {
+            dataFilter = newData.filter(item => item.status === ROOM_STATUS.EMPTY);
+        }
+        if (roomBooking === ROOM_BOOKINGS.OUT_TODAY) {
+            dataFilter = newData.filter(item => {
+                const checkOutDate = new Date(item.bookings?.[0]?.check_out_at);
+                checkOutDate.setHours(0, 0, 0, 0); // Set giờ về 00:00 để chỉ so sánh ngày
+                return checkOutDate.getTime() === today.getTime();
+            })
+        }
+        if (roomBooking === ROOM_BOOKINGS.GUESTS_STAYING_OVER) {
+            dataFilter = newData.filter(item => {
+                const checkOutDate = new Date(item.bookings?.[0]?.check_out_at);
+                checkOutDate.setHours(0, 0, 0, 0); // Set giờ về 00:00 để chỉ so sánh ngày
+                return checkOutDate.getTime() > today.getTime();
+            })
+        }
+        setNewData(dataFilter);
+    }, [])
+    return (
+        <section>
+            <div className="body_content-title flex gap-3">
+                <h3 className="text-lg font-[500] text-black">{roomBooking}
+                    <span className="font-[500] text-[var(--color-menu-icon-)]">
+                        ({newData.length})
+                    </span>
+                </h3>
+                <span className="body_content-line relative flex-1"></span>
+            </div>
+            <div
+                className="body_content-room grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 py-3 gap-3">
+                {newData.map((item: TypeRoomCard) => (
+                    <div key={item.id}>
+                        <RoomCard data={item} />
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+};
+
 
 interface FloorSectionProps {
     floor: Floor;

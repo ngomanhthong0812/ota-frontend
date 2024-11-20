@@ -96,8 +96,9 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
         const dateCheckIn = new Date(check_in_at);
         const dateCheckOut = new Date(check_out_at);
 
-        const formattedDateCheckIn = `${(dateCheckIn.getMonth() + 1).toString().padStart(2, '0')}/${dateCheckIn.getDay().toString().padStart(2, '0')}  ${dateCheckIn.getHours().toString().padStart(2, '0')}:${dateCheckIn.getMinutes().toString().padStart(2, '0')}`
-        const formattedDateCheckOut = `${(dateCheckOut.getMonth() + 1).toString().padStart(2, '0')}/${dateCheckOut.getDay().toString().padStart(2, '0')}  ${dateCheckOut.getHours().toString().padStart(2, '0')}:${dateCheckOut.getMinutes().toString().padStart(2, '0')}`
+        // Định dạng ngày tháng giờ (không có năm)
+        const formattedDateCheckIn = `${(dateCheckIn.getMonth() + 1).toString().padStart(2, '0')}/${dateCheckIn.getDate().toString().padStart(2, '0')} ${dateCheckIn.getHours().toString().padStart(2, '0')}:${dateCheckIn.getMinutes().toString().padStart(2, '0')}`;
+        const formattedDateCheckOut = `${(dateCheckOut.getMonth() + 1).toString().padStart(2, '0')}/${dateCheckOut.getDate().toString().padStart(2, '0')} ${dateCheckOut.getHours().toString().padStart(2, '0')}:${dateCheckOut.getMinutes().toString().padStart(2, '0')}`;
 
         return formattedDateCheckIn + ' - ' + formattedDateCheckOut;
     }
