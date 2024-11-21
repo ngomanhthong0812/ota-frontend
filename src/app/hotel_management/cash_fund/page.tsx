@@ -2,8 +2,9 @@
 import { useState } from "react";
 
 import ReceiptAndPaymentSlipPage from "./receipt_and_payment_slip/page";
-import InventoryPage from "./inventory/page";
 import CashDetailsPage from "./cash_details/page";
+import ComparePage from "./compare/page";
+
 interface Page {
   title: string;
   component: React.ReactNode;
@@ -12,7 +13,7 @@ interface IProps {}
 const DepositFundPage: React.FC<IProps> = () => {
   const pages: Page[] = [
     { title: "Lập phiếu thu chi", component: <ReceiptAndPaymentSlipPage /> },
-    { title: "Kiểm kê", component: <InventoryPage /> },
+    { title: "Kiểm kê", component: <ComparePage /> },
     { title: "Sổ chi tiết tiền mặt", component: <CashDetailsPage /> },
   ];
 

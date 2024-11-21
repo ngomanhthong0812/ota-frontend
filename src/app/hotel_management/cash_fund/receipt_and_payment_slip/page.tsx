@@ -1,8 +1,8 @@
 import axios from "axios";
 import Link from "next/link";
+import { parseCookies } from "nookies";
 import { useState } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
-import { MdDeleteForever, MdOutlineDeleteForever } from "react-icons/md";
 import useSWR from "swr";
 
 interface Transaction {
@@ -17,32 +17,39 @@ interface Transaction {
   updated_at: string;
   type: string;
   hotel_id: number;
+  transactionType: string;
 }
-
+const cookies = parseCookies();
+const token = cookies.access_token;
+const fetcher = (url: string) =>
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      console.log(res);
+      return res.json();
+    })
+    .catch((error) => {
+      console.error("Fetch error:", error);
+    });
 const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
-  const fetcher = (url: string) =>
-    fetch(url, {
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        console.log(res);
-        return res.json();
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [transactionType, setTransactionType] = useState("");
+  const [timeFilter, setTimeFilter] = useState(""); // Lọc theo thời gian
+
   const { data, error, isLoading, mutate } = useSWR(
-    `http://localhost:8080/api/transaction/cash?page=${page}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/cash?page=${page}`,
     fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
+      refreshInterval: 1000,
     }
   );
 
@@ -57,18 +64,75 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
 
   const tableData: Transaction[] = data?.data.transactions;
   const totalPages = data?.data.totalPages;
-  console.log(totalPages);
+  // Hàm xử lý lọc theo các khoảng thời gian
+  const getFilteredDateRange = (filter: string) => {
+    const now = new Date();
+    let start: Date | null = null;
+    let end: Date | null = null;
 
+    switch (filter) {
+      case "today":
+        start = new Date(now.setHours(0, 0, 0, 0));
+        end = new Date(now.setHours(23, 59, 59, 999));
+        break;
+      case "week":
+        const dayOfWeek = now.getDay();
+        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Tính từ thứ 2
+        start = new Date(now.setDate(now.getDate() + diffToMonday));
+        end = new Date(now.setDate(start.getDate() + 6)); // Tính cuối tuần (Chủ Nhật)
+        break;
+      case "this-month":
+        start = new Date(now.getFullYear(), now.getMonth(), 1); // Đầu tháng
+        end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Cuối tháng
+        break;
+      case "last-month":
+        start = new Date(now.getFullYear(), now.getMonth() - 1, 1); // Đầu tháng trước
+        end = new Date(now.getFullYear(), now.getMonth(), 0); // Cuối tháng trước
+        break;
+      case "quarter":
+        const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+        start = new Date(now.getFullYear(), quarterStartMonth, 1); // Đầu quý
+        end = new Date(now.getFullYear(), quarterStartMonth + 3, 0); // Cuối quý
+        break;
+      default:
+        return { start: null, end: null };
+    }
+
+    return { start, end };
+  };
+
+  // Lọc dữ liệu theo ngày và loại giao dịch
+  const filteredData = tableData.filter((transaction) => {
+    const { start, end } = getFilteredDateRange(timeFilter);
+    const transactionDate = new Date(transaction.created_at);
+
+    const matchesTimeRange =
+      (!start || transactionDate >= start) && (!end || transactionDate <= end);
+
+    const matchesType =
+      !transactionType || transaction.type === transactionType;
+
+    const matchesStartDate =
+      !startDate || transactionDate >= new Date(startDate);
+    const matchesEndDate = !endDate || transactionDate <= new Date(endDate);
+
+    return (
+      matchesType && matchesTimeRange && matchesStartDate && matchesEndDate
+    );
+  });
+  //-------------------------------------------------------------------
   const formatter = new Intl.NumberFormat("en-US");
   const deleteTransaction = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:8080/api/transaction/${id}`, {
-        headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       console.log(`xóa thành công ${id}`);
       mutate();
     } catch (error) {
@@ -81,7 +145,10 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
       {/* <!-- start Body Content --> */}
       <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex items-center gap-8">
-          <select className="btn !py-1 !px-2 !w-auto">
+          <select
+            onChange={(e) => setTimeFilter(e.target.value)}
+            className="btn !py-1 !px-2 !w-auto"
+          >
             <option value="today">Hôm nay</option>
             <option value="week">Tuần này</option>
             <option value="this-month">Tháng này</option>
@@ -94,6 +161,8 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               type="date"
               id="start-date"
               className="btn !py-1 !px-2 !w-auto ml-2"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
             />
             {/* <!-- Lấy thời gian hiện tại làm mặt định qua js --> */}
           </div>
@@ -103,12 +172,18 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               type="date"
               id="end-date"
               className="btn !py-1 !px-2 !w-auto ml-2"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
             />
             {/* <!-- Lấy thời gian hiện tại làm mặt định qua js--> */}
           </div>
-          <select className="btn !py-1 !px-2 !w-auto">
-            <option>Phiếu thu tiền</option>
-            <option>Phiếu chi tiền</option>
+          <select
+            className="btn !py-1 !px-2 !w-auto"
+            onChange={(e) => setTransactionType(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="income">Phiếu thu tiền</option>
+            <option value="expense">Phiếu chi tiền</option>
           </select>
           <button className="sbm group">
             <svg
@@ -182,8 +257,8 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               </td>
               <td className="w-[100px] absolute top-[50%] right-0 translate-y-[-50%]">
                 <div className="flex gap-1 p-1">
-                  <a
-                    href="/hotel-management/cash-fund/add_receipt"
+                  <Link
+                    href="/hotel_management/cash_fund/add_receipt"
                     className="btn-receipt btn !flex items-center justify-center !bg-[var(--room-empty-color-)] !text-white border-none"
                   >
                     <svg
@@ -201,9 +276,9 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                         d="M5 12h14m-7 7V5"
                       ></path>
                     </svg>
-                  </a>
-                  <a
-                    href="/hotel-management/cash-fund/add_ayment_slip"
+                  </Link>
+                  <Link
+                    href="/hotel_management/cash_fund/add_payment_slip"
                     className="btn-payment-slip btn !flex items-center justify-center !bg-[var(--room-out-of-service-color-)] !text-white border-none"
                   >
                     <svg
@@ -221,13 +296,13 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                         d="M5 12h14m-7 7V5"
                       ></path>
                     </svg>
-                  </a>
+                  </Link>
                 </div>
               </td>
             </tr>
           </thead>
           <tbody className="text-[14px]">
-            {tableData.map((transaction, index) => (
+            {filteredData.map((transaction, index) => (
               <tr
                 key={index}
                 className="group border-b !border-[var(--ht-neutral-100-)]"
@@ -247,7 +322,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                   <div className="flex">
                     <div className="flex invisible duration-75 group-hover:visible">
                       <Link
-                        href={`/hotel-management/cash-fund/single/?id=${transaction.id}`}
+                        href={`/hotel_management/cash_fund/ballot_details/${transaction.id}`}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
