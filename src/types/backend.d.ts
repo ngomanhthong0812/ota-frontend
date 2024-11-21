@@ -42,3 +42,32 @@ interface Bookings {
     check_out_at: string,
     status: string,
 }
+interface User {
+    id: number,
+    email: string,
+    name: string,
+    hotel_id: number,
+    isActive: boolean,
+}
+
+interface Category {
+    id: number,
+    name: string,
+    description: string,
+    hotel_id: number,
+}
+
+interface Services {
+    id: number,
+    name: string,
+    description: string,
+    unit_price: number,
+    category: Category
+}
+
+interface SelectedServiceType {
+    id: number,
+    name: string,
+    unit_price: number,
+    quantity: number,
+}

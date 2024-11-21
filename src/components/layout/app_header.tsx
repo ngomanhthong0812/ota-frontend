@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from "@/context/authContext";
+import { useAuth } from "@/context/auth.context";
 import Link from "next/link";
 import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";

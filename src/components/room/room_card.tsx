@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import UnusedRoomPopup from "./unused_room_popup";
-import InusedRoomPopup from "./inused-room-popup";
+import InusedRoomPopup from "./inused_room_popup";
 import { TypeRoomCard } from "@/types/backend";
 import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel_room-status";
 

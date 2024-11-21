@@ -4,17 +4,12 @@ import useSWR from 'swr';
 import RoomCard from "./room_card";
 import { useEffect, useState } from 'react';
 import { Floor, TypeRoomCard } from '@/types/backend';
-import { useToolbar } from '@/context/toolbarContext';
-import { parseCookies } from 'nookies';
+import { useToolbar } from '@/context/toolbar.context';
 import { ROOM_STATUS } from '@/constants/hotel_room-status';
+import { useAuth } from '@/context/auth.context';
+import { ROOM_BOOKINGS, TAB_ROOM_FINAL } from '@/constants/constants';
 
 interface IProps { }
-
-const ROOM_BOOKINGS = {
-    EMPTY_ROOM: "Phòng trống",
-    OUT_TODAY: "Khách đi hôm nay",
-    GUESTS_STAYING_OVER: "Khách ở qua ngày",
-}
 
 const fetcher = (url: string, token: string | null) =>
     fetch(url,
@@ -36,11 +31,10 @@ const RoomList: React.FC<IProps> = () => {
 
     const { selectedToolbar } = useToolbar();
 
-    const cookies = parseCookies();
-    const token = cookies.access_token;
+    const { user, token } = useAuth();
     const { data, error, isLoading } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday`,
-        (url) => fetcher(url, token),
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}`,
+        (url: string) => fetcher(url, token),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -83,22 +77,22 @@ const RoomList: React.FC<IProps> = () => {
 
     return (
         <div>
-            {selectedToolbar === 'Đặt phòng'
+            {selectedToolbar === TAB_ROOM_FINAL.BOOKING_ROOM
                 && roomBookings?.map((roomBooking, index) => (
                     <RoomBookingSection key={roomBooking + index} roomBooking={roomBooking} data={data?.data || []} />
                 ))
             }
-            {selectedToolbar === 'Tầng'
+            {selectedToolbar === TAB_ROOM_FINAL.FLOOR
                 && floors?.map((floor) => (
                     <FloorSection key={floor.id} floor={floor} data={data?.data || []} />
                 ))
             }
-            {selectedToolbar === 'Loại'
+            {selectedToolbar === TAB_ROOM_FINAL.CATEGORIES
                 && categories?.map((category, index) => (
                     <CategoriesSection key={category + index} category={category} data={data?.data || []} />
                 ))
             }
-            {selectedToolbar === 'Phòng'
+            {selectedToolbar === TAB_ROOM_FINAL.ROOM
                 && <RoomSection data={data?.data || []} />
             }
         </div>
@@ -136,7 +130,7 @@ const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, da
             })
         }
         setNewData(dataFilter);
-    }, [])
+    }, [roomBooking, data])
     return (
         <section>
             <div className="body_content-title flex gap-3">
@@ -149,7 +143,7 @@ const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, da
             </div>
             <div
                 className="body_content-room grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 py-3 gap-3">
-                {newData.map((item: TypeRoomCard) => (
+                {newData?.map((item: TypeRoomCard) => (
                     <div key={item.id}>
                         <RoomCard data={item} />
                     </div>

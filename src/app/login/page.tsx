@@ -7,9 +7,10 @@ import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
 import { BiSolidHotel } from "react-icons/bi";
 import { PiUsersFill } from "react-icons/pi";
 import { LiaPhoneSquareSolid } from "react-icons/lia";
-import { useAuth } from "@/context/authContext";
+import { useAuth } from "@/context/auth.context";
 import { PuffLoader } from "react-spinners";
 import DialogActive from "@/components/dialog_active";
+import { User } from "@/types/backend";
 
 interface IProps { }
 interface FormDataType {
@@ -23,7 +24,7 @@ const LoginPage: React.FC<IProps> = () => {
     const [rememberMe, setRememberMe] = useState<boolean>(true);
     const [isLoadingHotel, setIsLoadingHotel] = useState<boolean>(false);
     const [isLoadingStaff, setIsLoadingStaff] = useState<boolean>(false);
-    const [useInfo, setUserInfo] = useState<any>({});
+    const [useInfo, setUserInfo] = useState<User>();
     const [showModalActive, setShowModalActive] = useState<boolean>(false);
 
     const [formData, setFormData] = useState<FormDataType>({
@@ -61,14 +62,20 @@ const LoginPage: React.FC<IProps> = () => {
                 const responseData: any = await response.json();
                 if (response.ok) {
                     console.log("login success");
-                    setUserInfo({
+                    let newUserInfo: User;
+                    newUserInfo = {
                         id: responseData.user.id,
-                        usename: responseData.user.usename,
+                        name: responseData.user.username,
                         email: responseData.user.email,
+                        hotel_id: responseData.user.hotel_id,
                         isActive: responseData.user.isActive,
-                    });
+                    }
+                    setUserInfo(newUserInfo);
                     if (responseData.user.isActive) {
-                        saveToken(responseData.access_token, rememberMe);
+                        saveToken(
+                            responseData.access_token,
+                            rememberMe,
+                            newUserInfo);
                         router.push(url);
                     } else {
                         setShowModalActive(true);
@@ -107,7 +114,7 @@ const LoginPage: React.FC<IProps> = () => {
         <div className="relative">
             <div className="bg-login"></div>
             <div className="absolute top-0 left-0 flex flex-col items-center justify-between pt-32 pb-16 w-full h-full bg-black bg-opacity-50">
-                <DialogActive resData={{ id: useInfo.id, name: useInfo.name, email: useInfo.email }} showModalActive={showModalActive} handleSetUnModalActive={handleSetUnModalActive} />
+                <DialogActive resData={{ id: useInfo?.id, name: useInfo?.name, email: useInfo?.email }} showModalActive={showModalActive} handleSetUnModalActive={handleSetUnModalActive} />
                 <div className="form-login">
                     <form action="" className="w-[420px] bg-white py-7 px-5 rounded-t-2xl">
                         <div className="flex items-center justify-center">

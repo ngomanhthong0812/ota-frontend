@@ -142,7 +142,7 @@ const RegisterPage: React.FC<IProps> = () => {
             </div>
             <div className="w-[58%]">
                 {isRegister
-                    ? <div className="w-[60%]">
+                    ? <div className="w-full h-full flex items-center justify-center">
                         < ActiveEmail resData={resData} goToLogin={goToLogin} />
                     </div>
                     : (
@@ -313,6 +313,8 @@ export const ActiveEmail: React.FC<ActiveEmailType> = ({ resData, goToLogin }) =
     const [error, setError] = useState<string>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    console.log(resData);
+
     useEffect(() => {
         if (resendEmail) {
             const time = setInterval(() => {
@@ -385,7 +387,7 @@ export const ActiveEmail: React.FC<ActiveEmailType> = ({ resData, goToLogin }) =
     }
 
     return (
-        <div className="text-center w-full h-full m-auto px-5 flex flex-col items-center justify-center">
+        <div className="text-center px-5 flex flex-col items-center justify-center">
             <div className="mb-4">Xác thực tài khoản, vui lòng nhập mã xác nhận đã được gửi tới email!</div>
             <CustomTextField
                 label="Mã xác nhận"

@@ -1,9 +1,9 @@
 'use client'
+import { TAB_ROOM_FINAL } from "@/constants/constants";
 import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel_room-status";
-import { useAuth } from "@/context/authContext";
-import { useToolbar } from "@/context/toolbarContext";
+import { useAuth } from "@/context/auth.context";
+import { useToolbar } from "@/context/toolbar.context";
 import { RoomStatus, TypeRoomCard } from "@/types/backend";
-import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
@@ -21,12 +21,11 @@ const fetcher = (url: string, token: string | null) =>
 const ToolbarTop: React.FC<IProps> = () => {
     const [toolbarList, setToolbarList] = useState<RoomStatus[]>(HOTEL_ROOMSTATUS_NAV);
     const { selectedToolbar, handleSelectedToobar } = useToolbar();
+    const { user, token } = useAuth();
 
-    const cookies = parseCookies();
-    const token = cookies.access_token;
     const { data, error, isLoading } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday`,
-        (url) => fetcher(url, token),
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}`,
+        (url: string) => fetcher(url, token),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -58,17 +57,17 @@ const ToolbarTop: React.FC<IProps> = () => {
                 </div>
                 <div className="flex">
                     <div className="toolbar-top-type bg-[var(--ht-body-bg-)] flex rounded-3xl p-1 font-[500]">
-                        <button className={`toolbar-top-type_item ${selectedToolbar === "Đặt phòng" && "active"}`} onClick={() => handleSelectedToobar("Đặt phòng")}>
-                            Đặt phòng
+                        <button className={`toolbar-top-type_item ${selectedToolbar === TAB_ROOM_FINAL.BOOKING_ROOM && "active"}`} onClick={() => handleSelectedToobar(TAB_ROOM_FINAL.BOOKING_ROOM)}>
+                            {TAB_ROOM_FINAL.BOOKING_ROOM}
                         </button>
-                        <button className={`toolbar-top-type_item ${selectedToolbar === "Loại" && "active"}`} onClick={() => handleSelectedToobar("Loại")}>
-                            Loại
+                        <button className={`toolbar-top-type_item ${selectedToolbar === TAB_ROOM_FINAL.CATEGORIES && "active"}`} onClick={() => handleSelectedToobar(TAB_ROOM_FINAL.CATEGORIES)}>
+                            {TAB_ROOM_FINAL.CATEGORIES}
                         </button>
-                        <button className={`toolbar-top-type_item ${selectedToolbar === "Tầng" && "active"}`} onClick={() => handleSelectedToobar("Tầng")}>
-                            Tầng
+                        <button className={`toolbar-top-type_item ${selectedToolbar === TAB_ROOM_FINAL.FLOOR && "active"}`} onClick={() => handleSelectedToobar(TAB_ROOM_FINAL.FLOOR)}>
+                            {TAB_ROOM_FINAL.FLOOR}
                         </button>
-                        <button className={`toolbar-top-type_item ${selectedToolbar === "Phòng" && "active"}`} onClick={() => handleSelectedToobar("Phòng")}>
-                            Phòng
+                        <button className={`toolbar-top-type_item ${selectedToolbar === TAB_ROOM_FINAL.ROOM && "active"}`} onClick={() => handleSelectedToobar(TAB_ROOM_FINAL.ROOM)}>
+                            {TAB_ROOM_FINAL.ROOM}
                         </button>
                     </div>
                 </div>

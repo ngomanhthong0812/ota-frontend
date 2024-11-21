@@ -1,4 +1,5 @@
 'use client'
+import { TAB_ROOM_FINAL } from '@/constants/constants';
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 
 interface TypeToolbarContext {
@@ -9,7 +10,7 @@ interface TypeToolbarContext {
 const ToolbarContext = createContext<TypeToolbarContext | undefined>(undefined);
 
 export const ToolbarProvider = ({ children }: { children: ReactNode }) => {
-    const [selectedToolbar, setSelectedToolbar] = useState<string>('Đặt phòng');
+    const [selectedToolbar, setSelectedToolbar] = useState<string>(TAB_ROOM_FINAL.BOOKING_ROOM);
 
     const handleSelectedToobar = (name: string) => {
         setSelectedToolbar(name);
