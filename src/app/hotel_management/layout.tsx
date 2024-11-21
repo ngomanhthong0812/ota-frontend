@@ -1,6 +1,5 @@
 import HotelHeader from "@/components/layout/hotel_header";
 import HotelSidebar from "@/components/layout/hotel_sidebar";
-import { AuthProvider } from "@/context/auth.context";
 import { SelectedServiceProvider } from "@/context/selectedService.context";
 import { ToolbarProvider } from "@/context/toolbar.context";
 import type { Metadata } from "next";
@@ -18,21 +17,19 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <AuthProvider>
-                    <ToolbarProvider>
-                        <SelectedServiceProvider>
-                            <div>
-                                <HotelHeader />
-                                <div className="flex">
-                                    <HotelSidebar />
-                                    <main className="container-body ml-[210px] mt-[50px] w-[100%] p-3 text-sm text-[var(--color-menu-icon-)]">
-                                        {children}
-                                    </main>
-                                </div>
+                <ToolbarProvider>
+                    <SelectedServiceProvider>
+                        <div>
+                            <HotelHeader />
+                            <div className="flex">
+                                <HotelSidebar />
+                                <main className="container-body ml-[210px] mt-[50px] w-[100%] p-3 text-sm text-[var(--color-menu-icon-)]">
+                                    {children}
+                                </main>
                             </div>
-                        </SelectedServiceProvider>
-                    </ToolbarProvider>
-                </AuthProvider>
+                        </div>
+                    </SelectedServiceProvider>
+                </ToolbarProvider>
             </body>
         </html >
     )
