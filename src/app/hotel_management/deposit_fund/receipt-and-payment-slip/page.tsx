@@ -1,6 +1,7 @@
 import axios from "axios";
 import { NextPage } from "next";
 import Link from "next/link";
+import { parseCookies } from "nookies";
 import { useState } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
 import useSWR from "swr";
@@ -12,23 +13,25 @@ interface Transaction {
   date: Date;
   receiverAccount: string;
 }
+const cookies = parseCookies();
+const token = cookies.access_token;
+const fetcher = (url: string) =>
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      console.log(res);
+      return res.json();
+    })
+    .catch((error) => {
+      console.error("Fetch error:", error);
+    });
 const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
-  const fetcher = (url: string) =>
-    fetch(url, {
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        console.log(res);
-        return res.json();
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
+
   const { data, error, isLoading, mutate } = useSWR(
     `http://localhost:8080/api/transaction/bank?page=${page}`,
     fetcher,
@@ -36,6 +39,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
+      refreshInterval: 1000,
     }
   );
 

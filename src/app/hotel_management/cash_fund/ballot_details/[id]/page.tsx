@@ -82,6 +82,14 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Ngừng hành động mặc định của form
     console.log([content, note, amount, dateTime.CreatedAt, selectedUser]);
+    // Lấy giờ hiện tại
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+
+    // Ghép ngày từ state và giờ hiện tại
+    const date = `${dateTime.CreatedAt}T${hours}:${minutes}:${seconds}`;
 
     try {
       // Gửi dữ liệu khi form được submit qua API
@@ -91,6 +99,7 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
           content: content,
           note: note,
           amount: amount,
+          created_at: date,
         },
         {
           headers: {
@@ -102,7 +111,7 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
 
       // Kiểm tra phản hồi từ API
       if (response.data.statusCode === 200 || response.status === 201) {
-        console.log("Gửi update thành công");
+        console.log("Gửi update thành công", response.data);
         // Sau khi gửi thành công, điều hướng tới trang khác
         router.push("/hotel_management/cash_fund");
       }

@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { parseCookies } from "nookies";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 interface Transaction {
@@ -34,6 +34,7 @@ const CashDetailsPage: React.FC = ({}) => {
       .catch((error) => {
         console.error("Fetch error:", error);
       });
+      
   const { data, error, isLoading } = useSWR(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/details/cash?page=${page}`,
     fetcher,
@@ -41,6 +42,7 @@ const CashDetailsPage: React.FC = ({}) => {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
+      refreshInterval: 1000,
     }
   );
 

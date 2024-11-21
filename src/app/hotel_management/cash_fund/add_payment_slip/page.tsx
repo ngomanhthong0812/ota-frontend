@@ -35,6 +35,7 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
           content: reason,
           user_id: formData.creator,
           note: formData.notes,
+          created_at: formData.created_at,
           paymentType: "cash",
         },
         {
@@ -91,8 +92,18 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
         ...prevFormData,
         created_at: updatedDate, // Cập nhật chỉ trường created_at
       }));
+      console.log(formData.created_at);
+    } else if (name === "amount") {
+      // Xử lý định dạng tiền tệ
+      const numericValue = value.replace(/[^0-9]/g, ""); // Lọc số
+
+      // Cập nhật giá trị tiền vào formData, giữ lại dạng số để dễ sử dụng
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: numericValue, // Lưu trữ giá trị dạng số
+      }));
     } else {
-      // Nếu không phải trường "created_at", cập nhật các trường còn lại
+      // Cập nhật các trường còn lại
       setFormData({
         ...formData,
         [name]: value, // Cập nhật giá trị trường tương ứng
@@ -101,7 +112,7 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
   };
 
   // Formatter cho định dạng số
-  const formatter = new Intl.NumberFormat("vi-VN");
+  const formatter = new Intl.NumberFormat("en-US");
   return (
     <div>
       <form action="" onSubmit={handleSubmit}>
@@ -232,7 +243,9 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
                 <label form="start-date">Ngày chi tiền</label>
                 <input
                   name="created"
-                  value={formData.created_at}
+                  value={
+                    formData.created_at ? formData.created_at.split("T")[0] : ""
+                  }
                   onChange={handleInputChange}
                   type="date"
                   id="start-date"
@@ -345,7 +358,7 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
                     <div className="flex-1">
                       <input
                         name="amount"
-                        value={formData.amount}
+                        value={formatter.format(Number(formData.amount))}
                         onChange={handleInputChange}
                         type="text"
                         className="p-2 w-full border-b outline-none focus:!border-[var(--room-empty-color-)]"
@@ -359,7 +372,7 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
           </table>
           <div className="flex items-center justify-end py-3">
             <span className="py-1 px-2 rounded-md text-sm font-[500] bg-blue-500 !text-white">
-              Tổng VND 0
+              Tổng VND {formatter.format(Number(formData.amount))}
             </span>
           </div>
         </div>

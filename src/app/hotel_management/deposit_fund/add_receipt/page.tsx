@@ -29,6 +29,8 @@ const AddReceiptPage: React.FC<IProps> = () => {
     const reason = `${formData.content + ": " + formData.reason} `;
 
     try {
+      console.log(formData);
+      
       // Gửi dữ liệu khi form được submit qua API
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/create/income`,
@@ -38,6 +40,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
           content: reason,
           user_id: formData.creator,
           note: formData.notes,
+          created_at: formData.created_at,
           receiverAccount: formData.receiverAccount,
           paymentType: "bank",
         },
@@ -53,7 +56,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
       if (response.data.statusCode === 200 || response.status === 201) {
         console.log("Gửi thành công");
         // Sau khi gửi thành công, điều hướng tới trang khác
-        router.push("/hotel_management/cash_fund");
+        router.push("/hotel_management/deposit_fund");
       }
     } catch (error) {
       // In thông tin lỗi khi gặp sự cố
@@ -95,8 +98,18 @@ const AddReceiptPage: React.FC<IProps> = () => {
         ...prevFormData,
         created_at: updatedDate, // Cập nhật chỉ trường created_at
       }));
+      console.log(formData.created_at);
+    } else if (name === "amount") {
+      // Xử lý định dạng tiền tệ
+      const numericValue = value.replace(/[^0-9]/g, ""); // Lọc số
+
+      // Cập nhật giá trị tiền vào formData, giữ lại dạng số để dễ sử dụng
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: numericValue, // Lưu trữ giá trị dạng số
+      }));
     } else {
-      // Nếu không phải trường "created_at", cập nhật các trường còn lại
+      // Cập nhật các trường còn lại
       setFormData({
         ...formData,
         [name]: value, // Cập nhật giá trị trường tương ứng
@@ -105,7 +118,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
   };
 
   // Formatter cho định dạng số
-  const formatter = new Intl.NumberFormat("vi-VN");
+  const formatter = new Intl.NumberFormat("en-US");
 
   return (
     <div>
@@ -231,7 +244,9 @@ const AddReceiptPage: React.FC<IProps> = () => {
                 <input
                   type="date"
                   name="created"
-                  value={formData.created_at}
+                  value={
+                    formData.created_at ? formData.created_at.split("T")[0] : ""
+                  }
                   onChange={handleInputChange}
                   id="start-date"
                   className="btn !w-auto ml-2"
@@ -343,7 +358,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
                     <div className="flex-1">
                       <input
                         name="amount"
-                        value={formData.amount}
+                        value={formatter.format(Number(formData.amount))}
                         onChange={handleInputChange}
                         type="text"
                         className="p-2 w-full border-b outline-none focus:!border-[var(--room-empty-color-)]"
@@ -357,7 +372,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
           </table>
           <div className="flex items-center justify-end py-3">
             <span className="py-1 px-2 rounded-md text-sm font-[500] bg-blue-500 !text-white">
-              Tổng VND 0
+              Tổng VND {formatter.format(Number(formData.amount))}
             </span>
           </div>
         </div>

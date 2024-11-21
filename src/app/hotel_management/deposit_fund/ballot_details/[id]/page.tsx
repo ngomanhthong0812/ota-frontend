@@ -7,18 +7,7 @@ import useSWR, { Fetcher } from "swr";
 
 const cookies = parseCookies();
 const token = cookies.access_token;
-interface Transaction {
-  ID: number;
-  code: string;
-  amount: number;
-  content: string;
-  Note: string;
-  creator: string;
-  created_at: Date;
-  updated_at: string;
-  type: string;
-  hotel_id: number;
-}
+
 const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const router = useRouter();
   // Cập nhật các state để quản lý dữ liệu có thể sửa
@@ -86,7 +75,14 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Ngừng hành động mặc định của form
     console.log([content, note, amount, dateTime.CreatedAt, selectedUser]);
+    // Lấy giờ hiện tại
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
 
+    // Ghép ngày từ state và giờ hiện tại
+    const date = `${dateTime.CreatedAt}T${hours}:${minutes}:${seconds}`;
     try {
       // Gửi dữ liệu khi form được submit qua API
       const response = await axios.put(
@@ -97,6 +93,7 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
           amount: amount,
           receiverAccount,
           receiverName,
+          created_at: date,
         },
         {
           headers: {
@@ -144,8 +141,8 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
           <div className="flex items-center justify-between px-3 w-full rounded-md">
             <h1 className="text-base font-[600] flex items-center gap-1">
               {data.data.TransactionType
-                ? "Phiếu thu tiền mặt"
-                : "Phiếu chi tiền mặt"}
+                ? "Phiếu thu tiền gửi"
+                : "Phiếu chi tiền gửi"}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 576 512"

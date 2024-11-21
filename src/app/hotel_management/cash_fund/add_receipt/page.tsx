@@ -27,6 +27,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
 
     try {
       // Gửi dữ liệu khi form được submit qua API
+      console.log("data trước khi gửi: " + formData.created_at);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/create/income`,
         {
@@ -35,6 +36,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
           content: reason,
           user_id: formData.creator,
           note: formData.notes,
+          created_at: formData.created_at,
           paymentType: "cash",
         },
         {
@@ -44,7 +46,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
           },
         }
       );
-
+      console.log("data trả về : ", response.data);
       // Kiểm tra phản hồi từ API
       if (response.data.statusCode === 200 || response.status === 201) {
         console.log("Gửi thành công");
@@ -64,7 +66,6 @@ const AddReceiptPage: React.FC<IProps> = () => {
       [name]: value, // Cập nhật trường được thay đổi trong state
     }));
   };
-  // Hàm xử lý khi giá trị input thay đổi
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -91,8 +92,18 @@ const AddReceiptPage: React.FC<IProps> = () => {
         ...prevFormData,
         created_at: updatedDate, // Cập nhật chỉ trường created_at
       }));
+      console.log(formData.created_at);
+    } else if (name === "amount") {
+      // Xử lý định dạng tiền tệ
+      const numericValue = value.replace(/[^0-9]/g, ""); // Lọc số
+
+      // Cập nhật giá trị tiền vào formData, giữ lại dạng số để dễ sử dụng
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: numericValue, // Lưu trữ giá trị dạng số
+      }));
     } else {
-      // Nếu không phải trường "created_at", cập nhật các trường còn lại
+      // Cập nhật các trường còn lại
       setFormData({
         ...formData,
         [name]: value, // Cập nhật giá trị trường tương ứng
@@ -101,7 +112,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
   };
 
   // Formatter cho định dạng số
-  const formatter = new Intl.NumberFormat("vi-VN");
+  const formatter = new Intl.NumberFormat("en-US");
   return (
     <div>
       <form action="" onSubmit={handleSubmit}>
@@ -212,7 +223,9 @@ const AddReceiptPage: React.FC<IProps> = () => {
                 <label form="start-date">Ngày thu tiền</label>
                 <input
                   name="created"
-                  value={formData.created_at}
+                  value={
+                    formData.created_at ? formData.created_at.split("T")[0] : ""
+                  }
                   onChange={handleInputChange}
                   type="date"
                   id="start-date"
@@ -325,7 +338,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
                     <div className="flex-1">
                       <input
                         name="amount"
-                        value={formData.amount}
+                        value={formatter.format(Number(formData.amount))}
                         onChange={handleInputChange}
                         type="text"
                         className="p-2 w-full border-b outline-none focus:!border-[var(--room-empty-color-)]"
@@ -339,7 +352,7 @@ const AddReceiptPage: React.FC<IProps> = () => {
           </table>
           <div className="flex items-center justify-end py-3">
             <span className="py-1 px-2 rounded-md text-sm font-[500] bg-blue-500 !text-white">
-              Tổng VND 0
+              Tổng VND {formatter.format(Number(formData.amount))}
             </span>
           </div>
         </div>
