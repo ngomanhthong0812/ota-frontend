@@ -1,8 +1,8 @@
 import axios from "axios";
 import Link from "next/link";
+import { parseCookies } from "nookies";
 import { useState } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
-import { MdDeleteForever, MdOutlineDeleteForever } from "react-icons/md";
 import useSWR from "swr";
 
 interface Transaction {
@@ -18,14 +18,15 @@ interface Transaction {
   type: string;
   hotel_id: number;
 }
-
+const cookies = parseCookies();
+const token = cookies.access_token;
 const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
+
   const fetcher = (url: string) =>
     fetch(url, {
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     })
@@ -37,12 +38,13 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
         console.error("Fetch error:", error);
       });
   const { data, error, isLoading, mutate } = useSWR(
-    `http://localhost:8080/api/transaction/cash?page=${page}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/cash?page=${page}`,
     fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
+      refreshInterval: 1000,
     }
   );
 
@@ -62,13 +64,15 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const formatter = new Intl.NumberFormat("en-US");
   const deleteTransaction = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:8080/api/transaction/${id}`, {
-        headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF1YW5nY3V0ZUBnbWFpbC5jb20iLCJzdWIiOjIsImlhdCI6MTczMTk4NzU4MCwiZXhwIjoxNzMyNTkyMzgwfQ.oKWKQ4vXpDR4mGL3jMSd3nEexekI0412_aDHeKTdMro",
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       console.log(`xóa thành công ${id}`);
       mutate();
     } catch (error) {
@@ -182,8 +186,8 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               </td>
               <td className="w-[100px] absolute top-[50%] right-0 translate-y-[-50%]">
                 <div className="flex gap-1 p-1">
-                  <a
-                    href="/hotel-management/cash-fund/add_receipt"
+                  <Link
+                    href="/hotel_management/cash_fund/add_receipt"
                     className="btn-receipt btn !flex items-center justify-center !bg-[var(--room-empty-color-)] !text-white border-none"
                   >
                     <svg
@@ -201,9 +205,9 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                         d="M5 12h14m-7 7V5"
                       ></path>
                     </svg>
-                  </a>
-                  <a
-                    href="/hotel-management/cash-fund/add_ayment_slip"
+                  </Link>
+                  <Link
+                    href="/hotel_management/cash_fund/add_payment_slip"
                     className="btn-payment-slip btn !flex items-center justify-center !bg-[var(--room-out-of-service-color-)] !text-white border-none"
                   >
                     <svg
@@ -221,7 +225,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                         d="M5 12h14m-7 7V5"
                       ></path>
                     </svg>
-                  </a>
+                  </Link>
                 </div>
               </td>
             </tr>
@@ -247,7 +251,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                   <div className="flex">
                     <div className="flex invisible duration-75 group-hover:visible">
                       <Link
-                        href={`/hotel-management/cash-fund/single/?id=${transaction.id}`}
+                        href={`/hotel_management/cash_fund/ballot_details/${transaction.id}`}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

@@ -189,7 +189,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               <td className="w-[100px] absolute top-[50%] right-0 translate-y-[-50%]">
                 <div className="flex gap-1 p-1">
                   <Link
-                    href="/hotel-management/deposit-fund/add_receipt"
+                    href="/hotel_management/deposit_fund/add_receipt"
                     className="btn-receipt btn !flex items-center justify-center !bg-[var(--room-empty-color-)] !text-white border-none"
                   >
                     <svg
@@ -208,7 +208,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                     </svg>
                   </Link>
                   <Link
-                    href="/hotel-management/deposit-fund/add_inventory"
+                    href="/hotel_management/deposit_fund/add_payment_slip"
                     className="btn-payment-slip btn !flex items-center justify-center !bg-[var(--room-out-of-service-color-)] !text-white border-none"
                   >
                     <svg
@@ -256,14 +256,18 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                 <td className="p-2">
                   <div className="flex">
                     <div className="flex invisible duration-75 group-hover:visible">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        style={{ marginRight: "10px", marginTop: "2px" }}
+                      <Link
+                        href={`/hotel_management/deposit_fund/ballot_details/${transaction.id}`}
                       >
-                        {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
-                        <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z" />
-                      </svg>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 512 512"
+                          style={{ marginRight: "10px", marginTop: "2px" }}
+                        >
+                          {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
+                          <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z" />
+                        </svg>
+                      </Link>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 512 512"
