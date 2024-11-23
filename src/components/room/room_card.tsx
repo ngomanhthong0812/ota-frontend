@@ -162,7 +162,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                         }
                     </div>
                 </div>
-                <h1 className="text-[18px] font-medium text-black truncate">{data.name}</h1>
+                <h1 className="text-[18px] font-medium text-black truncate">P.{data.name}</h1>
                 {data.bookings &&
                     <div className="flex absolute bottom-3">
                         <div

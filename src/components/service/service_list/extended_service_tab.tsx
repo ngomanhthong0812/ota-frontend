@@ -1,11 +1,11 @@
-import { UseSelectedService } from "@/context/selectedService.context";
+import { useSelectedService } from "@/context/selectedService.context";
 import { SelectedServiceType } from "@/types/backend";
 import { useState } from "react";
 
 interface IProps { }
 
 const ExtendedServiceTab: React.FC<IProps> = () => {
-    const { handleAddSelectedService } = UseSelectedService();
+    const { handleAddSelectedService } = useSelectedService();
     const [service, setService] = useState<SelectedServiceType>({
         id: Math.random() * 1000,
         name: '',

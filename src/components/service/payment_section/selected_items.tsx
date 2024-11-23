@@ -1,6 +1,6 @@
 'use client'
 
-import { UseSelectedService } from "@/context/selectedService.context";
+import { useSelectedService } from "@/context/selectedService.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 import { SelectedServiceType } from "@/types/backend";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ interface IProps {
 }
 
 const SelectedItems: React.FC<IProps> = ({ data }) => {
-    const { handleDecreaseQuantityService, handleIncreaseQuantityService, handleClearSelectedService } = UseSelectedService();
+    const { handleDecreaseQuantityService, handleIncreaseQuantityService, handleClearSelectedService } = useSelectedService();
     const { formatPrice } = useFormatPriceWithCommas();
     const { formatPrice: formatPriceTotal } = useFormatPriceWithCommas();
     const [quanity, setQuantity] = useState<number>(data.quantity);

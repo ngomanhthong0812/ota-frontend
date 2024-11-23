@@ -1,4 +1,4 @@
-import { UseSelectedService } from "@/context/selectedService.context";
+import { useSelectedService } from "@/context/selectedService.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 import { Services } from "@/types/backend";
 
@@ -7,7 +7,7 @@ interface IProps {
 }
 
 const ServiceItem: React.FC<IProps> = ({ data }) => {
-    const { handleAddSelectedService } = UseSelectedService();
+    const { handleAddSelectedService } = useSelectedService();
     const { formatPrice } = useFormatPriceWithCommas();
     const selected = () => {
         handleAddSelectedService({
