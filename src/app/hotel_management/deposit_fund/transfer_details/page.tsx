@@ -45,7 +45,7 @@ const TransferDetailsPage: React.FC = ({}) => {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 1000,
+      refreshInterval: 100000,
     }
   );
 
@@ -77,13 +77,6 @@ const TransferDetailsPage: React.FC = ({}) => {
     <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
       <div className="flex justify-between">
         <div className="flex items-center gap-8">
-          {/* <select className="btn !py-1 !px-2 !w-auto">
-            <option value="today">Hôm nay</option>
-            <option value="week">Tuần này</option>
-            <option value="month">Tháng này</option>
-            <option value="month">Tháng trước</option>
-            <option value="month">Quý này</option>
-          </select> */}
           <div className="center">
             <label form="start-date">Từ</label>
             <input
