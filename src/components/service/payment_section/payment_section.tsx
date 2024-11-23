@@ -7,9 +7,9 @@ import ModalInvoiceCreationConfirmation from "../modal/modal_invoice_creation_co
 import { RequestPaymentService } from "@/types/backend";
 import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
-import useSWR from "swr";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { ClipLoader } from "react-spinners";
 
 interface IProps { }
 
@@ -17,7 +17,10 @@ const PaymentSection: React.FC<IProps> = () => {
     const router = useRouter();
     const { user, token } = useAuth();
     const { totalService, selectedService } = useSelectedService();
+
     const [showModalInvoiceCreationConfirmation, setShowModalInvoiceCreationConfirmation] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
     const [paymentInfoService, setPaymentInfoService] = useState<RequestPaymentService>({
         paymentOption: PAYMENT_OPTIONS.PAYMENT_AT_THE_COUNTER,
         currencyType: CURRENCY_TYPES.VND,
@@ -34,7 +37,6 @@ const PaymentSection: React.FC<IProps> = () => {
         created_by: user?.name || null
     });
 
-
     const handleSetUnModalInvoiceCreationConfirmation = () => {
         setShowModalInvoiceCreationConfirmation(false);
     }
@@ -49,6 +51,7 @@ const PaymentSection: React.FC<IProps> = () => {
     }
 
     const handleSubmit = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/createInvoiceService`,
                 JSON.stringify(paymentInfoService),
@@ -67,6 +70,7 @@ const PaymentSection: React.FC<IProps> = () => {
                 router.push(`sales_invoice_creation/invoice/${response.data.data.invoice_id}`);
             }
         } catch (error) {
+            setIsLoading(false);
             // In thông tin lỗi khi gặp sự cố
             console.error("Lỗi khi gửi dữ liệu:", error);
         }
@@ -119,6 +123,11 @@ const PaymentSection: React.FC<IProps> = () => {
                 handleSetUnModalInvoiceCreationConfirmation={handleSetUnModalInvoiceCreationConfirmation}
                 handleSubmit={handleSubmit}
             />
+            {isLoading
+                && <div className="fixed z-[999] bg-black bg-opacity-45 top-0 left-0 w-full h-full flex items-center justify-center">
+                    <ClipLoader size={50} color="fffff" />
+                </div>
+            }
         </div>
     )
 }
