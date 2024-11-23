@@ -40,10 +40,32 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [transactionType, setTransactionType] = useState("");
-  const [timeFilter, setTimeFilter] = useState(""); // Lọc theo thời gian
 
+  console.log("check gửi api", page, endDate, transactionType);
+
+  // Hàm xử lý khi thay đổi ngày bắt đầu
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+  };
+
+  // Hàm xử lý khi thay đổi ngày kết thúc
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+  };
+
+  // Hàm xử lý khi thay đổi loại giao dịch
+  const handleTransactionTypeChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setTransactionType(e.target.value);
+  };
+  const handleSubmit = () => {
+    console.log("Start Date:", startDate);
+    console.log("End Date:", endDate);
+    console.log("Transaction Type:", transactionType);
+  };
   const { data, error, isLoading, mutate } = useSWR(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/cash?page=${page}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/cash_fund/cash_fund?fromDate=${startDate}&toDate=${endDate}&page=${page}&type=${transactionType}`,
     fetcher,
     {
       revalidateIfStale: false,
@@ -65,61 +87,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const tableData: Transaction[] = data?.data.transactions;
   const totalPages = data?.data.totalPages;
   // Hàm xử lý lọc theo các khoảng thời gian
-  const getFilteredDateRange = (filter: string) => {
-    const now = new Date();
-    let start: Date | null = null;
-    let end: Date | null = null;
 
-    switch (filter) {
-      case "today":
-        start = new Date(now.setHours(0, 0, 0, 0));
-        end = new Date(now.setHours(23, 59, 59, 999));
-        break;
-      case "week":
-        const dayOfWeek = now.getDay();
-        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Tính từ thứ 2
-        start = new Date(now.setDate(now.getDate() + diffToMonday));
-        end = new Date(now.setDate(start.getDate() + 6)); // Tính cuối tuần (Chủ Nhật)
-        break;
-      case "this-month":
-        start = new Date(now.getFullYear(), now.getMonth(), 1); // Đầu tháng
-        end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Cuối tháng
-        break;
-      case "last-month":
-        start = new Date(now.getFullYear(), now.getMonth() - 1, 1); // Đầu tháng trước
-        end = new Date(now.getFullYear(), now.getMonth(), 0); // Cuối tháng trước
-        break;
-      case "quarter":
-        const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
-        start = new Date(now.getFullYear(), quarterStartMonth, 1); // Đầu quý
-        end = new Date(now.getFullYear(), quarterStartMonth + 3, 0); // Cuối quý
-        break;
-      default:
-        return { start: null, end: null };
-    }
-
-    return { start, end };
-  };
-
-  // Lọc dữ liệu theo ngày và loại giao dịch
-  const filteredData = tableData.filter((transaction) => {
-    const { start, end } = getFilteredDateRange(timeFilter);
-    const transactionDate = new Date(transaction.created_at);
-
-    const matchesTimeRange =
-      (!start || transactionDate >= start) && (!end || transactionDate <= end);
-
-    const matchesType =
-      !transactionType || transaction.type === transactionType;
-
-    const matchesStartDate =
-      !startDate || transactionDate >= new Date(startDate);
-    const matchesEndDate = !endDate || transactionDate <= new Date(endDate);
-
-    return (
-      matchesType && matchesTimeRange && matchesStartDate && matchesEndDate
-    );
-  });
   //-------------------------------------------------------------------
   const formatter = new Intl.NumberFormat("en-US");
   const deleteTransaction = async (id: number) => {
@@ -139,22 +107,18 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
       console.error(`Error deleting transaction ${id}:`, error);
     }
   };
-  mutate();
   return (
     <div>
       {/* <!-- start Body Content --> */}
       <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex items-center gap-8">
-          <select
-            onChange={(e) => setTimeFilter(e.target.value)}
-            className="btn !py-1 !px-2 !w-auto"
-          >
+          {/* <select className="btn !py-1 !px-2 !w-auto">
             <option value="today">Hôm nay</option>
             <option value="week">Tuần này</option>
-            <option value="this-month">Tháng này</option>
-            <option value="last-month">Tháng trước</option>
+            <option value="month">Tháng này</option>
+
             <option value="quarter">Quý này</option>
-          </select>
+          </select> */}
           <div className="center">
             <label form="start-date">Từ</label>
             <input
@@ -162,7 +126,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               id="start-date"
               className="btn !py-1 !px-2 !w-auto ml-2"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={handleStartDateChange}
             />
             {/* <!-- Lấy thời gian hiện tại làm mặt định qua js --> */}
           </div>
@@ -173,19 +137,20 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               id="end-date"
               className="btn !py-1 !px-2 !w-auto ml-2"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={handleEndDateChange}
             />
             {/* <!-- Lấy thời gian hiện tại làm mặt định qua js--> */}
           </div>
           <select
             className="btn !py-1 !px-2 !w-auto"
-            onChange={(e) => setTransactionType(e.target.value)}
+            onChange={handleTransactionTypeChange}
           >
-            <option value="all">All</option>
+            <option value="">All</option>
             <option value="income">Phiếu thu tiền</option>
             <option value="expense">Phiếu chi tiền</option>
           </select>
-          <button className="sbm group">
+          {/* bấm gửi  */}
+          {/* <button className="sbm group" onClick={handleSubmit}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -198,7 +163,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
             >
               <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path>
             </svg>
-          </button>
+          </button> */}
         </div>
         <table className="w-full rounded-t-[3px] overflow-hidden mt-3">
           <thead className="relative border !border-[var(--ht-neutral-100-)] font-[500] text-[var(--color-menu-icon-)]">
@@ -302,7 +267,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
             </tr>
           </thead>
           <tbody className="text-[14px]">
-            {filteredData.map((transaction, index) => (
+            {tableData.map((transaction, index) => (
               <tr
                 key={index}
                 className="group border-b !border-[var(--ht-neutral-100-)]"
