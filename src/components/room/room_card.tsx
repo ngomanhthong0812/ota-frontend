@@ -182,7 +182,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                 ?
                 <UnusedRoomPopup ref={popupRef} showPopup={showPopup} position={popupPosition} clean_status={data.clean_status} />
                 :
-                <InusedRoomPopup ref={popupRef} showPopup={showPopup} position={popupPosition} clean_status={data.clean_status} />
+                <InusedRoomPopup ref={popupRef} showPopup={showPopup} position={popupPosition} clean_status={data.clean_status} roomId={data.id}/>
             }
 
         </section>

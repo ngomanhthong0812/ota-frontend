@@ -1,13 +1,31 @@
-import { LegacyRef } from "react";
+'use client'
+
+import { useRouter } from "next/navigation";
+import { LegacyRef, useEffect, useState } from "react";
 
 interface IProps {
     ref: LegacyRef<HTMLDivElement> | undefined,
     showPopup: boolean,
     clean_status: boolean,
     position: { x: number; y: number };
+
+    roomId: number
 }
 
-const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, clean_status, position }) => {
+const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, clean_status, position, roomId }) => {
+    const [isClient, setIsClient] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+      setIsClient(true);
+    }, []);
+
+    const handleDetailClick = () => {
+      if (isClient) {
+        router.push(`/hotel_management/room/room_detail/${roomId}`);
+      }
+    };
+
     return (
         <div
             style={{
@@ -24,7 +42,7 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, clean_status, posit
                         <path
                             d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
                     </svg>
-                    <span>Chi tiết</span>
+                    <button onClick={handleDetailClick}>Chi tiết</button>
                 </li>
                 <li className="popup-item">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
