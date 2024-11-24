@@ -1,4 +1,5 @@
 "use client";
+import SelectUserUpdate from "@/components/selectUser";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";
@@ -52,7 +53,7 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
       setAmount(data.data.Amount);
       setreceiverAccount(data.data.ExtraDetails.receiverAccount);
       setreceiverName(data.data.ExtraDetails.receiverName);
-      setSelectedUser(2);
+      setSelectedUser(data.data.IdUser);
       // Kiểm tra xem CreatedAt có hợp lệ không
       const createdAt = data.data.CreatedAt;
 
@@ -94,6 +95,7 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
           receiverAccount,
           receiverName,
           created_at: date,
+          user_id: selectedUser,
         },
         {
           headers: {
@@ -247,17 +249,13 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
                   <option value="">Chi khác</option>
                 </select>
               </div>
-              <select
-                value={selectedUser}
-                onChange={handleSelectChange}
-                className="custom-select btn mb-4"
-              >
-                <option value="2">{data.data.CreatedBy}</option>
-                <option value="2">Mạnh Thông</option>
-                <option value="2">Đình Hoài</option>
-                <option value="2">Ngọc Quang</option>
-                <option value="2">Bảo nguyên</option>
-              </select>
+
+              <SelectUserUpdate
+                value={selectedUser} // Giá trị đã chọn
+                onChange={handleSelectChange} // Hàm xử lý thay đổi
+                IdUser={data.data.IdUser}
+                CreatedBy={data.data.CreatedBy}
+              />
               <div className="flex items-center">
                 <div>Tài khoản người nhận</div>
                 <input
