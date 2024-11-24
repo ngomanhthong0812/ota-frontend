@@ -149,7 +149,7 @@ const PaymentSummary: React.FC<IProps> = ({ handleSavePaymentInfo }) => {
                             onChange={(e) => setPaymentInfo(prev => ({ ...prev, paymentOption: e.target.value }))}
                         >
                             <option>{PAYMENT_OPTIONS.PAYMENT_AT_THE_COUNTER}</option>
-                            {customer?.data.map((item: any) => (
+                            {customer?.data?.map((item: any) => (
                                 <option
                                     key={item.id}>
                                     {item?.name} - {item?.bookings[0]?.customer?.name}
