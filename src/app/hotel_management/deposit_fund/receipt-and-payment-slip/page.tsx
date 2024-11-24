@@ -60,7 +60,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 1000,
+      refreshInterval: 100000,
     }
   );
 

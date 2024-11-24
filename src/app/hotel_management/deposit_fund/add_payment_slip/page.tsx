@@ -1,5 +1,6 @@
 "use client";
 
+import UserSelect from "@/components/userbyhotel";
 import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";
@@ -281,18 +282,10 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
                   <option value="">Chi khác</option>
                 </select>
               </div>
-              <select
-                name="creator"
-                value={formData.creator}
-                onChange={handleSelectChange}
-                className="custom-select btn mb-4"
-              >
-                <option value="">Tìm kiếm nhân viên...</option>
-                <option value="2">Mạnh Thông</option>
-                <option value="2">Đình Hoài</option>
-                <option value="2">Ngọc Quang</option>
-                <option value="2">Bảo nguyên</option>
-              </select>
+              <UserSelect
+                value={formData.creator} // Giá trị đã chọn
+                onChange={handleSelectChange} // Hàm xử lý thay đổi
+              />
               <div className="flex-1">
                 <input
                   name="receiverName"

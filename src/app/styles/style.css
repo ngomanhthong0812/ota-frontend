@@ -71,23 +71,23 @@ body {
   box-shadow: var(--room-not-checked-out-color-100-) 0px 1px 10px 0px;
 }
 
-.room-item-empty>p {
+.room-item-empty > p {
   background-color: var(--room-empty-color-);
 }
 
-.room-item-booked>p {
+.room-item-booked > p {
   background-color: var(--room-booked-color-);
 }
 
-.room-item-not-arrived>p {
+.room-item-not-arrived > p {
   background-color: var(--room-not-arrived-color-);
 }
 
-.room-item-occupied>p {
+.room-item-occupied > p {
   background-color: var(--room-occupied-color-);
 }
 
-.room-item-out-of-service>p {
+.room-item-out-of-service > p {
   background-color: var(--room-not-checked-out-color-);
 }
 
@@ -295,4 +295,15 @@ body {
   border-right: 1px solid white;
   bottom: 0;
   right: 0;
+}
+
+/* Loại bỏ nút tăng giảm ở ô input type="number" */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
