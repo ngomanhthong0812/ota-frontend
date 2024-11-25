@@ -28,13 +28,13 @@ const PaymentSection: React.FC<IProps> = () => {
         paymentMethod: PAYMENT_METHODS.CASH,
         customerName: 'Anonymous',
         note: '',
-        hotel_id: user?.hotel_id || null,
+        hotel_id: user?.hotel_id,
         selectedService: selectedService,
         discountForm: {
             discount: 0,
             note: '',
         },
-        created_by: user?.name || null
+        user_id: user?.id
     });
 
     const handleSetUnModalInvoiceCreationConfirmation = () => {
@@ -54,7 +54,13 @@ const PaymentSection: React.FC<IProps> = () => {
         setIsLoading(true);
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/createInvoiceService`,
-                JSON.stringify(paymentInfoService),
+                paymentInfoService.user_id && paymentInfoService.hotel_id ?
+                    paymentInfoService
+                    : {
+                        ...paymentInfoService,
+                        hotel_id: user?.hotel_id,
+                        user_id: user?.id
+                    },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`, // Thay token vào đây
@@ -71,8 +77,10 @@ const PaymentSection: React.FC<IProps> = () => {
             }
         } catch (error) {
             setIsLoading(false);
+            console.log(paymentInfoService);
+
             // In thông tin lỗi khi gặp sự cố
-            console.error("Lỗi khi gửi dữ liệu:", error);
+            console.log("Lỗi khi gửi dữ liệu:", error);
         }
     }
 
@@ -113,7 +121,11 @@ const PaymentSection: React.FC<IProps> = () => {
                 <div className="flex gap-2 w-full">
                     <div className="w-full flex flex-col gap-2">
                         <SelectedList />
-                        <PaymentSummary handleSavePaymentInfo={handleSavePaymentInfo} />
+                        <PaymentSummary
+                            token={token}
+                            user={user}
+                            handleSavePaymentInfo={handleSavePaymentInfo}
+                        />
                     </div>
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import useFormatDate from '@/hook/useFormatDate';
 import useFormatPriceWithCommas from '@/hook/useFormatPriceWithCommas';
 import { InvoiceReceipt } from '@/types/backend';
 import Link from 'next/link';
@@ -9,20 +10,7 @@ interface IProps {
 
 const InvoiceTable: React.FC<IProps> = ({ data }) => {
     const { formatPrice } = useFormatPriceWithCommas();
-
-    const formatDate = (dateString: string): string => {
-        const date = new Date(dateString);
-
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-
-        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-    };
+    const { formatDate } = useFormatDate();
     return (
         <table className="w-full rounded-t-[3px] overflow-hidden mt-3">
             <thead className="relative border border-[var(--ht-neutral-100-)] font-[500] text-[var(--color-menu-icon-)]">

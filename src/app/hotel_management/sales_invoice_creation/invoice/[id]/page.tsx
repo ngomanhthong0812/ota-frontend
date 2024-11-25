@@ -1,6 +1,7 @@
 'use client'
 import { PAYMENT_METHODS } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
+import useFormatDate from "@/hook/useFormatDate";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 import { ResponseInvoice } from "@/types/backend";
 import { useParams } from "next/navigation"
@@ -17,7 +18,10 @@ const fetcher = (url: string, token: string | null) =>
 const ServiceInvoice: React.FC<IProps> = () => {
     const { id } = useParams();
     const { token } = useAuth();
+
     const { formatPrice } = useFormatPriceWithCommas();
+    const { formatDate } = useFormatDate();
+
     const { data, error, isLoading } = useSWR(
         token ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/innvoiceByReceiptAndItemById/${id}` : null,
         (url: string) => fetcher(url, token),
@@ -31,20 +35,6 @@ const ServiceInvoice: React.FC<IProps> = () => {
     if (isLoading) {
         return <div>Loading...</div>;
     }
-
-    const formatDate = (dateString: string): string => {
-        const date = new Date(dateString);
-
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-
-        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-    };
 
     const invoice: ResponseInvoice = data?.data;
 

@@ -138,7 +138,7 @@ const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, da
             })
         }
         setNewData(dataFilter);
-    }, [roomBooking, data])
+    }, [roomBooking, data]);
     return (
         <section>
             <div className="body_content-title flex gap-3">

@@ -30,13 +30,13 @@ const ModalInvoiceCreationConfirmation: React.FC<IProps> = ({
                     handleSetUnModalInvoiceCreationConfirmation();
                 }
             }}>
-            <DialogContent className="bg-white rounded-xl min-w-[700px] max-h-full overflow-auto p-0 bg-transparent border-none">
-                <div className="bg-white rounded-xl">
+            <DialogContent className="rounded-xl min-w-[700px] max-h-full overflow-auto p-0 bg-transparent border-none">
+                <div className="rounded-xl">
                     <DialogTitle
                         className="text-white font-medium text-base bg-[var(--room-empty-color-)] px-4 py-2 rounded-t-xl">
                         Xác nhận tạo hoá đơn
                     </DialogTitle>
-                    <div className="px-4 pt-3 flex flex-col gap-7 text-[14px] text-[#656565]">
+                    <div className="bg-white px-4 pt-3 flex flex-col gap-7 text-[14px] text-[#656565]">
                         <h4 className="text-xs text-red-500">Đề nghị kiểm tra lại thông tin hoá đơn trước khi lưu</h4>
                         <div className="flex flex-col gap-4 px-4">
                             <p className="flex items-center justify-between">
@@ -63,22 +63,22 @@ const ModalInvoiceCreationConfirmation: React.FC<IProps> = ({
                                 <span>VND 0</span>
                             </p>
                         </div>
+                        <footer className="modal-footer px-4 py-3 rounded-b-xl text-[14px]">
+                            <div className="flex items-center justify-end gap-x-5 py-3 font-[500]">
+                                <button
+                                    onClick={handleSetUnModalInvoiceCreationConfirmation}
+                                    className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200">
+                                    Bỏ qua
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
+                                    Lưu
+                                </button>
+                            </div>
+                        </footer>
                     </div>
 
-                    <footer className="modal-footer px-4 py-3 rounded-b-xl text-[14px]">
-                        <div className="flex items-center justify-end gap-x-5 py-3 font-[500]">
-                            <button
-                                onClick={handleSetUnModalInvoiceCreationConfirmation}
-                                className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200">
-                                Bỏ qua
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
-                                Lưu
-                            </button>
-                        </div>
-                    </footer>
                 </div>
             </DialogContent>
         </Dialog >

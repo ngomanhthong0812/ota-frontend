@@ -1,15 +1,45 @@
-import { LegacyRef } from "react";
+'use client'
+import { LegacyRef, useState } from "react";
+import ModalBookingRoomList from "../service/modal/modal_booking_room_list";
+import { TypeRoomCard } from "@/types/backend";
+import useSWR from "swr";
+import { useAuth } from "@/context/auth.context";
 
 interface IProps {
     ref: LegacyRef<HTMLDivElement> | undefined,
     showPopup: boolean,
-    clean_status: boolean,
+    data: TypeRoomCard,
     position: { x: number; y: number },
 
     handleSetStatusClean: () => void,
 }
 
-const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, clean_status, position, handleSetStatusClean }) => {
+const fetcher = (url: string, token: string | null) =>
+    fetch(url,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        }).then((res) => res.json());
+
+
+const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, handleSetStatusClean }) => {
+    const [showModalBookingRoomList, setShowModalBookingRoomList] = useState<boolean>(false);
+
+    const { token } = useAuth();
+    const { data: bookingRoomList, error, isLoading } = useSWR(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/bookingRoomsWithCustomerByRoomId/${data.id}`,
+        (url: string) => fetcher(url, token),
+        {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false
+        }
+    );
+    const handleSetUnModalBookingRoomList = () => {
+        setShowModalBookingRoomList(false);
+    }
     return (
         <div
             style={{
@@ -93,7 +123,7 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, clean_status, posit
                 </li>
             </ul>
             <ul>
-                {clean_status
+                {data.clean_status
                     ?
                     <li
                         onClick={handleSetStatusClean}
@@ -122,9 +152,16 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, clean_status, posit
                         <path
                             d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z" />
                     </svg>
-                    <span>Danh sách đặt phòng</span>
+                    <span
+                        onClick={() => setShowModalBookingRoomList(true)}
+                    >Danh sách đặt phòng
+                    </span>
                 </li>
             </ul>
+            <ModalBookingRoomList
+                bookingRoomList={bookingRoomList?.data}
+                showModalBookingRoomList={showModalBookingRoomList}
+                handleSetUnModalBookingRoomList={handleSetUnModalBookingRoomList} />
         </div >
     )
 }

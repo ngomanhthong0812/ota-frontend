@@ -105,10 +105,10 @@ interface RequestPaymentService {
     paymentMethod: PaymentMethod,
     customerName: string,
     note: string,
-    hotel_id: number | null,
+    hotel_id: number,
     selectedService: SelectedServiceType[],
     discountForm: TypeDiscountForm,
-    created_by: string | null,
+    user_id: number,
 }
 
 interface InvoiceReceipt {

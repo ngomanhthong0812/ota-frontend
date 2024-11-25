@@ -214,14 +214,14 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                     ref={popupRef}
                     showPopup={showPopup}
                     position={popupPosition}
-                    clean_status={cleanStatus}
+                    data={data}
                     handleSetStatusClean={handleSetStatusClean} />
                 :
                 <InusedRoomPopup
                     ref={popupRef}
                     showPopup={showPopup}
                     position={popupPosition}
-                    clean_status={cleanStatus}
+                    data={data}
                     handleSetStatusClean={handleSetStatusClean} />
             }
 

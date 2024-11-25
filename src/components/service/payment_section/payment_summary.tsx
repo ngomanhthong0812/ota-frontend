@@ -1,14 +1,15 @@
 'use client'
 import { useSelectedService } from "@/context/selectedService.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ModalAddDiscount from "../modal/modal_add_discount";
-import { RequestPaymentService, TypeDiscountForm } from "@/types/backend";
+import { RequestPaymentService, TypeDiscountForm, User } from "@/types/backend";
 import useSWR from "swr";
-import { useAuth } from "@/context/auth.context";
 import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS } from "@/constants/constants";
 
 interface IProps {
+    token: string | null,
+    user: User,
     handleSavePaymentInfo: (paymentInfo: RequestPaymentService) => void,
 }
 
@@ -21,8 +22,7 @@ const fetcher = (url: string, token: string | null) =>
             },
         }).then((res) => res.json());
 
-const PaymentSummary: React.FC<IProps> = ({ handleSavePaymentInfo }) => {
-    const { user, token } = useAuth();
+const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo }) => {
     const { formatPrice } = useFormatPriceWithCommas();
 
     const { totalServicePrice, selectedService } = useSelectedService();
@@ -33,13 +33,13 @@ const PaymentSummary: React.FC<IProps> = ({ handleSavePaymentInfo }) => {
         paymentMethod: PAYMENT_METHODS.CASH,
         customerName: 'Anonymous',
         note: '',
-        hotel_id: user?.hotel_id || null,
+        hotel_id: user?.hotel_id,
         selectedService: selectedService,
         discountForm: {
             discount: 0,
             note: '',
         },
-        created_by: user?.name || null,
+        user_id: user?.id,
     });
 
     const [showModaAddDiscount, setShowModaAddDiscount] = useState<boolean>(false);
@@ -135,11 +135,7 @@ const PaymentSummary: React.FC<IProps> = ({ handleSavePaymentInfo }) => {
                 <div className="flex gap-2 mb-2">
                     <div className="flex flex-col flex-1">
                         <span className="text-xs mb-1">Tên khách hàng(*)</span>
-                        <input type=" text"
-                            value={paymentInfo.customerName}
-                            onChange={(e) => setPaymentInfo(prev => ({ ...prev, customerName: e.target.value }))}
-                            className="btn"
-                            placeholder="Tên khách hàng" />
+                        <span className="btn">{paymentInfo.customerName}</span>
                     </div>
                     <div className="flex flex-col flex-1">
                         <span className="text-xs mb-1">Lựa chọn TT</span>
