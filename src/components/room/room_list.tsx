@@ -8,6 +8,7 @@ import { useToolbar } from '@/context/toolbar.context';
 import { ROOM_STATUS } from '@/constants/hotel_room-status';
 import { useAuth } from '@/context/auth.context';
 import { ROOM_BOOKINGS, TAB_ROOM_FINAL } from '@/constants/constants';
+import { Skeleton } from '../ui/skeleton';
 
 interface IProps { }
 
@@ -72,8 +73,15 @@ const RoomList: React.FC<IProps> = () => {
     }, [data])
 
     if (error) return "An error has occurred.";
-    if (isLoading) return "Loading...";
-
+    if (isLoading) return (
+        <div className="flex flex-col space-y-3">
+            <Skeleton className="h-[50px] w-full rounded-xl" />
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+            </div>
+        </div>
+    );
 
     return (
         <div>
@@ -105,25 +113,25 @@ interface RoomBookingSectionProps {
 }
 
 const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, data }) => {
-    const [newData, setNewData] = useState<TypeRoomCard[]>(data);
+    const [newData, setNewData] = useState<TypeRoomCard[]>([]);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     useEffect(() => {
-        let dataFilter: TypeRoomCard[] = [];
+        let dataFilter: TypeRoomCard[] = data;
         if (roomBooking === ROOM_BOOKINGS.EMPTY_ROOM) {
-            dataFilter = newData.filter(item => item.status === ROOM_STATUS.EMPTY);
+            dataFilter = dataFilter.filter(item => item.status === ROOM_STATUS.EMPTY);
         }
         if (roomBooking === ROOM_BOOKINGS.OUT_TODAY) {
-            dataFilter = newData.filter(item => {
+            dataFilter = dataFilter.filter(item => {
                 const checkOutDate = new Date(item.bookings?.[0]?.check_out_at);
                 checkOutDate.setHours(0, 0, 0, 0); // Set giờ về 00:00 để chỉ so sánh ngày
                 return checkOutDate.getTime() === today.getTime();
             })
         }
         if (roomBooking === ROOM_BOOKINGS.GUESTS_STAYING_OVER) {
-            dataFilter = newData.filter(item => {
+            dataFilter = dataFilter.filter(item => {
                 const checkOutDate = new Date(item.bookings?.[0]?.check_out_at);
                 checkOutDate.setHours(0, 0, 0, 0); // Set giờ về 00:00 để chỉ so sánh ngày
                 return checkOutDate.getTime() > today.getTime();
