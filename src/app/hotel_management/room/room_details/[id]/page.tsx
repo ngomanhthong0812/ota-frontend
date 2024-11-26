@@ -8,6 +8,7 @@ import { parseCookies } from "nookies";
 import { use, useEffect, useState } from "react";
 import useSWR, { Fetcher } from "swr";
 import CheckOutAndPayModal from "@/components/room/modals/checkout_and_pay.modal";
+import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
 
 const cookies = parseCookies();
 const token = cookies.access_token;
@@ -50,7 +51,8 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
   const [roomPrice, setRoomPrice] = useState<number>(0);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState(false);
+  const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState<boolean>(false);
+  const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
 
   const { id } = use(params);
   const fetcher = (url: string) =>
@@ -467,23 +469,40 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
                 </div>
 
                 <div className="mt-8">
-                  <p>07/04 16:41 - Test</p>
+                  <ul>
+                    <li className="flex items-center justify-between">
+                      <div>
+                        <p>07/04 16:41 - Test</p>
+                        <p>Room key/ Thẻ khoá phòng(1)</p>
 
-                  <div className="flex items-center justify-between">
-                    <p>Room key/ Thẻ khoá phòng(1)</p>
+                      </div>
 
-                    <div className="flex items-center gap-2">
-                      <p>100,000</p>
+                      <div className="flex items-center gap-2">
+                        <p>100,000</p>
 
-                      <button className="bg-[var(--room-dirty-color-100-)] border-none rounded-full p-[1px]"></button>
-                    </div>
-                  </div>
+                        <button className="border border-red-500 rounded-full "
+                          onClick={() => setShowModalRemoveServices(true)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-red-500">
+                          <path d="M19.0005 4.99988L5.00049 18.9999M5.00049 4.99988L19.0005 18.9999" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+
+                      </div>
+                    </li>
+                  </ul>
+
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <RemoveServicesModal 
+        showModal={showModalRemoveServices}
+        closeModal={() => setShowModalRemoveServices(false)}
+      />
     </div>
   );
 };

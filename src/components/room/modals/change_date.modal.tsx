@@ -21,6 +21,17 @@ const ChangeDateModal = (props: IProps) => {
     const [updatedCheckIn, setUpdatedCheckIn] = useState(checkInDate);
     const [updatedCheckOut, setUpdatedCheckOut] = useState(checkOutDate);
 
+    useEffect(() => {
+        setUpdatedCheckIn(checkInDate);
+        setUpdatedCheckOut(checkOutDate);
+    }, [checkInDate, checkOutDate]);
+
+    const handleSetToCurrent = () => {
+        const now = new Date();
+        const formattedNow = now.toISOString().slice(0, 16);
+        setUpdatedCheckOut(formattedNow)
+    }
+
     const handleSave = () => {
         onSave(updatedCheckIn, updatedCheckOut);
         closeModal(); // Đóng modal sau khi lưu
@@ -54,7 +65,7 @@ const ChangeDateModal = (props: IProps) => {
                         <input 
                             type="datetime-local" 
                             className="btn"
-                            value={checkInDate}
+                            value={updatedCheckIn}
                             onChange={(e) => setUpdatedCheckIn(e.target.value)}
                         />
                     </div>
@@ -65,12 +76,14 @@ const ChangeDateModal = (props: IProps) => {
                             <input 
                                 type="datetime-local" 
                                 className="btn col-span-2"
-                                value={checkOutDate}
+                                value={updatedCheckOut}
                                 onChange={(e) => setUpdatedCheckOut(e.target.value)} 
                             />
                             <button 
                                 id="current-date" 
-                                className="bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)] font-semibold rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
+                                className="bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)] font-semibold rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200"
+                                onClick={() => handleSetToCurrent()}
+                            >
                                 Hiện tại
                             </button>
                         </div>

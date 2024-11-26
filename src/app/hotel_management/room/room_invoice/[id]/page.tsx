@@ -11,6 +11,7 @@ import { parseCookies } from "nookies";
 import useSWR from "swr";
 import CheckOutModal from "@/components/room/modals/checkout.modal";
 import CheckOutAndPayModal from "@/components/room/modals/checkout_and_pay.modal";
+import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
 
 const cookies = parseCookies();
 const token = cookies.access_token;
@@ -22,8 +23,9 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
     const [roomName, setRoomName] = useState<string>("");
     const [roomPrice, setRoomPrice] = useState<number>("");
-    const [showModalCheckOut, setShowModalCheckOut] = useState(false);
-    const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState(false);
+    const [showModalCheckOut, setShowModalCheckOut] = useState<boolean>(false);
+    const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState<boolean>(false);
+    const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
 
     const formattedPrice = new Intl.NumberFormat("vi-VN").format(roomPrice);
 
@@ -364,9 +366,12 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                         -100,000 VND
                       </span>
                       <div className="gap-2 select hidden">
-                        <FaPrint />
-                        <button className="bg-[var(--room-dirty-color-100-)] border-none rounded-full p-[1px]">
-                          <CiCircleRemove />
+                        <button className="border border-red-500 rounded-full "
+                          onClick={() => setShowModalRemoveServices(true)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-red-500">
+                          <path d="M19.0005 4.99988L5.00049 18.9999M5.00049 4.99988L19.0005 18.9999" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
                         </button>
                       </div>
                     </div>
@@ -385,9 +390,10 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                         +2,750,000 VND
                       </span>
                       <div className="gap-2 select hidden">
-                        <FaPrint />
-                        <button className="bg-[var(--room-dirty-color-100-)] border-none rounded-full p-[1px]">
-                          <CiCircleRemove />
+                        <button className="border border-red-500 rounded-full ">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-red-500">
+                            <path d="M19.0005 4.99988L5.00049 18.9999M5.00049 4.99988L19.0005 18.9999" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
                         </button>
                       </div>
                     </div>
@@ -714,6 +720,11 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
         <CheckOutModal 
           showModal={showModalCheckOut}
           closeModal={() => setShowModalCheckOut(false)}
+        />
+
+        <RemoveServicesModal
+          showModal={showModalRemoveServices}
+          closeModal={() => setShowModalRemoveServices(false)}
         />
       </div>
     );
