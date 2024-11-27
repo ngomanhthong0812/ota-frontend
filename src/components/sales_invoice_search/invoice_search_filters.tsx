@@ -3,10 +3,13 @@
 import { useAuth } from '@/context/auth.context';
 import { InvoiceReceipt } from '@/types/backend';
 import React, { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 
 interface IProps {
-    handleFilterData: (data: InvoiceReceipt[]) => void
+    handleFilterData: (data: InvoiceReceipt[]) => void,
+    setTotalData: (total: number) => void,
+    setPageSize: (size: number) => void,
+    currentPage: number,
 }
 
 interface TypeFilterInvoiceService {
@@ -16,7 +19,6 @@ interface TypeFilterInvoiceService {
 }
 
 const PERIOD_SERVICE_FILTER = {
-    ALL: "Tất cả",
     TODAY: "Hôm nay",
     THIS_WEEK: "Tuần này",
     THIS_MONTH: "Tháng này",
@@ -24,30 +26,51 @@ const PERIOD_SERVICE_FILTER = {
     THIS_QUARTER: "Quý này"
 };
 
-const fetcher = (url: string, token: string | null) =>
-    fetch(url,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        }).then((res) => res.json());
-
-const InvoiceSearchFilters: React.FC<IProps> = ({ handleFilterData }) => {
+const InvoiceSearchFilters: React.FC<IProps> = ({ handleFilterData, setTotalData, setPageSize, currentPage }) => {
     const { user, token } = useAuth();
+    const [data, setData] = useState<InvoiceReceipt[]>([]);
+    const [renderData, setRenderData] = useState<boolean>(false);
+    const pageSize = 10;
+
     const [filter, setFilter] = useState<TypeFilterInvoiceService>({
         period: PERIOD_SERVICE_FILTER.TODAY,
         startDate: new Date().toISOString().split("T")[0],
-        endDate: null,
+        endDate: new Date().toISOString().split("T")[0],
     });
-    const { data, error, isLoading } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/receipt/receiptServiceByHotelId/${user?.hotel_id}`,
-        (url: string) => fetcher(url, token),
-    );
 
     useEffect(() => {
-        handleFilterData(data?.data);
-    }, [data])
+        if (token) {
+            const fetchData = async () => {
+                try {
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/receipt/receiptServiceByHotelId?hotel_id=${user?.hotel_id}&currentPage=${currentPage}&pageSize=${pageSize}&startDate=${filter.startDate}&endDate=${filter.endDate}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                            },
+                        }
+                    );
+                    const result = await response.json();
+                    if (response.ok) {
+                        setData(result.data.receipts); // Lưu dữ liệu vào state khi thành công
+                        setTotalData(result.data.total);
+                        setPageSize(pageSize);
+                    } else {
+                        throw new Error(result.message || 'Có lỗi xảy ra');
+                    }
+                } catch (error: any) {
+                    console.log(error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [token, renderData, user?.hotel_id, currentPage]);
+
+    useEffect(() => {
+        handleFilterData(data);
+    }, [data]);
 
     useEffect(() => {
         const today = new Date();
@@ -55,11 +78,6 @@ const InvoiceSearchFilters: React.FC<IProps> = ({ handleFilterData }) => {
         let endDate = null;
 
         switch (filter.period) {
-            case PERIOD_SERVICE_FILTER.ALL:
-                startDate = null;
-                endDate = null;
-                break;
-
             case PERIOD_SERVICE_FILTER.TODAY:
                 startDate = today.toISOString().split("T")[0];
                 endDate = startDate;
@@ -108,27 +126,8 @@ const InvoiceSearchFilters: React.FC<IProps> = ({ handleFilterData }) => {
     }, [filter.period])
 
     const handleFilter = () => {
-        if (filter.startDate && filter.endDate) {
-            const startDate = getStartOfDay(new Date(filter.startDate));
-            const endDate = getEndOfDay(new Date(filter.endDate));
-            const newDataFilter: InvoiceReceipt[] = data?.data?.filter((item: InvoiceReceipt) => {
-                const createdAt = new Date(item.createdAt);
-                return createdAt >= startDate && createdAt <= endDate;
-            });
-            handleFilterData(newDataFilter);
-        } else {
-            handleFilterData(data?.data);
-        }
+        setRenderData(!renderData);
     }
-
-    const getEndOfDay = (date: Date): Date => {
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
-    };
-
-    const getStartOfDay = (date: Date): Date => {
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-    };
-
 
     return (
         <div className="flex justify-between">
@@ -136,7 +135,6 @@ const InvoiceSearchFilters: React.FC<IProps> = ({ handleFilterData }) => {
                 <select
                     onChange={(e) => setFilter(prev => ({ ...prev, period: e.target.value }))}
                     className="btn !py-1 !px-2 !w-auto">
-                    <option value={PERIOD_SERVICE_FILTER.ALL}>{PERIOD_SERVICE_FILTER.ALL}</option>
                     <option value={PERIOD_SERVICE_FILTER.TODAY}>{PERIOD_SERVICE_FILTER.TODAY}</option>
                     <option value={PERIOD_SERVICE_FILTER.THIS_WEEK}>{PERIOD_SERVICE_FILTER.THIS_WEEK}</option>
                     <option value={PERIOD_SERVICE_FILTER.THIS_MONTH}>{PERIOD_SERVICE_FILTER.THIS_MONTH}</option>

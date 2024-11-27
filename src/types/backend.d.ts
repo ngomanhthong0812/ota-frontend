@@ -38,6 +38,7 @@ interface Floor {
 }
 interface Bookings {
     id: number,
+    booking_at: string,
     check_in_at: string,
     check_out_at: string,
     status: string,

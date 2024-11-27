@@ -202,7 +202,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                                     d="M12.25 2c-5.514 0-10 4.486-10 10s4.486 10 10 10 10-4.486 10-10-4.486-10-10-10zM18 13h-6.75V6h2v5H18v2z">
                                 </path>
                             </svg>
-                            {handleFormattedDate(data.bookings[0].check_in_at, data.bookings[0].check_out_at)}
+                            {handleFormattedDate(data.bookings[0].booking_at, data.bookings[0].check_out_at)}
                         </div>
                     </div>
                 }
