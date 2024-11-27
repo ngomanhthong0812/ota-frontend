@@ -1,5 +1,5 @@
-// components/RoomManagerDialog.tsx
-import React from "react";
+// components/UpdateRoomManagerDialog.tsx
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -18,15 +18,19 @@ import axios from "axios";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 
-interface RoomManagerDialogProps {
-  open: boolean;
+interface UpdateRoomManagerDialogProps {
+  isOpen: boolean;
   onClose: () => void;
+  roomTypeId: number | null;
+  onUpdateSuccess: () => void;
 }
 const cookies = parseCookies();
 const token = cookies.access_token; // Giả sử cookie chứa access_token
-const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
-  open,
+const UpdateRoomManagerDialog: React.FC<UpdateRoomManagerDialogProps> = ({
+  isOpen,
   onClose,
+  roomTypeId,
+  onUpdateSuccess,
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
@@ -41,65 +45,58 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
     hourlyRate: "",
     dailyRate: "",
     overnightRate: "",
-    standardCapacity: 2,
-    standardChildren: 2,
-    maxCapacity: 2,
-    maxChildren: 2,
+    standardCapacity: "",
+    standardChildren: "",
+    maxCapacity: "",
+    maxChildren: "",
   });
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
 
-  //   // Kiểm tra nếu là trường số
-  //   if (e.target.type === "number") {
-  //     // Chuyển giá trị nhập thành số
-  //     const numValue = Number(value);
-
-  //     // Nếu giá trị không phải là số hoặc số âm, đặt lại giá trị về 0
-  //     if (isNaN(numValue) || numValue < 0) {
-  //       // Cập nhật lại formData với giá trị mặc định 0
-  //       setFormData({
-  //         ...formData,
-  //         [name]: 0,
-  //       });
-  //       return;
-  //     }
-
-  //     // Cập nhật giá trị vào formData
-  //     setFormData({
-  //       ...formData,
-  //       [name]: numValue, // Lưu giá trị là số
-  //     });
-  //   } else {
-  //     // Nếu không phải là số, cập nhật giá trị dưới dạng chuỗi
-  //     setFormData({
-  //       ...formData,
-  //       [name]: value,
-  //     });
-  //   }
-  // };
-
-  // Hàm reset formData khi đóng dialog
-  const resetFormData = () => {
-    setFormData({
-      code: "",
-      name: "",
-      notes: "",
-      hourlyRate: "",
-      dailyRate: "",
-      overnightRate: "",
-      standardCapacity: 2,
-      standardChildren: 2,
-      maxCapacity: 2,
-      maxChildren: 2,
-    });
-  };
-
-  // Gọi resetFormData khi dialog đóng
-  React.useEffect(() => {
-    if (!open) {
-      resetFormData();
+  // lấy ra data 1 roomtype
+  // Hàm lấy dữ liệu phòng từ API
+  useEffect(() => {
+    if (isOpen && roomTypeId) {
+      console.log("test update");
+      fetchRoomTypes();
     }
-  }, [open]);
+  }, [isOpen, roomTypeId]);
+
+  // Hàm fetchRoomTypes cập nhật formData
+  const fetchRoomTypes = async () => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/getone/${roomTypeId}`,
+        config
+      );
+      if (response.data.statusCode === 200) {
+        const data = response.data.data;
+        // Map dữ liệu từ API vào form
+        setFormData({
+          code: data.code ?? "",
+          name: data.name ?? "",
+          notes: data.notes ?? "",
+          hourlyRate: data.hourlyRate ?? "",
+          dailyRate: data.dailyRate ?? "",
+          overnightRate: data.overnightRate ?? "",
+          standardCapacity: data.standardCapacity ?? "",
+          standardChildren: data.standardChildren ?? "",
+          maxCapacity: data.maxCapacity ?? "",
+          maxChildren: data.maxChildren ?? "",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch room type:", err);
+      toast.error("Không thể tải dữ liệu hạng phòng.");
+    }
+  };
+  // Gọi resetFormData khi dialog đóng
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -123,12 +120,15 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
   // Hàm gửi dữ liệu lên API
   const submitRoomData = async () => {
     try {
+      // Xóa bỏ trường không mong muốn nếu có
+      const sanitizedData = { ...formData };
+
       setLoading(true);
       setError(null);
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type`,
-        formData,
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/${roomTypeId}`,
+        sanitizedData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -137,36 +137,16 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
         }
       );
 
-      // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
-        // Nếu thành công, thông báo thành công
-        toast.success(`Thêm thành công !`);
-        onClose(); // Đóng dialog sau khi gửi thành công
+        toast.success("Cập nhật thành công!");
+        onUpdateSuccess(); // Cập nhật thành công
+        onClose(); // Đóng dialog
       } else {
-        toast.error(response.data.message || "Có lỗi xảy ra vui lòng thử lại sau.");
+        toast.error(response.data.message || "Có lỗi xảy ra.");
       }
-
-      console.log("API Response: ", response.data);
-    } catch (err: any) {
-      if (err.response) {
-        // Lỗi từ API
-        const errorMessage = err.response.data.message
-          ? err.response.data.message.join(", ") // Kết hợp các lỗi trong mảng message
-          : "Có lỗi xảy ra.";
-
-        // Hiển thị lỗi vào state hoặc popup thông báo
-        setError(errorMessage);
-        toast.error(error);
-      } else if (err.request) {
-        // Không nhận được phản hồi từ API
-        setError("Không nhận được phản hồi từ server.");
-        toast.error(error);
-      } else {
-        // Lỗi không xác định
-
-        setError("Có lỗi xảy ra.");
-        toast.error(error);
-      }
+    } catch (err) {
+      console.error("Lỗi khi cập nhật hạng phòng:", err);
+      toast.error("Có lỗi xảy ra trong quá trình cập nhật.");
     } finally {
       setLoading(false);
     }
@@ -181,10 +161,9 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
   return (
     <div onSubmit={handleSubmit}>
       <Dialog
-        open={open}
+        open={isOpen}
         onClose={() => {
           onClose();
-          resetFormData();
         }}
         fullWidth
         maxWidth="md"
@@ -480,4 +459,4 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
   );
 };
 
-export default RoomManagerDialog;
+export default UpdateRoomManagerDialog;
