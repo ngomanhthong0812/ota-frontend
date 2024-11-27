@@ -3,6 +3,8 @@ import HotelSidebarAdmin from "@/components/layout/hotel_sidebar_admin";
 import { SelectedServiceProvider } from "@/context/selectedService.context";
 import { ToolbarProvider } from "@/context/toolbar.context";
 import type { Metadata } from "next";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "Ota App",
@@ -17,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <ToastContainer />
         <ToolbarProvider>
           <SelectedServiceProvider>
             <div>

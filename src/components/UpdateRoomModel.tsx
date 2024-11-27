@@ -1,5 +1,5 @@
-// components/AddRoomModel.tsx
-import React from "react";
+// components/UpdateRoomModel.tsx
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -22,13 +22,18 @@ import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 import SelectRoomType from "./selectRoomType";
 import SelectFloor from "./selectFloor";
-interface AddRoomModelProps {
+interface UpdateRoomModelProps {
   open: boolean;
   onClose: () => void;
+  idRoom: number | null;
 }
 const cookies = parseCookies();
 const token = cookies.access_token;
-const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
+const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
+  open,
+  onClose,
+  idRoom,
+}) => {
   const [openAreaPopup, setOpenAreaPopup] = useState(false); // Trạng thái để điều khiển popup con
   const [isRoomCategoryDialogOpen, setRoomCategoryDialogOpen] = useState(false);
   const handleRoomCategoryDialogOpen = () => setRoomCategoryDialogOpen(true);
@@ -45,9 +50,51 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
     name: "",
     floor_id: "",
     room_type_id: "",
-    start_date_use: "",
+    start_date_use: "", // Đảm bảo chỉ có một nơi khai báo thuộc tính này
     notes: "",
   });
+
+  // Hàm lấy dữ liệu phòng từ API
+  useEffect(() => {
+    if (open && idRoom) {
+      console.log("test update");
+      fetchRoomTypes();
+    }
+  }, [open, idRoom]);
+
+  // Hàm fetchRoomTypes cập nhật formData
+  const fetchRoomTypes = async () => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${idRoom}`,
+        config
+      );
+      console.log("id phòng: ", response.data.data);
+      if (response.data.statusCode === 200 && response.data.data) {
+        const data = response.data.data;
+        setFormData({
+          name: data.name ?? "",
+          floor_id: data.floor_id ?? "",
+          room_type_id: data.room_type_id ?? "",
+          start_date_use: data.start_date_use ?? "",
+          notes: data.notes ?? "",
+        });
+      } else {
+        console.error("Dữ liệu không hợp lệ:", response.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch room type:", err);
+      toast.error(`Lỗi ${err}`);
+    }
+  };
+  // Gọi resetFormData khi dialog đóng
   // Hàm xử lý khi lựa chọn thay đổi trong select
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -67,13 +114,15 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Ngừng hành động mặc định của form
     try {
       setLoading(true);
-      setError(null);
-      console.log("data trước khi tạo  phòng: ", formData);
+      setError(null); // Đặt lại lỗi cũ
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room`,
+      console.log("data trước khi tạo phòng: ", formData);
+
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${idRoom}`,
         formData,
         {
           headers: {
@@ -82,44 +131,31 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
           },
         }
       );
+
       console.log(response);
 
-      // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
-        // Nếu thành công, thông báo thành công
-        toast.success(`Thêm thành công !`);
+        toast.success(`Cập nhật thành công!`);
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         toast.error(
           response.data.message || "Có lỗi xảy ra vui lòng thử lại sau."
         );
       }
-
-      console.log("API Response: ", response.data);
     } catch (err: any) {
-      if (err.response) {
-        // Lỗi từ API
-        const errorMessage = err.response.data.message
-          ? err.response.data.message.join(", ") // Kết hợp các lỗi trong mảng message
-          : "Có lỗi xảy ra.";
+      // Kiểm tra loại lỗi và xử lý nếu không phải mảng
+      const errorMessage =
+        err?.response?.data?.message instanceof Array
+          ? err?.response?.data?.message.join(", ") // Nếu message là mảng, join các lỗi lại
+          : err?.response?.data?.message || err?.message || "Có lỗi xảy ra."; // Nếu không phải mảng, sử dụng message mặc định
 
-        // Hiển thị lỗi vào state hoặc popup thông báo
-        setError(errorMessage);
-        toast.error(error);
-      } else if (err.request) {
-        // Không nhận được phản hồi từ API
-        setError("Không nhận được phản hồi từ server.");
-        toast.error(error);
-      } else {
-        // Lỗi không xác định
-
-        setError("Có lỗi xảy ra.");
-        toast.error(error);
-      }
+      setError(errorMessage);
+      toast.error(errorMessage); // Hiển thị lỗi bằng toast
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div onSubmit={handleSubmit}>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -180,7 +216,7 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
                   Bắt đầu sử dụng
                 </span>
                 <input
-                  value={formData.start_date_use}
+                  value={formData.start_date_use.split("T")[0]}
                   onChange={handleInputChange}
                   name="start_date_use"
                   type="date"
@@ -246,4 +282,4 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
   );
 };
 
-export default AddRoomModel;
+export default UpdateRoomModel;
