@@ -12,13 +12,13 @@ import { FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import SelectFloor from "./selectFloor";
+import { callApi } from "@/utils/api";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
-const cookies = parseCookies();
-const token = cookies.access_token;
+
 const AddAreaPopUp: React.FC<Props> = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -47,17 +47,12 @@ const AddAreaPopUp: React.FC<Props> = ({ open, onClose }) => {
     setLoading(true); // Đặt trạng thái loading khi gửi yêu cầu
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/floor`, // Endpoint API để thêm floor
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json", // Đảm bảo content-type là JSON
-          },
-        }
+      // Sử dụng callApi thay vì axios trực tiếp
+      const response = await callApi<any>(
+        "/api/floor", // Endpoint của API
+        "POST",
+        formData // Dữ liệu gửi lên
       );
-
       // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công

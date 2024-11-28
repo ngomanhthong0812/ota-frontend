@@ -1,3 +1,4 @@
+import { callApi } from "@/utils/api";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
@@ -11,10 +12,6 @@ interface RoomType {
   roomTypeId: number;
   roomTypeName: string;
 }
-
-const cookies = parseCookies();
-const token = cookies.access_token;
-
 const SelectRoomType: React.FC<Props> = ({ value, onChange }) => {
   const [roomtypes, setRoomTypes] = useState<RoomType[]>([]); // Lưu danh sách room type
   const [loading, setLoading] = useState<boolean>(true); // Trạng thái loading
@@ -23,15 +20,11 @@ const SelectRoomType: React.FC<Props> = ({ value, onChange }) => {
   useEffect(() => {
     const fetchRoomTypes = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/findAllRoomType`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
+        const response = await callApi<any>(
+          `/api/room-type/findAllRoomType`, // Endpoint của API
+          "GET"
         );
+
         setRoomTypes(response.data.data); // Gán danh sách room types
       } catch (error) {
         console.error("Có lỗi khi lấy danh sách room types", error);
@@ -55,7 +48,7 @@ const SelectRoomType: React.FC<Props> = ({ value, onChange }) => {
       onChange={onChange}
       className="focus:outline-none w-full text-sm"
     >
-          {roomtypes.length > 0 ? (
+      {roomtypes && roomtypes.length > 0 ? (
         <>
           <option value="">--Lựa chọn--</option>
           {roomtypes.map((roomType) => (

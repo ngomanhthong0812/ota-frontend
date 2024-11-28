@@ -296,14 +296,3 @@ body {
   bottom: 0;
   right: 0;
 }
-
-/* Loại bỏ nút tăng giảm ở ô input type="number" */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type="number"] {
-  -moz-appearance: textfield;
-}

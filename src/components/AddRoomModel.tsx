@@ -1,4 +1,3 @@
-// components/AddRoomModel.tsx
 import React from "react";
 import {
   Dialog,
@@ -6,28 +5,23 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  Tab,
-  Tabs,
-  Box,
 } from "@mui/material";
 import { useState } from "react";
-import { FaPencilAlt, FaRegSave } from "react-icons/fa";
+import { FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import ImageInput from "./ImageInput";
 import AddAreaPopUp from "./AddAreaPopUp";
 import { FaPlus } from "react-icons/fa";
 import RoomManagerDialog from "./AddRoomrCategoryModal ";
-import axios from "axios";
-import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 import SelectRoomType from "./selectRoomType";
 import SelectFloor from "./selectFloor";
+import { callApi } from "@/utils/api";
 interface AddRoomModelProps {
   open: boolean;
   onClose: () => void;
 }
-const cookies = parseCookies();
-const token = cookies.access_token;
+
 const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
   const [openAreaPopup, setOpenAreaPopup] = useState(false); // Trạng thái để điều khiển popup con
   const [isRoomCategoryDialogOpen, setRoomCategoryDialogOpen] = useState(false);
@@ -72,15 +66,11 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
       setError(null);
       console.log("data trước khi tạo  phòng: ", formData);
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      // Sử dụng callApi thay vì axios trực tiếp
+      const response = await callApi<any>(
+        "/api/room", // Endpoint của API
+        "POST",
+        formData // Dữ liệu gửi lên
       );
       console.log(response);
 

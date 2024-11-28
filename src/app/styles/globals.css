@@ -11,7 +11,7 @@ body svg {
 }
 
 .layout-container {
-  @apply container m-auto px-20
+  @apply container m-auto px-20;
 }
 
 .menu-item-container {
@@ -19,11 +19,11 @@ body svg {
 }
 
 .menu-item {
-  @apply relative flex p-3 gap-4 duration-300 font-[500] text-sm text-[var(--color-menu-icon-)] hover:bg-[var(--ht-body-bg-)] hover:text-[var(--navbar-color-)] bg-white
+  @apply relative flex p-3 gap-4 duration-300 font-[500] text-sm text-[var(--color-menu-icon-)] hover:bg-[var(--ht-body-bg-)] hover:text-[var(--navbar-color-)] bg-white;
 }
 
 .menu-item:hover svg {
-  @apply fill-[var(--navbar-color-)]
+  @apply fill-[var(--navbar-color-)];
 }
 
 .menu-item svg {
@@ -31,15 +31,15 @@ body svg {
 }
 
 .menu-item span {
-  @apply flex flex-1 items-center justify-between
+  @apply flex flex-1 items-center justify-between;
 }
 
 .menu-item-container .active {
-  @apply bg-[var(--ht-body-bg-)] text-[var(--navbar-color-)]
+  @apply bg-[var(--ht-body-bg-)] text-[var(--navbar-color-)];
 }
 
 .menu-item-container .active svg {
-  @apply fill-[var(--navbar-color-)]
+  @apply fill-[var(--navbar-color-)];
 }
 
 /* menu toggle */
@@ -51,7 +51,7 @@ body svg {
   @apply w-11;
 }
 
-.menu-item-container_toggle~.container-body {
+.menu-item-container_toggle ~ .container-body {
   @apply ml-11;
 }
 
@@ -62,7 +62,7 @@ body svg {
 /* menu toggle */
 
 .center {
-  @apply flex items-center justify-center
+  @apply flex items-center justify-center;
 }
 
 .room-empty {
@@ -96,7 +96,7 @@ body svg {
 }
 
 .status-item {
-  @apply flex gap-1 items-center justify-center border-[1.5px] font-[500] px-2 py-[3px] rounded-full whitespace-nowrap select-none
+  @apply flex gap-1 items-center justify-center border-[1.5px] font-[500] px-2 py-[3px] rounded-full whitespace-nowrap select-none;
 }
 
 .toolbar-top-type .active {
@@ -115,14 +115,12 @@ body svg {
   @apply flex items-center justify-center p-2 px-3 min-w-[100px] whitespace-nowrap rounded-full hover:text-[var(--navbar-color-)] duration-300 select-none;
 }
 
-
-
 .popup-container {
   @apply absolute w-56 bg-white shadow-lg border border-[var(--ht-neutral-100-)] z-50 rounded-lg;
 }
 
 .popup-container ul:not(:last-child) {
-  @apply border-[var(--ht-neutral-100-)] border-b-[1px]
+  @apply border-[var(--ht-neutral-100-)] border-b-[1px];
 }
 
 .popup-container ul {
@@ -138,11 +136,11 @@ body svg {
 }
 
 .btn {
-  @apply block w-full border p-2 text-gray-500 border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[var(--navbar-color-)] focus:border-[var(--navbar-color-)]
+  @apply block w-full border p-2 text-gray-500 border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-[var(--navbar-color-)] focus:border-[var(--navbar-color-)];
 }
 
 .sbm {
-  @apply rounded-md flex gap-1 items-center justify-center py-1 px-2 border border-[var(--room-empty-color-)] hover:bg-[var(--room-empty-color-)] hover:text-white duration-75 text-sm text-[var(--room-empty-color-)] font-[500]
+  @apply rounded-md flex gap-1 items-center justify-center py-1 px-2 border border-[var(--room-empty-color-)] hover:bg-[var(--room-empty-color-)] hover:text-white duration-75 text-sm text-[var(--room-empty-color-)] font-[500];
 }
 
 .date-time {
@@ -154,11 +152,11 @@ body svg {
 }
 
 .right-line {
-  @apply border-r border-stone-600 pb-4
+  @apply border-r border-stone-600 pb-4;
 }
 
 .title-info {
-  @apply border-b border-[var(--ht-neutral-100-)] py-2 text-base font-medium
+  @apply border-b border-[var(--ht-neutral-100-)] py-2 text-base font-medium;
 }
 
 .btn-tx-black {
@@ -168,11 +166,11 @@ body svg {
 .cash-fund_content svg,
 .checkout-body svg,
 .room-detail-body svg {
-  @apply w-[15px] h-[15px] fill-[var(--color-menu-icon-)]
+  @apply w-[15px] h-[15px] fill-[var(--color-menu-icon-)];
 }
 
 .icon {
-  @apply w-[15px] h-[15px] fill-[var(--color-menu-icon-)] mt-[2px]
+  @apply w-[15px] h-[15px] fill-[var(--color-menu-icon-)] mt-[2px];
 }
 
 .btn-fn {
@@ -190,7 +188,6 @@ body svg {
 .active-tab {
   @apply border-b-2 border-[var(--room-empty-color-)];
 }
-
 
 /* nguyên */
 .btn-loaigia {
@@ -221,7 +218,6 @@ body svg {
 
 @layer base {
   :root {
-
     --background: 0 0% 100%;
 
     --foreground: 0 0% 3.9%;
@@ -270,11 +266,10 @@ body svg {
 
     --chart-5: 27 87% 67%;
 
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
 
   .dark {
-
     --background: 0 0% 3.9%;
 
     --foreground: 0 0% 98%;
@@ -321,7 +316,7 @@ body svg {
 
     --chart-4: 280 65% 60%;
 
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -333,4 +328,14 @@ body svg {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
 }
