@@ -5,6 +5,8 @@ import UnusedRoomPopup from "./unused_room_popup";
 import InusedRoomPopup from "./inused_room_popup";
 import { TypeRoomCard } from "@/types/backend";
 import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel_room-status";
+import axios from "axios";
+import { useAuth } from "@/context/auth.context";
 
 interface IProps {
     data: TypeRoomCard
@@ -18,6 +20,8 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
     const roomCardRef = useRef<HTMLDivElement>(null);
     const popupStatusCleanRef = useRef<HTMLDivElement>(null);
     const [status, setStatus] = useState(HOTEL_ROOMSTATUS_NAV.find(item => item.name === data.status));
+    const [cleanStatus, setCleanStatus] = useState<boolean>(data.clean_status);
+    const { token } = useAuth();
 
     const handleClickOutside = (e: MouseEvent) => {
         // Kiểm tra nếu click không phải trong phần tử đã tham chiếu
@@ -103,8 +107,29 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
         return formattedDateCheckIn + ' - ' + formattedDateCheckOut;
     }
 
-    const handleSetStatusClean = () => {
+    const handleSetStatusClean = async () => {
+        try {
+            const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${data.id}`,
+                JSON.stringify({
+                    clean_status: !cleanStatus,
+                }),
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Thay token vào đây
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
+            // Kiểm tra phản hồi từ API
+            if (response.data.statusCode === 200 || response.status === 201) {
+                console.log("Gửi thành công");
+                setCleanStatus(!cleanStatus);
+            }
+        } catch (error) {
+            // In thông tin lỗi khi gặp sự cố
+            console.error("Lỗi khi gửi dữ liệu:", error);
+        }
     }
     return (
         <section
@@ -117,7 +142,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
             <div className="p-3">
                 <div className="flex mb-1 justify-between">
                     {
-                        data.clean_status
+                        cleanStatus
                             ? (
                                 <div
                                     className="center bg-[var(--ht-body-bg-)] rounded-full px-2 py-[3px] text-xs gap-1">
@@ -155,14 +180,18 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                         {
                             showPopupStatusClean &&
                             (
-                                data.clean_status
-                                    ? <button className="popup-container !w-[70px] py-1 px-2 right-0 whitespace-nowrap text-xs hover:!bg-[var(--ht-neutral-100-)]">Chưa dọn</button>
-                                    : <button className="popup-container !w-[70px] py-1 px-2 right-0 whitespace-nowrap text-xs hover:!bg-[var(--ht-neutral-100-)] ">Làm sạch</button>
+                                cleanStatus
+                                    ? <button
+                                        onClick={handleSetStatusClean}
+                                        className="popup-container !w-[70px] py-1 px-2 right-0 whitespace-nowrap text-xs hover:!bg-[var(--ht-neutral-100-)]">Chưa dọn</button>
+                                    : <button
+                                        onClick={handleSetStatusClean}
+                                        className="popup-container !w-[70px] py-1 px-2 right-0 whitespace-nowrap text-xs hover:!bg-[var(--ht-neutral-100-)] ">Làm sạch</button>
                             )
                         }
                     </div>
                 </div>
-                <h1 className="text-[18px] font-medium text-black truncate">{data.name}</h1>
+                <h1 className="text-[18px] font-medium text-black truncate">P.{data.name}</h1>
                 {data.bookings &&
                     <div className="flex absolute bottom-3">
                         <div
@@ -173,7 +202,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                                     d="M12.25 2c-5.514 0-10 4.486-10 10s4.486 10 10 10 10-4.486 10-10-4.486-10-10-10zM18 13h-6.75V6h2v5H18v2z">
                                 </path>
                             </svg>
-                            {handleFormattedDate(data.bookings[0].check_in_at, data.bookings[0].check_out_at)}
+                            {handleFormattedDate(data.bookings[0].booking_at, data.bookings[0].check_out_at)}
                         </div>
                     </div>
                 }
@@ -181,9 +210,19 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
 
             {data.status === "Trống"
                 ?
-                <UnusedRoomPopup ref={popupRef} showPopup={showPopup} position={popupPosition} clean_status={data.clean_status} />
+                <UnusedRoomPopup
+                    ref={popupRef}
+                    showPopup={showPopup}
+                    position={popupPosition}
+                    data={data}
+                    handleSetStatusClean={handleSetStatusClean} />
                 :
-                <InusedRoomPopup ref={popupRef} showPopup={showPopup} position={popupPosition} clean_status={data.clean_status} />
+                <InusedRoomPopup
+                    ref={popupRef}
+                    showPopup={showPopup}
+                    position={popupPosition}
+                    data={data}
+                    handleSetStatusClean={handleSetStatusClean} />
             }
 
         </section>

@@ -39,12 +39,12 @@ const ServiceList: React.FC<IProps> = () => {
     useEffect(() => {
         let newData: Services[] = data?.data;
         if (tabActive !== TAB_SERVICE_FINAL.ALL) {
-            newData = newData.filter((item: Services) => item.category.name === tabActive);
+            newData = newData?.filter((item: Services) => item.category.name === tabActive);
         }
         if (tabActive === TAB_SERVICE_FINAL.EXTENDED_SERVICE) newData = [];
 
         if (search) {
-            newData = newData.filter((item: Services) => item.name.toLowerCase().trim().includes(search.toLowerCase().trim()));
+            newData = newData?.filter((item: Services) => item.name.toLowerCase().trim().includes(search.toLowerCase().trim()));
         }
 
         setDataOnTab(newData);

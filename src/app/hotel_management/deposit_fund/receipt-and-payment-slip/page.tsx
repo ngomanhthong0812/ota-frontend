@@ -31,15 +31,36 @@ const fetcher = (url: string) =>
     });
 const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [transactionType, setTransactionType] = useState("");
 
+  console.log("check gửi api", page, endDate, transactionType);
+
+  // Hàm xử lý khi thay đổi ngày bắt đầu
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+  };
+
+  // Hàm xử lý khi thay đổi ngày kết thúc
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+  };
+
+  // Hàm xử lý khi thay đổi loại giao dịch
+  const handleTransactionTypeChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setTransactionType(e.target.value);
+  };
   const { data, error, isLoading, mutate } = useSWR(
-    `http://localhost:8080/api/transaction/bank?page=${page}`,
+    `http://localhost:8080/api/transaction/bank?fromDate=${startDate}&toDate=${endDate}&page=${page}&type=${transactionType}`,
     fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 1000,
+      refreshInterval: 100000,
     }
   );
 
@@ -78,19 +99,21 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
       {/* <!-- start Body Content --> */}
       <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex items-center gap-8">
-          <select className="btn !py-1 !px-2 !w-auto">
+          {/* <select className="btn !py-1 !px-2 !w-auto">
             <option value="today">Hôm nay</option>
             <option value="week">Tuần này</option>
-            <option value="this-month">Tháng này</option>
-            <option value="last-month">Tháng trước</option>
+            <option value="month">Tháng này</option>
+
             <option value="quarter">Quý này</option>
-          </select>
+          </select> */}
           <div className="center">
             <label form="start-date">Từ</label>
             <input
               type="date"
               id="start-date"
               className="btn !py-1 !px-2 !w-auto ml-2"
+              value={startDate}
+              onChange={handleStartDateChange}
             />
             {/* <!-- Lấy thời gian hiện tại làm mặt định qua js --> */}
           </div>
@@ -100,14 +123,21 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
               type="date"
               id="end-date"
               className="btn !py-1 !px-2 !w-auto ml-2"
+              value={endDate}
+              onChange={handleEndDateChange}
             />
             {/* <!-- Lấy thời gian hiện tại làm mặt định qua js--> */}
           </div>
-          <select className="btn !py-1 !px-2 !w-auto">
-            <option>Phiếu thu tiền</option>
-            <option>Phiếu chi tiền</option>
+          <select
+            className="btn !py-1 !px-2 !w-auto"
+            onChange={handleTransactionTypeChange}
+          >
+            <option value="">All</option>
+            <option value="income">Phiếu thu tiền</option>
+            <option value="expense">Phiếu chi tiền</option>
           </select>
-          <button className="sbm group">
+          {/* bấm gửi  */}
+          {/* <button className="sbm group" onClick={handleSubmit}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -120,7 +150,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
             >
               <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path>
             </svg>
-          </button>
+          </button> */}
         </div>
         <table className="w-full rounded-t-[3px] overflow-hidden mt-3">
           <thead className="relative border !border-[var(--ht-neutral-100-)] font-[500] text-[var(--color-menu-icon-)]">

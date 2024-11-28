@@ -1,13 +1,13 @@
 'use client'
 
-import { UseSelectedService } from "@/context/selectedService.context";
+import { useSelectedService } from "@/context/selectedService.context";
 import { SelectedServiceType } from "@/types/backend";
 import SelectedItems from "./selected_items";
 
 interface IProps { }
 
 const SelectedList: React.FC<IProps> = () => {
-    const { selectedService } = UseSelectedService();
+    const { selectedService } = useSelectedService();
 
     return (
         <div

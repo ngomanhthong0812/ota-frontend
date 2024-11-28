@@ -1,5 +1,5 @@
 'use client'
-import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useContext, useMemo } from 'react';
 import { parseCookies, setCookie } from 'nookies';
 import { User } from '@/types/backend';
 
@@ -49,8 +49,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setCookie(null, "user", "", { path: "/", maxAge: -1 });
     }
 
+    const contextValue = useMemo(
+        () => ({
+            token,
+            user,
+            saveToken,
+            clearToken,
+        }),
+        [token, user]
+    );
+
     return (
-        <AuthContext.Provider value={{ token, user, saveToken, clearToken }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     )

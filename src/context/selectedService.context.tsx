@@ -66,7 +66,7 @@ export const SelectedServiceProvider = ({ children }: { children: ReactNode }) =
     )
 }
 
-export const UseSelectedService = () => {
+export const useSelectedService = () => {
     const context = useContext(SelectedServiceContext);
     if (!context) {
         throw new Error('useToolbar must be used within a ToolbarProvider');

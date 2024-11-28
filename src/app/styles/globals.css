@@ -107,6 +107,10 @@ body svg {
   @apply text-[var(--navbar-color-)] bg-[var(--ht-body-bg-)];
 }
 
+.toolbar-top-room-detail .active svg {
+  @apply !fill-[var(--room-empty-color-)];
+}
+
 .toolbar-top-type_item {
   @apply flex items-center justify-center p-2 px-3 min-w-[100px] whitespace-nowrap rounded-full hover:text-[var(--navbar-color-)] duration-300 select-none;
 }
@@ -268,6 +272,7 @@ body svg {
 
     --radius: 0.5rem
   }
+
   .dark {
 
     --background: 0 0% 3.9%;
@@ -324,6 +329,7 @@ body svg {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

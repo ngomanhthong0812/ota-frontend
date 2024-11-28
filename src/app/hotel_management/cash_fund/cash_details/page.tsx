@@ -20,6 +20,8 @@ interface Transaction {
 
 const CashDetailsPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const cookies = parseCookies();
   const token = cookies.access_token;
   const fetcher = (url: string) =>
@@ -36,15 +38,15 @@ const CashDetailsPage: React.FC = ({}) => {
       .catch((error) => {
         console.error("Fetch error:", error);
       });
-      
+
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/details/cash?page=${page}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/details/cash?page=${page}&fromDate=${startDate}&toDate=${endDate}`,
     fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 1000,
+      refreshInterval: 100000,
     }
   );
 
@@ -56,12 +58,19 @@ const CashDetailsPage: React.FC = ({}) => {
   if (!data) {
     return <div>Loading...</div>;
   }
+  // Hàm xử lý khi thay đổi ngày bắt đầu
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+  };
 
+  // Hàm xử lý khi thay đổi ngày kết thúc
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+  };
   const tableData: Transaction[] = data?.data.transactions;
   const totalPages = data?.data.totalPages;
   const totalIncome = data?.data.totalIncome;
   const totalExpense = data?.data.totalExpense;
-  console.log(totalPages);
 
   const formatter = new Intl.NumberFormat("en-US");
   return (
@@ -70,18 +79,20 @@ const CashDetailsPage: React.FC = ({}) => {
       <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex justify-between">
           <div className="flex items-center gap-8">
-            <select className="btn !py-1 !px-2 !w-auto">
+            {/* <select className="btn !py-1 !px-2 !w-auto">
               <option value="today">Hôm nay</option>
               <option value="week">Tuần này</option>
               <option value="month">Tháng này</option>
               <option value="month">Tháng trước</option>
               <option value="month">Quý này</option>
-            </select>
+            </select> */}
             <div className="center">
               <label form="start-date">Từ</label>
               <input
                 type="date"
                 id="start-date"
+                value={startDate}
+                onChange={handleStartDateChange}
                 className="btn !py-1 !px-2 !w-auto ml-2"
               />
               {/* <!-- Lấy thời gian hiện tại làm mặt định qua js --> */}
@@ -91,6 +102,8 @@ const CashDetailsPage: React.FC = ({}) => {
               <input
                 type="date"
                 id="end-date"
+                value={endDate}
+                onChange={handleEndDateChange}
                 className="btn !py-1 !px-2 !w-auto ml-2"
               />
               {/* <!-- Lấy thời gian hiện tại làm mặt định qua js--> */}
