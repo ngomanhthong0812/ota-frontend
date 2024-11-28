@@ -1,3 +1,5 @@
+"use client"
+
 import { NextPage } from "next";
 import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
