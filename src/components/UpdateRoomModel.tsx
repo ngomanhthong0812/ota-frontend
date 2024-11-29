@@ -6,12 +6,9 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  Tab,
-  Tabs,
-  Box,
 } from "@mui/material";
 import { useState } from "react";
-import { FaPencilAlt, FaRegSave } from "react-icons/fa";
+import { FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import ImageInput from "./ImageInput";
 import AddAreaPopUp from "./AddAreaPopUp";
@@ -22,13 +19,12 @@ import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 import SelectRoomType from "./selectRoomType";
 import SelectFloor from "./selectFloor";
+import { callApi } from "@/utils/api";
 interface UpdateRoomModelProps {
   open: boolean;
   onClose: () => void;
   idRoom: number | null;
 }
-const cookies = parseCookies();
-const token = cookies.access_token;
 const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
   open,
   onClose,
@@ -65,18 +61,12 @@ const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
   // Hàm fetchRoomTypes cập nhật formData
   const fetchRoomTypes = async () => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${idRoom}`,
-        config
+      // Sử dụng callApi thay vì axios trực tiếp
+      const response = await callApi<any>(
+        `/api/room/${idRoom}`, // Endpoint của API
+        "GET",
+        formData // Dữ liệu gửi lên
       );
-      console.log("id phòng: ", response.data.data);
       if (response.data.statusCode === 200 && response.data.data) {
         const data = response.data.data;
         setFormData({
@@ -120,16 +110,11 @@ const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
       setError(null); // Đặt lại lỗi cũ
 
       console.log("data trước khi tạo phòng: ", formData);
-
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${idRoom}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      // Sử dụng callApi thay vì axios trực tiếp
+      const response = await callApi<any>(
+        `/api/room/${idRoom}`, // Endpoint của API
+        "PUT",
+        formData // Dữ liệu gửi lên
       );
 
       console.log(response);

@@ -1,20 +1,10 @@
 import axios from "axios";
 import { NextPage } from "next";
-import { parseCookies } from "nookies";
 import React, { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { toast } from "react-toastify";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  Tab,
-  Tabs,
-  Box,
-} from "@mui/material";
 import UpdateRoomManagerDialog from "@/components/UpdateRoomType";
+import { callApi } from "@/utils/api";
 interface Props {}
 interface Room {
   roomId: number;
@@ -40,8 +30,7 @@ interface RoomType {
   totalRooms: number;
   rooms: Room[];
 }
-const cookies = parseCookies();
-const token = cookies.access_token; // Giả sử cookie chứa access_token
+
 const RoomCategoryPage: NextPage<Props> = ({}) => {
   const [selectedRoomDetails, setSelectedRoomDetails] =
     useState<RoomType | null>(null);
@@ -76,7 +65,7 @@ const RoomCategoryPage: NextPage<Props> = ({}) => {
   const handleCloseUpdateDialog = () => {
     setSelectedRoomTypeId(null);
     setUpdateDialogOpen(false);
-  };  
+  };
 
   // Callback khi cập nhật thành công
   const handleUpdateSuccess = () => {
@@ -87,17 +76,9 @@ const RoomCategoryPage: NextPage<Props> = ({}) => {
     try {
       setLoading(true);
       setError(null);
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/findAllRoomType`,
-        config
+      const response = await callApi<any>(
+        `/api/room-type/findAllRoomType`, // Endpoint của API
+        "GET"
       );
 
       // Log dữ liệu trả về để kiểm tra cấu trúc
@@ -120,15 +101,11 @@ const RoomCategoryPage: NextPage<Props> = ({}) => {
   const deleteTransaction = async (id: number, code: string) => {
     try {
       // Gửi yêu cầu xóa dữ liệu
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await callApi<any>(
+        `/api/room-type/${id}`, // Endpoint của API
+        "DELETE"
       );
+
       // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công

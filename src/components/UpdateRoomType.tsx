@@ -17,6 +17,7 @@ import ImageInput from "./ImageInput";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
+import { callApi } from "@/utils/api";
 
 interface UpdateRoomManagerDialogProps {
   isOpen: boolean;
@@ -24,8 +25,7 @@ interface UpdateRoomManagerDialogProps {
   roomTypeId: number | null;
   onUpdateSuccess: () => void;
 }
-const cookies = parseCookies();
-const token = cookies.access_token; // Giả sử cookie chứa access_token
+
 const UpdateRoomManagerDialog: React.FC<UpdateRoomManagerDialogProps> = ({
   isOpen,
   onClose,
@@ -63,16 +63,10 @@ const UpdateRoomManagerDialog: React.FC<UpdateRoomManagerDialogProps> = ({
   // Hàm fetchRoomTypes cập nhật formData
   const fetchRoomTypes = async () => {
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/getone/${roomTypeId}`,
-        config
+      const response = await callApi<any>(
+        `/api/room-type/getone/${roomTypeId}`, // Endpoint của API
+        "GET",
+        formData // Dữ liệu gửi lên
       );
       if (response.data.statusCode === 200) {
         const data = response.data.data;
@@ -125,16 +119,11 @@ const UpdateRoomManagerDialog: React.FC<UpdateRoomManagerDialogProps> = ({
 
       setLoading(true);
       setError(null);
-
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type/${roomTypeId}`,
-        sanitizedData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      // Sử dụng callApi thay vì axios trực tiếp
+      const response = await callApi<any>(
+        `/api/room-type/${roomTypeId}`, // Endpoint của API
+        "PUT",
+        sanitizedData // Dữ liệu gửi lên
       );
 
       if (response.data.statusCode === 200) {

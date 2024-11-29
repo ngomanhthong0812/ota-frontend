@@ -2,7 +2,6 @@
 
 import { FaPrint } from "react-icons/fa6";
 import { CiCircleRemove } from "react-icons/ci";
-import { FaPlus } from "react-icons/fa6";
 import { use, useEffect, useState } from "react";
 import AddServicesModal from "@/components/room/modals/add_services.modal";
 import { useRouter } from "next/navigation";
@@ -12,6 +11,7 @@ import useSWR from "swr";
 import CheckOutModal from "@/components/room/modals/checkout.modal";
 import CheckOutAndPayModal from "@/components/room/modals/checkout_and_pay.modal";
 import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
+import { useParams } from "next/navigation"
 
 const cookies = parseCookies();
 const token = cookies.access_token;
@@ -21,8 +21,8 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
     const [activeTab, setActiveTab] = useState<string>("denHienTai");
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
-    const [roomName, setRoomName] = useState<string>("");
-    const [roomPrice, setRoomPrice] = useState<number>("");
+    const [roomDetails, setRoomDetails] = useState<{ name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
+    const [roomPrice, setRoomPrice] = useState<number>(0);
     const [showModalCheckOut, setShowModalCheckOut] = useState<boolean>(false);
     const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState<boolean>(false);
     const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
@@ -30,7 +30,6 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
     const formattedPrice = new Intl.NumberFormat("vi-VN").format(roomPrice);
 
     const {id} = use(params);
-
     const fetcher = (url: string) =>
       fetch(url, {
         headers: {
@@ -46,7 +45,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
           console.error("Fetch error:", error);
         });
     const { data, error, isLoading } = useSWR(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${id}`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/invoiceById/${id}`,
       fetcher,
       {
         revalidateIfStale: false,
@@ -56,9 +55,14 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
     );
   
     useEffect(() => {
-      if(data) {
-        setRoomName(data.data.name)
-        setRoomPrice(data.data.price)
+      if(data && data.data) {
+        setRoomPrice(data?.data?.bookings?.total)
+
+        const roomDetailsList = data.data.rooms.map((room: any) => ({
+          name: room.name,
+          price: room.price,
+        }));
+        setRoomDetails(roomDetailsList);  // Cập nhật state với tên và giá phòng
       }
     },[data])
   
@@ -109,7 +113,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                       <span>Hoá đơn</span>
                     </p>
                     <p className="price">
-                      <span>{formattedPrice} VND</span>
+                      <span>{formattedPrice} VNĐ</span>
                     </p>
                   </div>
 
@@ -417,7 +421,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                       <span>Hoá đơn</span>
                     </p>
                     <p className="price">
-                      <span>{formattedPrice} VND</span>
+                      <span>{formattedPrice} VNĐ</span>
                     </p>
                   </div>
 
@@ -713,8 +717,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
         <CheckOutAndPayModal
                     showModal={showModalCheckOutAndPay}
                     closeModal={() => setShowModalCheckOutAndPay(false)}
-                    roomName={roomName}
-                    roomPrice={roomPrice}
+                    roomDetails={roomDetails}  // Truyền thông tin phòng và giá vào modal
                   />        
 
         <CheckOutModal 

@@ -1,3 +1,4 @@
+import { callApi } from "@/utils/api";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
@@ -14,9 +15,6 @@ interface User {
   user_name: string;
 }
 
-const cookies = parseCookies();
-const token = cookies.access_token;
-
 const SelectUserUpdate: React.FC<Props> = ({
   value,
   onChange,
@@ -30,15 +28,11 @@ const SelectUserUpdate: React.FC<Props> = ({
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/userbyhotel/all`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Thay token vào đây
-              "Content-Type": "application/json",
-            },
-          }
+        const response = await callApi<any>(
+          `/api/users/userbyhotel/all`, // Endpoint của API
+          "GET"
         );
+
         setUsers(response.data.data); // Giả sử dữ liệu trả về là response.data.data
       } catch (error) {
         console.error("Có lỗi khi lấy danh sách người dùng", error);

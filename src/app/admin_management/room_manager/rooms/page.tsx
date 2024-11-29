@@ -1,8 +1,6 @@
 import UpdateRoomModel from "@/components/UpdateRoomModel";
+import { callApi } from "@/utils/api";
 import axios from "axios";
-import { Table } from "lucide-react";
-import { NextPage } from "next";
-import { parseCookies } from "nookies";
 import React, { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { toast } from "react-toastify";
@@ -39,8 +37,6 @@ interface Room {
   status: string;
 }
 
-const cookies = parseCookies();
-const token = cookies.access_token;
 const RoomsPage: React.FC<IProps> = () => {
   const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(
     null
@@ -67,16 +63,9 @@ const RoomsPage: React.FC<IProps> = () => {
       setLoading(true);
       setError(null);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/getrooms/all`,
-        config
+      const response = await callApi<any>(
+        `/api/room/getrooms/all`, // Endpoint của API
+        "GET"
       );
 
       // Log dữ liệu trả về để kiểm tra cấu trúc
@@ -101,15 +90,11 @@ const RoomsPage: React.FC<IProps> = () => {
   const deleteRoom = async (id: number, name: string) => {
     try {
       // Gửi yêu cầu xóa dữ liệu
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await callApi<any>(
+        `/api/room/${id}`, // Endpoint của API
+        "DELETE"
       );
+
       // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công
