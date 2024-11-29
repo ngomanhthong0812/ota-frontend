@@ -1,9 +1,11 @@
+import AreaComponent from "@/components/area";
 import UpdateRoomModel from "@/components/UpdateRoomModel";
 import { callApi } from "@/utils/api";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { toast } from "react-toastify";
+import { Area } from "recharts";
 
 interface IProps {}
 interface roomType {
@@ -135,8 +137,9 @@ const RoomsPage: React.FC<IProps> = () => {
     setUpdateDialogOpen(false);
   };
   return (
-    <div className="">
-      <div className="flex  flex-col bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
+    <div className="flex gap-5">
+      <AreaComponent />
+      <div className="flex w-full  flex-col bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
         <div className="flex gap-5 items-center text-center">
           <div className="border w-60 flex justify-center items-center py-1 px-2">
             <input

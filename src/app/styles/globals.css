@@ -339,3 +339,46 @@ body svg {
 .no-spinner {
   -moz-appearance: textfield;
 }
+.chart .CircularProgressbar {
+  width: 80px;
+  height: 80px;
+}
+.chart .css-1evyvmv-MuiChartsSurface-root {
+  width: 100%;
+  height: 100%;
+}
+/* Ẩn thanh cuộn mặc định */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Thanh cuộn mỏng trên Firefox */
+  scrollbar-color: transparent transparent; /* Ẩn thanh cuộn trên Firefox */
+}
+
+/* Thanh cuộn webkit */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0px; /* Đặt chiều rộng thanh cuộn là 0 để ẩn */
+  height: 0px; /* Đặt chiều cao thanh cuộn ngang là 0 */
+}
+
+/* Khi hover vào container, hiển thị thanh cuộn */
+.custom-scrollbar:hover::-webkit-scrollbar {
+  width: 6px; /* Hiển thị thanh cuộn ngang khi hover */
+  height: 6px; /* Hiển thị thanh cuộn dọc khi hover */
+}
+
+/* Track của thanh cuộn */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6; /* Màu nền của track */
+  border-radius: 12px; /* Bo góc track */
+}
+
+/* Thumb của thanh cuộn */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563; /* Màu của thumb */
+  border-radius: 12px; /* Bo góc thumb */
+  border: 2px solid #f3f4f6; /* Viền quanh thumb tạo khoảng cách */
+}
+
+/* Hover vào thumb */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #374151; /* Màu của thumb khi hover */
+}

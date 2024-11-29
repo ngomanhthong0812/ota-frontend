@@ -1,10 +1,9 @@
 import { callApi } from "@/utils/api";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface Props {
-  value: string | number; // Giá trị hiện tại của floor
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value: string | number; // Giá trị hiện tại của floor (ID của tầng)
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; // Hàm xử lý khi thay đổi lựa chọn
 }
 
 interface Floor {
@@ -39,35 +38,29 @@ const SelectFloor: React.FC<Props> = ({ value, onChange }) => {
 
   // Hiển thị loading nếu dữ liệu đang được tải
   if (loading) {
-    return (
-      <div className="loading-spinner">
-        {/* Thay thế với loading spinner hoặc GIF nếu cần */}
-        Đang tải dữ liệu...
-      </div>
-    );
+    return <div>Đang tải dữ liệu...</div>;
   }
 
   // Hiển thị thông báo lỗi nếu có lỗi xảy ra
   if (error) {
-    return <div className="error-message">{error}</div>;
+    return <div>{error}</div>;
   }
 
   return (
     <select
       name="floor_id"
-      value={value}
-      onChange={onChange}
+      value={value} // Truyền vào giá trị của tầng đã chọn
+      onChange={onChange} // Xử lý khi thay đổi tầng
       className="focus:outline-none w-full text-sm"
     >
+      <option value="">--Lựa chọn--</option>
+      {/* Option mặc định khi không có giá trị */}
       {floors && floors.length > 0 ? (
-        <>
-          <option value="">--Lựa chọn--</option>
-          {floors.map((floor) => (
-            <option key={floor.id} value={floor.id}>
-              {floor.name}
-            </option>
-          ))}
-        </>
+        floors.map((floor) => (
+          <option key={floor.id} value={floor.id}>
+            {floor.name}
+          </option>
+        ))
       ) : (
         <option value="" disabled>
           Chưa có tầng, vui lòng thêm tầng mới

@@ -407,25 +407,13 @@ const RoomCategoryPage: NextPage<Props> = ({}) => {
                                       {room.roomName}
                                     </td>
                                     <td className="px-2 py-2 border-b">
-                                      Chi nhánh A
+                                      {room.floorName}
                                     </td>
                                     <td className="px-2 py-2 border-b">
                                       {room.status}
                                     </td>
                                   </tr>
                                 ))}
-
-                                <tr>
-                                  <td className="px-2 py-2 border-b">
-                                    Phòng 2
-                                  </td>
-                                  <td className="px-2 py-2 border-b">
-                                    Chi nhánh B
-                                  </td>
-                                  <td className="px-2 py-2 border-b">
-                                    Đang bảo trì
-                                  </td>
-                                </tr>
                               </tbody>
                             </table>
                           </div>
