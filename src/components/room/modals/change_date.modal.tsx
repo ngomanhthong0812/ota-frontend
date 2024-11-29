@@ -9,14 +9,14 @@ interface IProps {
     showModal: boolean;
     closeModal: () => void;
     roomName: string;
-
+    customerName: string;
     checkInDate: string; 
     checkOutDate: string;
 
     onSave: (updatedCheckIn: string, updatedCheckOut: string) => void;
 }
 const ChangeDateModal = (props: IProps) => {
-    const {showModal, closeModal, roomName, checkInDate, checkOutDate, onSave} = props;
+    const {showModal, closeModal, roomName, customerName, checkInDate, checkOutDate, onSave} = props;
 
     const [updatedCheckIn, setUpdatedCheckIn] = useState(checkInDate);
     const [updatedCheckOut, setUpdatedCheckOut] = useState(checkOutDate);
@@ -49,13 +49,12 @@ const ChangeDateModal = (props: IProps) => {
                 <div className="grid grid-cols-2 modal-body mt-3">
                     <div className="flex items-center gap-3">
                         
-                        <p>{roomName}</p>
+                        <p>Phòng: {roomName}</p>
                     </div>
 
                     <div>
                         <p className="flex items-center gap-2">
-                            
-                            Guest
+                            Khách hàng: {customerName}
                         </p>
                     </div>
                 </div>

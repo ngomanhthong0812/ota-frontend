@@ -1,17 +1,23 @@
+"use client"
+
 import {
     Dialog,
     DialogContent,
     DialogTitle,
   } from "@/components/ui/dialog"
+ 
+import { toast } from "sonner"
+ 
 
 interface IProps {
     showModal: boolean;
     closeModal: () => void;
-    roomDetails: { name: string; price: number }[];  // Thông tin phòng và giá
+    roomName: string;
+    roomPrice: number;
 }
-const CheckOutAndPayModal = (props: IProps) => {
+const CheckOutAndPayModalForRoom = (props: IProps) => {
 
-    const {showModal, closeModal, roomDetails} = props;
+    const {showModal, closeModal, roomName, roomPrice} = props;
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat("vi-VN").format(amount);
@@ -19,6 +25,13 @@ const CheckOutAndPayModal = (props: IProps) => {
 
     const handleCheckOut = () => {
         closeModal();
+        toast("Thanh toan thanh cong", {
+            description: "Sunday, December 03, 2023 at 9:00 AM",
+            action: {
+                label: "Undo",
+                onClick: () => console.log("Undo"),
+            },
+        })
     }
 
     return (
@@ -28,19 +41,12 @@ const CheckOutAndPayModal = (props: IProps) => {
 
                 <div className="mt-3">
                     <ul>
-                        {roomDetails.length > 0 ? (
-                            roomDetails.map((room, index) => (
-                                <li key={index}>
-                                    <div className="flex items-center justify-between">
-                                        <p className="room-name">{room.name}</p>
-
-                                        <p className="room-price">{formatCurrency(room.price)} VND</p>
-                                    </div>
-                                </li>
-                            ))
-                        ) : (
-                            <li>No rooms available</li>
-                        )}
+                        <li>
+                            <div className="flex items-center justify-between">
+                                <p className="room-name">{roomName}</p>
+                                <p className="room-price">{formatCurrency(roomPrice)} VND</p>
+                            </div>
+                        </li>
                     </ul>
                 
                 </div>
@@ -95,4 +101,4 @@ const CheckOutAndPayModal = (props: IProps) => {
     )
 }
 
-export default CheckOutAndPayModal;
+export default CheckOutAndPayModalForRoom;

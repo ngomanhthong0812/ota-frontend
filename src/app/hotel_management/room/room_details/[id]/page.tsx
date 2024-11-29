@@ -7,11 +7,23 @@ import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";
 import { use, useEffect, useState } from "react";
 import useSWR, { Fetcher } from "swr";
-import CheckOutAndPayModal from "@/components/room/modals/checkout_and_pay.modal";
 import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
+import CheckOutAndPayModalForRoom from "@/components/room/modals/checkout_and_pay_for_room.modal";
+import CheckInModal from "@/components/room/modals/check_in.modal";
+import { useSWRConfig } from "swr"
 
 const cookies = parseCookies();
 const token = cookies.access_token;
+
+interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  gender: string;
+  birthday: string;
+  hotel_id: number;
+}
 
 interface Booking {
     id: number;
@@ -21,31 +33,28 @@ interface Booking {
     children: number;
     adults: number;
     status: string;
-}
-  
-interface Hotel {
-    id: number;
-    name: string;
+    customer: Customer;
 }
 
 interface Room {
   id: number;
   name: string;
-  price:number
+  clean_status: boolean;
   status: string;
-  clean_status:boolean;
+  price: number;
   room_type: string;
-  room_type_id:number;
-  floor_id:number;
-  hotel_id:number;
   floor: string;
-  hotel: Hotel;
+  hotel: {
+    id: number;
+    name: string;
+  };
   bookings: Booking[];
 }
 
 const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
 
   const router = useRouter();
+  const { mutate } = useSWRConfig()
 
   const [roomName, setRoomName] = useState<string>("");
   const [roomPrice, setRoomPrice] = useState<number>(0);
@@ -53,6 +62,7 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
   const [showModal, setShowModal] = useState(false);
   const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState<boolean>(false);
   const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
+  const [showModalCheckIn, setShowModalCheckIn] = useState<boolean>(false);
 
   const { id } = use(params);
   const fetcher = (url: string) =>
@@ -126,7 +136,71 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
       console.error("Failed to update booking dates:", error);
     }
   };
+
+  const handleCreateCheckIn = async (createCheckIn: string, createCheckOut: string) => {
+    try {
+        const bookingId = bookings[0]?.id;
+
+        if (!bookingId) {
+            alert("Không tìm thấy booking.");
+            return;
+        }
+
+        // Gửi yêu cầu cập nhật lên API
+        const response = await axios.put(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/${bookingId}`,
+            {
+                check_in_at: createCheckIn,
+                check_out_at: createCheckOut,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (response.status === 200) {
+            // Cập nhật bookings trong state
+            setBookings((prev) =>
+                prev.map((booking) =>
+                    booking.id === bookingId
+                        ? { ...booking, check_in_at: createCheckIn, check_out_at: createCheckOut }
+                        : booking
+                )
+            );
+
+            // Làm mới dữ liệu bookings trong bộ nhớ đệm của SWR
+            mutate(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings`);
+
+            alert("Nhận phòng thành công!");
+        } else {
+          alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+        }
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Server error:", error.response.data);
+        alert(`Lỗi: ${error.response.data.message || "Không thể nhận phòng."}`);
+      } else if (error.request) {
+        console.error("Network error:", error.request);
+        alert("Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng.");
+      } else {
+        console.error("Error:", error.message);
+        alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+      }
+    }
+  };
+
+  const formatForInput = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
   
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   return (
     <div>
@@ -172,41 +246,46 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
                   </div>
 
                   <div>
+                    {bookings.length > 0 ? (
+                      bookings.map((booking) => {
+                        const isCheckedIn = Boolean(booking.check_in_at)
+
+                        console.log("Checkin", isCheckedIn);
+                        
+                        return (
+                          <div key={booking.id}>
+                            {isCheckedIn ? (
+                              <button className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
+                                onClick={() => setShowModalCheckOutAndPay(true)}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-pink-500">
+                                  <path d="M11 3L10.3374 3.23384C7.75867 4.144 6.46928 4.59908 5.73464 5.63742C5 6.67576 5 8.0431 5 10.7778V13.2222C5 15.9569 5 17.3242 5.73464 18.3626C6.46928 19.4009 7.75867 19.856 10.3374 20.7662L11 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                  <path d="M21 12L11 12M21 12C21 11.2998 19.0057 9.99153 18.5 9.5M21 12C21 12.7002 19.0057 14.0085 18.5 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                Trả phòng
+                              </button>
+                            ) : (
+                              <button className="btn-fn bg-[var(--room-not-checked-out-color-200-)] text-white"
+                                onClick={() => setShowModalCheckIn(true)}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-white">
+                                  <path d="M2 3.5V20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M22 8.5L22 20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M2 8.5L6 10.5H22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M2 15.5H6M22 15.5H19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M6 10.5V16.5C6 18.1547 6.34533 18.5 8 18.5H17C18.6547 18.5 19 18.1547 19 16.5V10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M6.81362 10.5C6.89385 10.076 7.0202 9.63248 6.99567 9.19713C6.95941 8.5536 6.63697 7.96625 6.1264 7.61368C5.92478 7.47446 5.48 7.33239 5.01268 7.21093C4.3308 7.0337 3.98986 6.94508 3.59142 7.03644C3.30841 7.10133 3.06258 7.25187 2.71115 7.52079C2.67243 7.55042 2.65307 7.56523 2.62289 7.59026C2.3843 7.78812 2.17276 8.07424 2.05352 8.36034C2.03844 8.39653 2.02562 8.43102 2 8.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                Nhận phòng
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })
+                    ) : (
+                      <p>No bookings available</p>
+                    )}
                     
-                    <CheckOutAndPayModal
-                        showModal={showModalCheckOutAndPay}
-                        closeModal={() => setShowModalCheckOutAndPay(false)}
-                        roomName={roomName}
-                        roomPrice={roomPrice}
-                    />
-
-
-                    <button className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
-                        onClick={() => setShowModalCheckOutAndPay(true)}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        className="w-4 h-4 text-pink-500 font-bold"
-                      >
-                        <path
-                          d="M11 3L10.3374 3.23384C7.75867 4.144 6.46928 4.59908 5.73464 5.63742C5 6.67576 5 8.0431 5 10.7778V13.2222C5 15.9569 5 17.3242 5.73464 18.3626C6.46928 19.4009 7.75867 19.856 10.3374 20.7662L11 21"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M21 12L11 12M21 12C21 11.2998 19.0057 9.99153 18.5 9.5M21 12C21 12.7002 19.0057 14.0085 18.5 14.5"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <p>
-                        <span>Trả phòng</span>
-                      </p>
-                    </button>
                   </div>
                 </div>
 
@@ -215,23 +294,8 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
                     <li className="py-4 border-b !border-[var(--ht-neutral-100-)]">
                       <div className="flex items-center justify-between">
                        
-                        <ChangeDateModal
-                            showModal={showModal}
-                            closeModal={() => setShowModal(false)}
-                            roomName={roomName}
-                            checkInDate={
-                                bookings.length > 0 
-                                    ? new Date(bookings[0].check_in_at).toISOString().slice(0, 16) 
-                                    : ""
-                            }
+                        
 
-                            checkOutDate={
-                                bookings.length > 0 
-                                    ? new Date(bookings[0].check_out_at).toISOString().slice(0, 16) 
-                                    : ""
-                            }
-                            onSave={handleSaveDates}
-                        />
                         
                         <div className="flex items-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={20} height={20} color={"#000000"} fill={"none"}>
@@ -242,14 +306,30 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
                             </svg>
 
                             {bookings.length > 0 ? (
-                                bookings.map((booking) => (
-                                <div key={booking.id}>
-                                    <p>Check-in: {new Date(booking.check_in_at).toLocaleString()}</p>
-                                    <p>Check-out: {new Date(booking.check_out_at).toLocaleString()}</p>
-                                </div>
-                                ))
+                              bookings.map((booking) => {
+                                const isCheckedIn = Boolean(booking.check_in_at);
+                                const date = new Date(isCheckedIn ? booking.check_in_at : booking.booking_at);
+                                const checkOutDate = new Date(booking.check_out_at);
+                                
+                                const formatDateTime = (date: Date): string => {
+                                  const day = String(date.getDate()).padStart(2, "0");
+                                  const month = String(date.getMonth() + 1).padStart(2, "0");
+                                  const year = String(date.getFullYear());
+                                  const hours = String(date.getHours()).padStart(2, "0");
+                                  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+                                  return `${hours}: ${minutes} - ${day}/${month}/${year}`;
+                                }
+                                
+                                return (
+                                  <div key={booking.id}>
+                                    <p>{isCheckedIn ? "Nhận phòng" : "Đặt phòng"}: {formatDateTime(date)}</p>
+                                    <p>Trả phòng: {formatDateTime(checkOutDate)}</p>
+                                  </div>
+                                )
+                              })
                             ) : (
-                                <p>No bookings available</p>
+                              <p>No bookings available</p>
                             )}
                         </div>
 
@@ -300,7 +380,15 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
                     </li>
 
                     <li className="py-4 border-b !border-[var(--ht-neutral-100-)] flex items-center justify-between">
-                      <p className="flex items-center gap-2">Guest</p>
+                      {bookings.length > 0 ? (
+                        bookings.map((booking) => (
+                          <div key={booking.id}>
+                            <p>Khách hàng: {booking.customer.name}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p>No bookings available.</p>
+                      )}
 
                       <button></button>
                     </li>
@@ -499,10 +587,50 @@ const ViewDetailRoom = ({ params }: { params: Promise<{ id: number }> }) => {
         </div>
       </div>
 
+      <ChangeDateModal
+        showModal={showModal}
+        closeModal={() => setShowModal(false)}
+        roomName={roomName}
+        customerName={
+          bookings.length > 0 && bookings[0].customer.name 
+            ? bookings[0].customer.name : ""
+        }
+        checkInDate={
+          bookings.length > 0 && bookings[0].check_in_at 
+            ? formatForInput(new Date(bookings[0].check_in_at))
+            : bookings.length > 0 && bookings[0].booking_at
+            ? formatForInput(new Date(bookings[0].booking_at))
+            : ""
+        }
+        checkOutDate={
+          bookings.length > 0 && bookings[0].check_out_at 
+            ? formatForInput(new Date(bookings[0].check_out_at))
+            : ""
+        }
+        onSave={handleSaveDates}
+      />
+
+      <CheckOutAndPayModalForRoom
+        showModal={showModalCheckOutAndPay}
+        closeModal={() => setShowModalCheckOutAndPay(false)}
+        roomName={roomName}
+        roomPrice={roomPrice}
+      />
+
       <RemoveServicesModal 
         showModal={showModalRemoveServices}
         closeModal={() => setShowModalRemoveServices(false)}
       />
+
+      <CheckInModal
+        showModal={showModalCheckIn}
+        closeModal={() => setShowModalCheckIn(false)}
+        checkOutAt={
+          bookings.length > 0 && bookings[0].check_out_at ? bookings[0].check_out_at : ""
+        }
+        onSave={handleCreateCheckIn}
+      />
+
     </div>
   );
 };
