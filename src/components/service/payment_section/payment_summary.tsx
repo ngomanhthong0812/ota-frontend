@@ -11,6 +11,7 @@ interface IProps {
     token: string | null,
     user: User,
     handleSavePaymentInfo: (paymentInfo: RequestPaymentService) => void,
+    setInvoiceId: (id: number) => void,
 }
 
 const fetcher = (url: string, token: string | null) =>
@@ -22,7 +23,7 @@ const fetcher = (url: string, token: string | null) =>
             },
         }).then((res) => res.json());
 
-const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo }) => {
+const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo, setInvoiceId }) => {
     const { formatPrice } = useFormatPriceWithCommas();
 
     const { totalServicePrice, selectedService } = useSelectedService();
@@ -45,7 +46,7 @@ const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo }
     const [showModaAddDiscount, setShowModaAddDiscount] = useState<boolean>(false);
 
     const { data: customer, error, isLoading } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-roomsWithCustomerToday/${user?.hotel_id}`,
+        user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-roomsWithCustomerToday/${user?.hotel_id}` : null,
         (url: string) => fetcher(url, token),
         {
             revalidateIfStale: false,
@@ -142,7 +143,23 @@ const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo }
                         <select
                             name="" id=""
                             className="btn"
-                            onChange={(e) => setPaymentInfo(prev => ({ ...prev, paymentOption: e.target.value }))}
+                            onChange={(e) => {
+                                const selectedIndex = e.target.selectedIndex;
+                                setPaymentInfo(prev => ({ ...prev, paymentOption: e.target.value }));
+
+                                if (selectedIndex > 0) {
+                                    const selectedItem = customer?.data[selectedIndex - 1];
+                                    if (
+                                        selectedItem?.bookings?.length > 0 &&
+                                        selectedItem.bookings[0]?.invoice?.length > 0 &&
+                                        selectedItem.bookings[0].invoice[0]?.id
+                                    ) {
+                                        setInvoiceId(selectedItem.bookings[0].invoice[0].id);
+                                    } else {
+                                        console.warn('Không tìm thấy invoice ID.');
+                                    }
+                                }
+                            }}
                         >
                             <option>{PAYMENT_OPTIONS.PAYMENT_AT_THE_COUNTER}</option>
                             {customer?.data?.map((item: any) => (

@@ -9,6 +9,7 @@ interface TypeSelectedServiceContext {
     handleClearSelectedService: (id: number) => void,
     handleIncreaseQuantityService: (quantity: number, id: number) => void,
     handleDecreaseQuantityService: (quantity: number, id: number) => void,
+    handleClearAllSelectedService: () => void,
 }
 const SelectedServiceContext = createContext<TypeSelectedServiceContext | undefined>(undefined);
 
@@ -50,6 +51,9 @@ export const SelectedServiceProvider = ({ children }: { children: ReactNode }) =
             return (item.id === id && item.quantity > 1) ? { ...item, quantity: item.quantity - quantity } : item;
         }));
     }
+    const handleClearAllSelectedService = () => {
+        setSelectedService([]);
+    }
     return (
         <SelectedServiceContext.Provider
             value={{
@@ -59,7 +63,8 @@ export const SelectedServiceProvider = ({ children }: { children: ReactNode }) =
                 handleAddSelectedService,
                 handleClearSelectedService,
                 handleIncreaseQuantityService,
-                handleDecreaseQuantityService
+                handleDecreaseQuantityService,
+                handleClearAllSelectedService,
             }}>
             {children}
         </SelectedServiceContext.Provider>

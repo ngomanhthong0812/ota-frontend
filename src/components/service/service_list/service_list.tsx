@@ -27,7 +27,7 @@ const ServiceList: React.FC<IProps> = () => {
     const [tabActive, setTabActive] = useState<string>(TAB_SERVICE_FINAL.ALL);
 
     const { data, error, isLoading } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services/servicesByHotelId/${user?.hotel_id}`,
+        user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services/servicesByHotelId/${user?.hotel_id}` : null,
         (url: string) => fetcher(url, token),
         {
             revalidateIfStale: false,

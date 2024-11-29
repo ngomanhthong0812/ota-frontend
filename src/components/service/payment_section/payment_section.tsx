@@ -10,16 +10,18 @@ import { useAuth } from "@/context/auth.context";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
 interface IProps { }
 
 const PaymentSection: React.FC<IProps> = () => {
     const router = useRouter();
     const { user, token } = useAuth();
-    const { totalService, selectedService } = useSelectedService();
+    const { totalService, selectedService, handleClearAllSelectedService } = useSelectedService();
 
     const [showModalInvoiceCreationConfirmation, setShowModalInvoiceCreationConfirmation] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [invoiceId, setInvoiceId] = useState<number | null>(null);
 
     const [paymentInfoService, setPaymentInfoService] = useState<RequestPaymentService>({
         paymentOption: PAYMENT_OPTIONS.PAYMENT_AT_THE_COUNTER,
@@ -84,8 +86,33 @@ const PaymentSection: React.FC<IProps> = () => {
         }
     }
 
-    const handleAddServiceForRoom = () => {
-        alert("Chất năng đang phát triễn");
+    const handleAddServiceForRoom = async () => {
+        if (selectedService.length > 0) {
+            setIsLoading(true)
+            try {
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoiceItems/createInvoices/${invoiceId}`,
+                    selectedService,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                // Kiểm tra phản hồi từ API
+                if (response.data.statusCode === 200 || response.status === 201) {
+                    console.log("Gửi thành công");
+                    handleClearAllSelectedService();
+                    setIsLoading(false);
+                    toast("Đã thêm dịch vụ vào phòng!")
+                }
+            } catch (error) {
+                setIsLoading(false);
+                // In thông tin lỗi khi gặp sự cố
+                console.log("Lỗi khi gửi dữ liệu:", error);
+            }
+        }
     }
 
     return (
@@ -125,6 +152,7 @@ const PaymentSection: React.FC<IProps> = () => {
                             token={token}
                             user={user}
                             handleSavePaymentInfo={handleSavePaymentInfo}
+                            setInvoiceId={setInvoiceId}
                         />
                     </div>
                 </div>
