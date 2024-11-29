@@ -14,16 +14,13 @@ import { useState } from "react";
 import { FaPencilAlt, FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import ImageInput from "./ImageInput";
-import axios from "axios";
-import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
+import { callApi } from "@/utils/api";
 
 interface RoomManagerDialogProps {
   open: boolean;
   onClose: () => void;
 }
-const cookies = parseCookies();
-const token = cookies.access_token; // Giả sử cookie chứa access_token
 const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
   open,
   onClose,
@@ -46,37 +43,6 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
     maxCapacity: 2,
     maxChildren: 2,
   });
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-
-  //   // Kiểm tra nếu là trường số
-  //   if (e.target.type === "number") {
-  //     // Chuyển giá trị nhập thành số
-  //     const numValue = Number(value);
-
-  //     // Nếu giá trị không phải là số hoặc số âm, đặt lại giá trị về 0
-  //     if (isNaN(numValue) || numValue < 0) {
-  //       // Cập nhật lại formData với giá trị mặc định 0
-  //       setFormData({
-  //         ...formData,
-  //         [name]: 0,
-  //       });
-  //       return;
-  //     }
-
-  //     // Cập nhật giá trị vào formData
-  //     setFormData({
-  //       ...formData,
-  //       [name]: numValue, // Lưu giá trị là số
-  //     });
-  //   } else {
-  //     // Nếu không phải là số, cập nhật giá trị dưới dạng chuỗi
-  //     setFormData({
-  //       ...formData,
-  //       [name]: value,
-  //     });
-  //   }
-  // };
 
   // Hàm reset formData khi đóng dialog
   const resetFormData = () => {
@@ -126,47 +92,24 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
       setLoading(true);
       setError(null);
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room-type`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      // Sử dụng callApi thay vì axios trực tiếp
+      const response = await callApi<any>(
+        "/api/room-type", // Endpoint của API
+        "POST",
+        formData // Dữ liệu gửi lên
       );
 
-      // Kiểm tra mã trạng thái trả về
-      if (response.data.statusCode === 200) {
-        // Nếu thành công, thông báo thành công
-        toast.success(`Thêm thành công !`);
+      if (response.success) {
+        toast.success("Thêm thành công!");
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
-        toast.error(response.data.message || "Có lỗi xảy ra vui lòng thử lại sau.");
+        toast.error(response.message || "Có lỗi xảy ra vui lòng thử lại sau.");
       }
-
-      console.log("API Response: ", response.data);
     } catch (err: any) {
-      if (err.response) {
-        // Lỗi từ API
-        const errorMessage = err.response.data.message
-          ? err.response.data.message.join(", ") // Kết hợp các lỗi trong mảng message
-          : "Có lỗi xảy ra.";
-
-        // Hiển thị lỗi vào state hoặc popup thông báo
-        setError(errorMessage);
-        toast.error(error);
-      } else if (err.request) {
-        // Không nhận được phản hồi từ API
-        setError("Không nhận được phản hồi từ server.");
-        toast.error(error);
-      } else {
-        // Lỗi không xác định
-
-        setError("Có lỗi xảy ra.");
-        toast.error(error);
-      }
+      // Xử lý lỗi nếu có
+      const errorMessage = err?.message || "Có lỗi xảy ra.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -251,7 +194,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                             name="hourlyRate"
                             value={formData.hourlyRate}
                             onChange={handleInputChange}
-                            className="focus:outline-none border-b w-full focus:border-green-800 focus:border-b-2 text-end"
+                            className="no-spinner focus:outline-none border-b w-full focus:border-green-800 focus:border-b-2 text-end"
                           />
                         </div>
                         <div className="flex gap-5 ">
@@ -267,7 +210,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                             name="dailyRate"
                             value={formData.dailyRate}
                             onChange={handleInputChange}
-                            className="focus:outline-none border-b w-full focus:border-green-800 focus:border-b-2 text-end"
+                            className="no-spinner focus:outline-none border-b w-full focus:border-green-800 focus:border-b-2 text-end"
                           />
                         </div>
                         <div className="flex gap-5 ">
@@ -283,7 +226,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                             name="overnightRate"
                             value={formData.overnightRate}
                             onChange={handleInputChange}
-                            className="focus:outline-none border-b w-full focus:border-green-800 focus:border-b-2 text-end"
+                            className="no-spinner focus:outline-none border-b w-full focus:border-green-800 focus:border-b-2 text-end"
                           />
                         </div>
                       </div>
@@ -299,7 +242,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                       </div>
                     </div>
                   </div>
-                  <div className="border rounded-md">
+                  {/* <div className="border rounded-md">
                     <h5 className="bg-[#f1f3f4] p-2 rounded-t-md font-semibold text-black">
                       Phụ thu quá giờ (khi quá giờ quy định)
                     </h5>
@@ -323,14 +266,14 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                             </span>
                             <input
                               type="number"
-                              className="w-6 text-center focus:outline-none border-b"
+                              className="no-spinner w-6 text-center focus:outline-none border-b"
                               value={1}
                               onChange={handleInputChange}
                             />
                             <span>giờ,phụ thu</span>
                             <input
                               type="number"
-                              className="w-6 text-center focus:outline-none border-b"
+                              className="no-spinner w-6 text-center focus:outline-none border-b"
                               value={2}
                               onChange={handleInputChange}
                             />
@@ -342,14 +285,14 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                             </span>
                             <input
                               type="number"
-                              className="w-6 text-center focus:outline-none border-b"
+                              className="no-spinner w-6 text-center focus:outline-none border-b"
                               value={2}
                               onChange={handleInputChange}
                             />
                             <span>giờ,phụ thu</span>
                             <input
                               type="number"
-                              className="w-6 text-center focus:outline-none border-b"
+                              className="no-spinner w-6 text-center focus:outline-none border-b"
                               value={2}
                               onChange={handleInputChange}
                             />
@@ -366,7 +309,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                         <span>Áp dụng cho tất cả hạng phòng</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="border rounded-md ">
                     <h5 className="bg-[#f1f3f4] p-2 rounded-t-md font-semibold text-black">
                       Sức chứa
@@ -382,12 +325,12 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                           onChange={handleInputChange}
                           min="0"
                           type="number"
-                          className="w-6 text-center focus:outline-none border-b "
+                          className="no-spinner w-6 text-center focus:outline-none border-b "
                         />
                         <span>người lớn</span>
                         <input
                           type="number"
-                          className="w-6 text-center focus:outline-none border-b "
+                          className="no-spinner w-6 text-center focus:outline-none border-b "
                           name="standardChildren"
                           value={formData.standardChildren}
                           onChange={handleInputChange}
@@ -401,7 +344,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                         </span>
                         <input
                           type="number"
-                          className="w-6 text-center focus:outline-none border-b "
+                          className="no-spinner w-6 text-center focus:outline-none border-b "
                           name="maxCapacity"
                           value={formData.maxCapacity}
                           onChange={handleInputChange}
@@ -410,7 +353,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
                         <span>người lớn</span>
                         <input
                           type="number"
-                          className="w-6 text-center focus:outline-none border-b "
+                          className="no-spinner w-6 text-center focus:outline-none border-b "
                           name="maxChildren"
                           value={formData.maxChildren}
                           onChange={handleInputChange}

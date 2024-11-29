@@ -1,8 +1,11 @@
+import { callApi } from "@/utils/api";
 import axios from "axios";
 import Link from "next/link";
 import { parseCookies } from "nookies";
 import { useState } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
+import { GiCancel } from "react-icons/gi";
+import { toast } from "react-toastify";
 import useSWR from "swr";
 
 interface Transaction {
@@ -71,7 +74,6 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
       revalidateIfStale: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-      refreshInterval: 100000,
     }
   );
 
@@ -85,6 +87,8 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   }
 
   const tableData: Transaction[] = data?.data.transactions;
+  console.log();
+
   const totalPages = data?.data.totalPages;
   // Hàm xử lý lọc theo các khoảng thời gian
 
@@ -92,17 +96,23 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const formatter = new Intl.NumberFormat("en-US");
   const deleteTransaction = async (id: number) => {
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transaction/${id}`,
+      const response = await callApi<any>(
+        `/api/transaction/${id}`, // Endpoint của API
+        "PUT",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          status: "cancelled", // Dữ liệu bạn muốn cập nhật, ví dụ thay đổi trạng thái
         }
       );
-      console.log(`xóa thành công ${id}`);
-      mutate();
+      // Kiểm tra mã trạng thái trả về
+      if (response.data.statusCode === 200) {
+        // Nếu thành công, thông báo thành công
+        toast.success(`Hủy thành công!`);
+        mutate();
+      } else {
+        // Nếu thất bại (ví dụ: mã lỗi 404), thông báo thất bại với message trả về từ API
+        toast.error(response.data.message || "Có lỗi xảy ra khi Hủy.");
+        console.log(response.data.message);
+      }
     } catch (error) {
       console.error(`Error deleting transaction ${id}:`, error);
     }
@@ -284,33 +294,39 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
                 </td>
                 <td className="p-2 border-l">{transaction.content}</td>
                 <td className="p-2">
-                  <div className="flex">
-                    <div className="flex invisible duration-75 group-hover:visible">
-                      <Link
-                        href={`/hotel_management/cash_fund/ballot_details/${transaction.id}`}
-                      >
+                  {transaction.status != "cancelled" ? (
+                    <div className="flex">
+                      <div className="flex invisible duration-75 group-hover:visible">
+                        <Link
+                          href={`/hotel_management/cash_fund/ballot_details/${transaction.id}`}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                            style={{ marginRight: "10px", marginTop: "2px" }}
+                          >
+                            {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
+                            <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z" />
+                          </svg>
+                        </Link>
+
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 512 512"
                           style={{ marginRight: "10px", marginTop: "2px" }}
                         >
-                          {/* <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
-                          <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z" />
+                          <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
                         </svg>
-                      </Link>
-
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        style={{ marginRight: "10px", marginTop: "2px" }}
-                      >
-                        <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-                      </svg>
+                      </div>
+                      <button onClick={() => deleteTransaction(transaction.id)}>
+                        <GiCancel size={25} />
+                      </button>
                     </div>
-                    <button onClick={() => deleteTransaction(transaction.id)}>
-                      <FaDeleteLeft size={25} />
-                    </button>
-                  </div>
+                  ) : (
+                    <span className="whitespace-nowrap text-[var(--room-dirty-color-)] font-[500]">
+                      Đã huỷ
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
