@@ -42,6 +42,10 @@ interface Bookings {
     check_in_at: string,
     check_out_at: string,
     status: string,
+    children: number,
+    adults: number,
+    customer: Customer,
+    invoice_id: number,
 }
 interface User {
     id: number,

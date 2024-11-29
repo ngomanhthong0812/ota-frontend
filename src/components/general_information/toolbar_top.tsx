@@ -1,26 +1,38 @@
+import { TAB_GENERA_INFOMATION } from "@/constants/constants";
 import { BiSolidPlaneLand } from "react-icons/bi";
 import { BiSolidPlaneTakeOff } from "react-icons/bi";
 
-interface IProps { }
+interface IProps {
+    tabActive: string,
+    setTabActive: (name: string) => void,
+}
 
-const ToolbarTop: React.FC<IProps> = () => {
+const ToolbarTop: React.FC<IProps> = ({ tabActive, setTabActive }) => {
     return (
         <div className="toolbar-top rounded-t-md pb-2 flex items-center justify-between text-xs">
             <div className="flex">
                 <div className="toolbar-top-room-detail flex rounded-3xl p-1 font-[500] bg-white">
-                    <button className="toolbar-top-type_item gap-1">
+                    <button
+                        onClick={() => setTabActive(TAB_GENERA_INFOMATION.WILL_ARRIVE)}
+                        className={`toolbar-top-type_item gap-1 ${TAB_GENERA_INFOMATION.WILL_ARRIVE === tabActive && 'active'}`}>
                         <BiSolidPlaneLand size={18} className="!fill-[var(--color-menu-icon-)]" />
-                        Sẽ đến
+                        {TAB_GENERA_INFOMATION.WILL_ARRIVE}
                     </button>
-                    <button className="toolbar-top-type_item gap-1">
+                    <button
+                        onClick={() => setTabActive(TAB_GENERA_INFOMATION.WILL_DEPART)}
+                        className={`toolbar-top-type_item gap-1 ${TAB_GENERA_INFOMATION.WILL_DEPART === tabActive && 'active'}`}>
                         <BiSolidPlaneTakeOff size={18} className="!fill-[var(--color-menu-icon-)]" />
-                        Sẽ đi
+                        {TAB_GENERA_INFOMATION.WILL_DEPART}
                     </button>
-                    <button className="toolbar-top-type_item gap-1">
-                        Quá hạn sẽ đến
+                    <button
+                        onClick={() => setTabActive(TAB_GENERA_INFOMATION.OVERDUE_ARRIVE)}
+                        className={`toolbar-top-type_item gap-1 ${TAB_GENERA_INFOMATION.OVERDUE_ARRIVE === tabActive && 'active'}`}>
+                        {TAB_GENERA_INFOMATION.OVERDUE_ARRIVE}
                     </button>
-                    <button className="toolbar-top-type_item gap-1 active">
-                        Khách đang ở
+                    <button
+                        onClick={() => setTabActive(TAB_GENERA_INFOMATION.CURRENT_GUEST)}
+                        className={`toolbar-top-type_item gap-1 ${TAB_GENERA_INFOMATION.CURRENT_GUEST === tabActive && 'active'}`}>
+                        {TAB_GENERA_INFOMATION.CURRENT_GUEST}
                     </button>
                 </div>
             </div>

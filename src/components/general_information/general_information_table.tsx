@@ -1,12 +1,17 @@
-
 import { BiSolidUserBadge } from "react-icons/bi";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { FaBed } from "react-icons/fa";
 import { GiBackwardTime } from "react-icons/gi";
+import { TypeRoomCard } from "@/types/backend";
+import useFormatDate from "@/hook/useFormatDate";
+import { ROOM_STATUS } from "@/constants/constants";
 
-interface IProps { }
+interface IProps {
+    data: TypeRoomCard[],
+}
 
-const GeneralInformationTable: React.FC<IProps> = () => {
+const GeneralInformationTable: React.FC<IProps> = ({ data }) => {
+    const { formatDate } = useFormatDate();
     return (
         <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
             <table className="w-full rounded-t-[3px] overflow-hidden">
@@ -47,64 +52,42 @@ const GeneralInformationTable: React.FC<IProps> = () => {
                     </tr>
                 </thead>
                 <tbody className="text-[14px]">
-                    <tr className="group border-b !border-[var(--ht-neutral-100-)]">
-                        <td className="p-2">
-                            <div className="flex justify-between items-center">
-                                <FaBed className="!w-[18px] !h-[18px]" />
-                                101 (Phòng đôi)
-                            </div>
-                        </td>
-                        <td className="p-2 flex justify-center">1</td>
-                        <td className="p-2">
-                            <div className="flex items-center gap-2">
-                                <BiSolidUserBadge className="!w-[18px] !h-[18px]" />
-                                Ngomanhthong 1
-                            </div>
-                        </td>
-                        <td className="p-2">03/04 20:08</td>
-                        <td className="p-2">01:19:32</td>
-                        <td className="p-2">3/2</td>
-                        <td className="p-2">
-                            <div className="flex justify-end !text-[50px]">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-                                    className="mr-[10px] mt-[2px]">
-                                    <path
-                                        d="M128 0C92.7 0 64 28.7 64 64l0 96 64 0 0-96 226.7 0L384 93.3l0 66.7 64 0 0-66.7c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0L128 0zM384 352l0 32 0 64-256 0 0-64 0-16 0-16 256 0zm64 32l32 0c17.7 0 32-14.3 32-32l0-96c0-35.3-28.7-64-64-64L64 192c-35.3 0-64 28.7-64 64l0 96c0 17.7 14.3 32 32 32l32 0 0 64c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-64zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z">
-                                    </path>
-                                </svg>
-                                <FiMoreHorizontal className="mr-[10px] mt-[2px]" />
-                            </div>
-                        </td>
-                    </tr>
-                    <tr className="group border-b !border-[var(--ht-neutral-100-)]">
-                        <td className="p-2">
-                            <div className="flex justify-between items-center">
-                                <GiBackwardTime className="!w-[18px] !h-[18px]" />
-                                102 (Phòng đơn)
-                            </div>
-                        </td>
-                        <td className="p-2 flex justify-center">1</td>
-                        <td className="p-2">
-                            <div className="flex items-center gap-2">
-                                <BiSolidUserBadge className="!w-[18px] !h-[18px]" />
-                                Ngomanhthong 1
-                            </div>
-                        </td>
-                        <td className="p-2">03/04 20:08</td>
-                        <td className="p-2">01:19:32</td>
-                        <td className="p-2">3/2</td>
-                        <td className="p-2">
-                            <div className="flex justify-end !text-[50px]">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-                                    className="mr-[10px] mt-[2px]">
-                                    <path
-                                        d="M128 0C92.7 0 64 28.7 64 64l0 96 64 0 0-96 226.7 0L384 93.3l0 66.7 64 0 0-66.7c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0L128 0zM384 352l0 32 0 64-256 0 0-64 0-16 0-16 256 0zm64 32l32 0c17.7 0 32-14.3 32-32l0-96c0-35.3-28.7-64-64-64L64 192c-35.3 0-64 28.7-64 64l0 96c0 17.7 14.3 32 32 32l32 0 0 64c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-64zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z">
-                                    </path>
-                                </svg>
-                                <FiMoreHorizontal className="mr-[10px] mt-[2px]" />
-                            </div>
-                        </td>
-                    </tr>
+                    {data?.map(item => (
+                        <tr
+                            key={item.id}
+                            className="group border-b !border-[var(--ht-neutral-100-)]">
+                            <td className="p-2">
+                                <div className="flex justify-between items-center">
+                                    {item.status === ROOM_STATUS.NOT_CHECKED_OUT
+                                        ? <GiBackwardTime className="!w-[18px] !h-[18px]" />
+                                        : <FaBed className="!w-[18px] !h-[18px]" />
+                                    }
+                                    {item.name} ({item.room_type})
+                                </div>
+                            </td>
+                            <td className="p-2 flex justify-center">{item.id}</td>
+                            <td className="p-2">
+                                <div className="flex items-center gap-2">
+                                    <BiSolidUserBadge className="!w-[18px] !h-[18px]" />
+                                    {item.bookings[0].customer.name}
+                                </div>
+                            </td>
+                            <td className="p-2">{formatDate(item.bookings[0].booking_at)}</td>
+                            <td className="p-2">01:19:32</td>
+                            <td className="p-2">{item.bookings[0].adults}/{item.bookings[0].children}</td>
+                            <td className="p-2">
+                                <div className="flex justify-end !text-[50px]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+                                        className="mr-[10px] mt-[2px]">
+                                        <path
+                                            d="M128 0C92.7 0 64 28.7 64 64l0 96 64 0 0-96 226.7 0L384 93.3l0 66.7 64 0 0-66.7c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0L128 0zM384 352l0 32 0 64-256 0 0-64 0-16 0-16 256 0zm64 32l32 0c17.7 0 32-14.3 32-32l0-96c0-35.3-28.7-64-64-64L64 192c-35.3 0-64 28.7-64 64l0 96c0 17.7 14.3 32 32 32l32 0 0 64c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-64zM432 248a24 24 0 1 1 0 48 24 24 0 1 1 0-48z">
+                                        </path>
+                                    </svg>
+                                    <FiMoreHorizontal className="mr-[10px] mt-[2px]" />
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
             <div className="pagination center !justify-end p-4 gap-3">

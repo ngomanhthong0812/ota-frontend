@@ -31,12 +31,12 @@ const fetcher = (url: string, token: string | null) =>
 const SheetChart: React.FC<IProps> = ({ isShowChart, setIsShowChart }) => {
     const { user, token } = useAuth();
     const { data } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/statistics/getRoomCapacityAndOccupancy/${user?.hotel_id}`,
+        user?.hotel_id ? ` ${process.env.NEXT_PUBLIC_BACKEND_URL}/api/statistics/getRoomCapacityAndOccupancy/${user?.hotel_id}` : null,
         (url: string) => fetcher(url, token)
     );
 
     const { data: dataTodayActivities } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/statistics/getTodayActivities/${user?.hotel_id}`,
+        user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/statistics/getTodayActivities/${user?.hotel_id}` : null,
         (url: string) => fetcher(url, token)
     );
 
