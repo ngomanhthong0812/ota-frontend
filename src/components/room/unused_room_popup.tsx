@@ -12,6 +12,7 @@ interface IProps {
     position: { x: number; y: number },
 
     handleSetStatusClean: () => void,
+    cleanStatus: boolean,
 }
 const fetcher = (url: string, token: string | null) =>
     fetch(url,
@@ -23,7 +24,7 @@ const fetcher = (url: string, token: string | null) =>
         }).then((res) => res.json());
 
 
-const UnusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, handleSetStatusClean }) => {
+const UnusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, handleSetStatusClean, cleanStatus }) => {
     const [showModalBookingRoomList, setShowModalBookingRoomList] = useState<boolean>(false);
 
     const { token } = useAuth();
@@ -60,7 +61,7 @@ const UnusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
                 </li>
             </ul>
             <ul>
-                {data.clean_status
+                {cleanStatus
                     ?
                     <li
                         onClick={handleSetStatusClean}
