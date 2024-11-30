@@ -1,7 +1,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-const NavigationTabs = ({ id }: { id: number }) => {
+const NavigationTabs = ({ id }: { id: any }) => {
   const pathname = usePathname(); // Lấy đường dẫn hiện tại
 
   const handleClick = (link: string) => {
