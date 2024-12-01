@@ -19,6 +19,7 @@ import useSWR from "swr";
 interface IProps {
     isOpen: boolean;
     onClose: () => void;
+    invoiceId: number;
 }
 
 const fetcher = (url: string, token: string | null) =>
@@ -31,7 +32,7 @@ const fetcher = (url: string, token: string | null) =>
         }).then((res) => res.json());
 
 const AddServicesModal = (props: IProps) => {
-    const { isOpen, onClose } = props;
+    const { isOpen, onClose, invoiceId } = props;
     const { formatPrice } = useFormatPriceWithCommas();
 
     const { token, user } = useAuth();
@@ -90,7 +91,7 @@ const AddServicesModal = (props: IProps) => {
         if (selectedService.length > 0) {
             setIsLoading(true)
             try {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoiceItems/createInvoices/${data?.id}`,
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoiceItems/createInvoices/${invoiceId}`,
                     selectedService,
                     {
                         headers: {

@@ -78,6 +78,8 @@ interface InvoiceItem {
     quantity: number,
     unit_price: number,
     total_price: number,
+    category: string,
+    createdAt: string,
     invoice_id: number,
 }
 
@@ -143,4 +145,33 @@ interface ResponseInvoice {
     amount: number,
     items: InvoiceItem[],
     customer: Customer,
+}
+
+interface ResponseInvoiceItem extends InvoiceItem {
+    service: Services
+}
+interface RequestTransaction {
+    paymentOption: string,
+    paymentMethod: string,
+    currencyType: string,
+    price: number,
+    note: string,
+    invoice_id: number,
+    user_id: number,
+    hotel_id: number,
+}
+
+
+interface ReceiptAndExpense {
+    id: number,
+    code: string,
+    amount: number,
+    payment_method: string,
+    note: string,
+    created_by: string,
+    hotel_id: number,
+    category: string,
+    invoice_id: number | null,
+    createdAt: string,
+    type: string;
 }

@@ -6,8 +6,6 @@ interface IProps {
 }
 
 const GeneralInformationTable: React.FC<IProps> = ({ data }) => {
-    console.log(data);
-
     return (
         <div className="bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
             <table className="w-full rounded-t-[3px]">
