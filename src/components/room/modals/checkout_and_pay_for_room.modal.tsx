@@ -48,7 +48,6 @@ const CheckOutAndPayModalForRoom = (props: IProps) => {
                             </div>
                         </li>
                     </ul>
-                
                 </div>
 
                 <div className="grid grid-cols-3 gap-5 mt-5">

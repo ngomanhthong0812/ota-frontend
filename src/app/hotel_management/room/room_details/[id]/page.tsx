@@ -8,11 +8,12 @@ import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
 import useSWR, { Fetcher } from "swr";
 import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
-import CheckOutAndPayModalForRoom from "@/components/room/modals/checkout_and_pay_for_room.modal";
 import CheckInModal from "@/components/room/modals/check_in.modal";
 import { useSWRConfig } from "swr"
 import { useParams } from "next/navigation"
 import AddServicesModal from "@/components/room/modals/add_services.modal";
+import UpdateCustomerInfoModal from "@/components/room/modals/update_customer_info.modal";
+import Link from "next/link";
 
 const cookies = parseCookies();
 const token = cookies.access_token;
@@ -81,6 +82,7 @@ const ViewDetailRoom = () => {
   const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
   const [showModalCheckIn, setShowModalCheckIn] = useState<boolean>(false);
   const [showModalAddServices, setShowModalAddServices] = useState<boolean>(false);
+  const [showModalUpdateCustomerInfo, setShowModalUpdateCustomerInfo] = useState<boolean>(false);
 
   const { id } = useParams();
   const fetcher = (url: string) =>
@@ -279,15 +281,15 @@ const ViewDetailRoom = () => {
                   <div>
                       <div>
                         {booking?.check_in_at ? (
-                          <button className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
-                            onClick={() => setShowModalCheckOutAndPay(true)}
+                          <Link href={`/hotel_management/room/room_invoice/${id}`} className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
+                            
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-pink-500">
                               <path d="M11 3L10.3374 3.23384C7.75867 4.144 6.46928 4.59908 5.73464 5.63742C5 6.67576 5 8.0431 5 10.7778V13.2222C5 15.9569 5 17.3242 5.73464 18.3626C6.46928 19.4009 7.75867 19.856 10.3374 20.7662L11 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                               <path d="M21 12L11 12M21 12C21 11.2998 19.0057 9.99153 18.5 9.5M21 12C21 12.7002 19.0057 14.0085 18.5 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                             Trả phòng
-                          </button>
+                          </Link>
                         ) : (
                           <button className="btn-fn bg-[var(--room-not-checked-out-color-200-)] text-white"
                             onClick={() => setShowModalCheckIn(true)}
@@ -382,7 +384,24 @@ const ViewDetailRoom = () => {
 
                       <p>Khách hàng: {booking?.customer.name}</p>
                       
-                      <button></button>
+                      <button className="group border border-green-400 hover:bg-[var(--navbar-color-)] duration-200 rounded-full p-[1px]"
+                        onClick={() => setShowModalUpdateCustomerInfo(true)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          className="text-green-500 w-4 h-4 group-hover:text-white"
+                        >
+                          <path
+                            d="M12 4V20M20 12H4"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -597,20 +616,6 @@ const ViewDetailRoom = () => {
         onSave={handleSaveDates}
       />
 
-      <CheckOutAndPayModalForRoom
-        showModal={showModalCheckOutAndPay}
-        closeModal={() => setShowModalCheckOutAndPay(false)}
-        roomName={
-          rooms.length > 0 && rooms[0].name
-            ? rooms[0].name : ""
-        }
-        
-        roomPrice={
-          rooms.length > 0 && rooms[0].name
-            ? rooms[0].price : 0
-        }
-      />
-
       <RemoveServicesModal 
         showModal={showModalRemoveServices}
         closeModal={() => setShowModalRemoveServices(false)}
@@ -629,6 +634,11 @@ const ViewDetailRoom = () => {
       <AddServicesModal
         isOpen={showModalAddServices}
         onClose={() => setShowModalAddServices(false)}
+      />
+
+      <UpdateCustomerInfoModal
+        showModal={showModalUpdateCustomerInfo}
+        closeModal={() => setShowModalUpdateCustomerInfo(false)}
       />
 
     </div>
