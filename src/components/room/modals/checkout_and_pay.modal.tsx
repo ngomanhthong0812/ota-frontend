@@ -1,51 +1,92 @@
-"use client"
-
+'use client'
 import {
     Dialog,
     DialogContent,
     DialogTitle,
-  } from "@/components/ui/dialog"
+} from "@/components/ui/dialog"
+import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS, PAYMENT_OPTIONS_INVOICE_ROOM } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
-import { useParams } from "next/navigation";
-import useSWR from "swr";
+import { RequestTransaction } from "@/types/backend";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
 interface IProps {
     showModal: boolean;
     closeModal: () => void;
-    roomDetails: { name: string }[];  // Thông tin phòng và giá
-    roomPrice: number;
-    id: any;
-
-    handleUpdatePayments: (newPayment: Payments) => void; // Nhận thêm hàm từ props
+    roomName: string;  // Thông tin phòng và giá
+    remainingAmount: number;
+    invoice_id: number;
 }
-
-interface Payments {
-    id: number;
-    payment_date: Date;
-    amount: number;
-    payment_method: string;
-    note: string;
-}
-
-const CheckOutAndPayModal = (props: IProps) => {
-
-    const {showModal, closeModal, roomDetails, id, roomPrice, handleUpdatePayments} = props;
+const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id }) => {
     const { formatPrice } = useFormatPriceWithCommas();
-    const [paymentMethod, setPaymentMethod] = useState<string>("Cash");
-    const invoiceId = id;
+    const { user, token } = useAuth();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [transactionRequest, setTransactionRequest] = useState<RequestTransaction>({
+        paymentOption: PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT,
+        paymentMethod: PAYMENT_METHODS.CASH,
+        currencyType: CURRENCY_TYPES.VND,
+        price: remainingAmount,
+        note: `Thanh toán tiền còn lại của phòng ${roomName}`,
+        invoice_id: Number(invoice_id),
+        user_id: user?.id,
+        hotel_id: user?.hotel_id,
+    });
 
-    const { token } = useAuth();
+
+    useEffect(() => {
+        setTransactionRequest(prev => ({
+            ...prev,
+            note: `Thanh toán tiền còn lại của phòng ${roomName}`,
+            price: remainingAmount,
+            user_id: user?.id,
+            hotel_id: user?.hotel_id,
+        }))
+    }, [user, remainingAmount, roomName]);
+
+
+    const handleCheckOut = async () => {
+        setIsLoading(true)
+
+        if (transactionRequest.price > 0) {
+            console.log("da nhan");
+
+            try {
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/handleTransaction/`,
+                    transactionRequest,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                // Kiểm tra phản hồi từ API
+                if (response.data.statusCode === 200 || response.status === 201) {
+                    console.log("Gửi thành công");
+                    await handleSavePayment();
+
+                    //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
+                }
+            } catch (error) {
+                setIsLoading(false);
+                // In thông tin lỗi khi gặp sự cố
+                console.log("Lỗi khi gửi dữ liệu:", error);
+            }
+        } else {
+            closeModal()
+        }
+    }
 
     const handleSavePayment = async () => {
         try {
             const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/${invoiceId}`,
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/${invoice_id}`,
                 {
-                    total_amount: roomPrice,
-                    payment_method: paymentMethod,
+                    payment_method: transactionRequest.paymentMethod === PAYMENT_METHODS.CASH ? 'Cash' : 'Bank_transfer',
                     status: "Paid"
                 },
                 {
@@ -57,16 +98,7 @@ const CheckOutAndPayModal = (props: IProps) => {
             );
 
             if (response.status === 200) {
-                alert("Thanh toán thành công!");
-
-                const newPayment = {
-                    id: response.data.id,
-                    payment_date: new Date(),
-                    amount: roomPrice,
-                    payment_method: paymentMethod,
-                    note: "note",
-                };
-                handleUpdatePayments(newPayment);
+                toast("Thanh toán thành công!");
             }
         } catch (error) {
             console.error("Failed to create payment:", error);
@@ -75,96 +107,79 @@ const CheckOutAndPayModal = (props: IProps) => {
             closeModal();
         }
     };
-
-    
-    const handleSubmit = () => {
-        closeModal();
-    }
-
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
-            <DialogContent className="overflow-auto p-0 bg-transparent border-none">
-                
-                <div className="rounded-xl">
-                    <DialogTitle 
-                        className="text-white font-medium text-base bg-[var(--room-empty-color-)] px-4 py-2 rounded-t-xl">
-                            Thanh toán
-                    </DialogTitle>
+            <DialogContent>
+                <DialogTitle>Thanh toán</DialogTitle>
 
-                    <div className="bg-white p-4">
-                        <div className="">
-                            <ul>
-                                {roomDetails.length > 0 ? (
-                                    roomDetails.map((room, index) => (
-                                        <li key={index}>
-                                            <div className="flex items-center justify-between">
-                                                <p className="room-name">{room.name}</p>
+                <div className="mt-3">
+                    <ul>
+                        <li>
+                            <div className="flex items-center justify-between">
+                                <p className="room-name">{roomName}</p>
 
-                                                <p className="room-price">{formatPrice(String(roomPrice))} VNĐ</p>
-                                            </div>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li>No rooms available</li>
-                                )}
-                            </ul>
-                        
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-5 mt-5">
-                            <div className="flex flex-col col-span-2">
-                                <select 
-                                    className="btn"
-                                    value={paymentMethod}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                    >
-                                    <option value="Cash">Tiền mặt</option>
-                                    <option value="Credit_card">Thẻ tín dụng</option>
-                                    <option value="Bank_transfer">Chuyển khoản NH</option>
-                                </select>
+                                <p className="room-price">{formatPrice(String(remainingAmount))} VND</p>
                             </div>
+                        </li>
+                    </ul>
 
-                            <div className="flex flex-col">
-                                <select name="" id="" className="btn">
-                                    <option value="">VND</option>
-                                    <option value="">USD</option>
-                                </select>
-                            </div>
-                        </div>
+                </div>
 
-                        <div>
-                            <div className="flex items-center mt-3">
-                                <label className="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox"/>
-                                    
-                                    <span className="ml-2 text-gray-700">Gửi email cho khách</span>
-                                </label>
-                            </div>
-                        </div>
+                <div className="grid grid-cols-3 gap-5 mt-5">
+                    <div className="flex flex-col col-span-2">
+                        <select
+                            onChange={e => setTransactionRequest(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                            name="" id="" className="btn">
+                            <option>{PAYMENT_METHODS.CASH}</option>
+                            <option>{PAYMENT_METHODS.BANK_TRANSFER}</option>
+                            <option>{PAYMENT_METHODS.CREDIT_CARD}</option>
+                        </select>
+                    </div>
 
-                        <footer className="modal-footer">
-                            <div className="flex items-center justify-end gap-x-10 py-3 font-medium">
-                                <div className="flex items-center justify-end gap-x-5 py-3 font-semibold">
-                                    <button 
-                                        className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200"
-                                        onClick={handleSubmit}
-                                        >
-                                        Bỏ qua
-                                    </button>
-                                    <button 
-                                        className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200"
-                                        onClick={handleSavePayment}
-                                        >
-                                        Thanh toán
-                                    </button>
-                                </div>
-                            </div>
-                        </footer>
-
+                    <div className="flex flex-col">
+                        <select
+                            onChange={e => setTransactionRequest(prev => ({ ...prev, currencyType: e.target.value }))}
+                            name="" id=""
+                            className="btn">
+                            <option value="">{CURRENCY_TYPES.VND}</option>
+                            <option value="">{CURRENCY_TYPES.USD}</option>
+                        </select>
                     </div>
                 </div>
 
+                <div>
+                    <div className="flex items-center mt-3">
+                        <label className="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" />
 
+                            <span className="ml-2 text-gray-700">Gửi email cho khách</span>
+                        </label>
+                    </div>
+                </div>
+
+                <footer className="modal-footer">
+                    <div className="flex items-center justify-end gap-x-10 py-3 font-medium">
+                        <div className="flex items-center justify-end gap-x-5 py-3 font-semibold">
+                            <button
+                                className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200"
+                                onClick={closeModal}
+                            >
+                                Bỏ qua
+                            </button>
+                            <button
+                                className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200"
+                                onClick={handleCheckOut}
+                            >
+                                Thanh toán
+                            </button>
+                        </div>
+                    </div>
+                </footer>
+                {isLoading
+                    && <div className="fixed z-[999] bg-black bg-opacity-45 top-0 left-0 w-full h-full flex items-center justify-center">
+                        <ClipLoader size={50} color="fffff" />
+                    </div>
+                }
             </DialogContent>
         </Dialog>
     )
