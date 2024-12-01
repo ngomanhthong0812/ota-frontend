@@ -1,3 +1,5 @@
+"use client"
+
 import {
     Dialog,
     DialogContent,
@@ -11,8 +13,8 @@ interface IProps {
     showModal: boolean;
     closeModal: () => void;
     transactionRequest: RequestTransaction,
-
 }
+
 const CheckOutModal = (props: IProps) => {
     const { token } = useAuth();
     const { showModal, closeModal, transactionRequest } = props;
@@ -46,6 +48,7 @@ const CheckOutModal = (props: IProps) => {
             closeModal()
         }
     }
+
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
             <DialogContent>

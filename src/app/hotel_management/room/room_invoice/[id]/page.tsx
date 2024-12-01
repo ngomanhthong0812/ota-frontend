@@ -1,28 +1,28 @@
 'use client'
 
-import { FaPrint } from "react-icons/fa6";
-import { CiCircleRemove } from "react-icons/ci";
 import { use, useEffect, useState } from "react";
 import AddServicesModal from "@/components/room/modals/add_services.modal";
-import { useRouter } from "next/navigation";
 import NavigationTabs from "@/components/layout/navigation_room_tabs";
 import { parseCookies } from "nookies";
 import useSWR from "swr";
 import CheckOutModal from "@/components/room/modals/checkout.modal";
 import CheckOutAndPayModal from "@/components/room/modals/checkout_and_pay.modal";
 import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
-import { useParams } from "next/navigation"
 import { ReceiptAndExpense, RequestTransaction, ResponseInvoiceItem } from "@/types/backend";
 import axios from "axios";
 import useFormatDate from "@/hook/useFormatDate";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
-import { CURRENCY_TYPES, PAYMENT_METHODS } from "@/constants/constants";
+import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS_INVOICE_ROOM } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
+import { toast } from "react-toastify";
 
-const PAYMENT_OPTIONS = {
-  REFUND: 'Hoàn tiền',
-  PAYMENT: 'Thanh toán'
-};
+interface Payments {
+  id: number;
+  payment_date: Date;
+  amount: number;
+  payment_method: string;
+  note: string;
+}
 
 const cookies = parseCookies();
 const token = cookies.access_token;
@@ -37,13 +37,15 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [roomDetails, setRoomDetails] = useState<{ name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
   const [roomPrice, setRoomPrice] = useState<number>(0);
+  const [payments, setPayments] = useState<Payments[]>([]);
+  const [remainingAmount, setRemainingAmount] = useState<number>(0);
   const [showModalCheckOut, setShowModalCheckOut] = useState<boolean>(false);
   const [showModalCheckOutAndPay, setShowModalCheckOutAndPay] = useState<boolean>(false);
   const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
   const [services, setServices] = useState<ResponseInvoiceItem[]>([]);
   const [transactions, setTransactions] = useState<ReceiptAndExpense[]>([]);
   const [transactionRequest, setTransactionRequest] = useState<RequestTransaction>({
-    paymentOption: PAYMENT_OPTIONS.PAYMENT,
+    paymentOption: PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT,
     paymentMethod: PAYMENT_METHODS.CASH,
     currencyType: CURRENCY_TYPES.VND,
     price: 0,
@@ -76,7 +78,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
         console.error("Fetch error:", error);
       });
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/invoiceById/${id}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/id/${id}`,
     fetcher,
     {
       revalidateIfStale: false,
@@ -97,14 +99,15 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
 
   useEffect(() => {
-    if (data && data.data) {
-      setRoomPrice(data?.data?.invoice?.total)
+    if (data && data.invoice) {
+      setRoomPrice(data?.invoice?.invoice?.total)
 
-      const roomDetailsList = data.data.rooms.map((room: any) => ({
+      const roomDetailsList = data.invoice.rooms.map((room: any) => ({
         name: room.name,
         price: room.price,
       }));
-      setRoomDetails(roomDetailsList);  // Cập nhật state với tên và giá phòng
+      setRoomDetails(roomDetailsList);
+      setPayments(data?.payments || []) // Cập nhật state với tên và giá phòng
     }
   }, [data])
 
@@ -189,6 +192,37 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
     return diffDays;
   }
 
+  useEffect(() => {
+    // Cập nhật số tiền còn lại sau khi trừ tổng amount payments
+    const totalPaid = calculateTotalAmount(payments);
+    setRemainingAmount(roomPrice - totalPaid);
+    console.log(totalPaid);
+
+  }, [payments, roomPrice]); // Chạy lại khi payments hoặc totalInvoice thay đổi
+
+  const calculateTotalAmount = (payments: Payments[]): number => {
+    const totalAmountPayments = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+
+    return totalAmountPayments;
+  };
+
+  const handleShowModalCheckOut = () => {
+    if (transactionRequest.price < remainingAmount && transactionRequest.price > 0) {
+      setShowModalCheckOut(true);
+    }
+
+    if (remainingAmount === 0) {
+      toast('Phòng đã thanh toán hết')
+    } else {
+      if (transactionRequest.price > remainingAmount) {
+        toast('Số tiền nhập vượt quá số tiền thanh toán cần thiết')
+      }
+      if (transactionRequest.price <= 0) {
+        toast('Số tiền nhập phải lớn hơn 0')
+      }
+    }
+  }
+
   if (isLoading) return "Loading...";
   if (error) return "An error has occurred.";
 
@@ -246,11 +280,11 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                   </div>
                   <div className="flex flex-col col-span-3">
                     <div className="flex justify-between py-1">
-                      <span>Giá đêm ({formatDate(data?.data?.invoice?.booking_at)} - {formatDate(getCurrentDateTime())})</span>
+                      <span>Giá đêm ({formatDate(data?.invoice?.invoice?.booking_at)} - {formatDate(getCurrentDateTime())})</span>
                       <div>{formatPrice(String(invoiceItemBooking?.data?.total_price))}demo</div>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span>Giá đêm (03/04 21:00 - 04/04 12:00){calculateDaysBetween(data?.data?.invoice?.booking_at, getCurrentDateTime())}demo</span>
+                      <span>Giá đêm (03/04 21:00 - 04/04 12:00){calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime())}demo</span>
                       <div>300,000</div>
                     </div>
                     <div className="flex justify-between py-1">
@@ -340,7 +374,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                           <span>Cần thanh toán</span>
                         </p>
                         <p>
-                          <span>0</span>
+                          <span>{formatPrice(String(roomPrice))}</span>
                         </p>
                       </div>
 
@@ -349,7 +383,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                           <span>Đã thanh toán</span>
                         </p>
                         <p>
-                          <span>0</span>
+                          <span>{formatPrice(String(roomPrice - remainingAmount))}</span>
                         </p>
                       </div>
 
@@ -358,7 +392,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                           <span>Còn lại</span>
                         </p>
                         <p>
-                          <span>0</span>
+                          <span>{formatPrice(String(remainingAmount))}</span>
                         </p>
                       </div>
                     </div>
@@ -405,24 +439,24 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                 <div className="flex items-center gap-2">
                   <input
                     type="radio"
-                    checked={transactionRequest.paymentOption === PAYMENT_OPTIONS.PAYMENT}
-                    value={PAYMENT_OPTIONS.PAYMENT}
+                    checked={transactionRequest.paymentOption === PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT}
+                    value={PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT}
                     onChange={e => setTransactionRequest(prev => ({ ...prev, paymentOption: e.target.value }))}
                     name="payment-option" />
                   <p>
-                    <span>{PAYMENT_OPTIONS.PAYMENT}</span>
+                    <span>{PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT}</span>
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <input
                     type="radio"
-                    checked={transactionRequest.paymentOption === PAYMENT_OPTIONS.REFUND}
-                    value={PAYMENT_OPTIONS.REFUND}
+                    checked={transactionRequest.paymentOption === PAYMENT_OPTIONS_INVOICE_ROOM.REFUND}
+                    value={PAYMENT_OPTIONS_INVOICE_ROOM.REFUND}
                     onChange={e => setTransactionRequest(prev => ({ ...prev, paymentOption: e.target.value }))}
                     name="payment-option" />
                   <p>
-                    <span>{PAYMENT_OPTIONS.REFUND}</span>
+                    <span>{PAYMENT_OPTIONS_INVOICE_ROOM.REFUND}</span>
                   </p>
                 </div>
               </div>
@@ -447,7 +481,10 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                     Tiền tệ
                   </label>
 
-                  <select name="" id="" className="btn">
+                  <select
+                    onChange={e => setTransactionRequest(prev => ({ ...prev, currencyType: e.target.value }))}
+                    name="" id=""
+                    className="btn">
                     <option value="">{CURRENCY_TYPES.VND}</option>
                     <option value="">{CURRENCY_TYPES.USD}</option>
                   </select>
@@ -482,7 +519,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
               <div className="flex justify-end border-b !border-[var(--ht-neutral-100-)] pb-2">
                 <button className="btn-fn bg-blue-100 text-[#60a5fa]"
-                  onClick={() => setShowModalCheckOut(true)}
+                  onClick={handleShowModalCheckOut}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -554,7 +591,9 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
       <CheckOutAndPayModal
         showModal={showModalCheckOutAndPay}
         closeModal={() => setShowModalCheckOutAndPay(false)}
-        roomDetails={roomDetails}  // Truyền thông tin phòng và giá vào modal
+        roomName={roomDetails[0]?.name}
+        remainingAmount={remainingAmount}
+        invoice_id={id}
       />
 
       <CheckOutModal
