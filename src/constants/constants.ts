@@ -43,3 +43,8 @@ export const TAB_GENERA_INFOMATION = {
     OVERDUE_ARRIVE: 'Quá hạn sẽ đến',
     CURRENT_GUEST: 'Khách đang ở',
 }
+
+export const PAYMENT_OPTIONS_INVOICE_ROOM = {
+    REFUND: 'Hoàn tiền',
+    PAYMENT: 'Thanh toán'
+};
