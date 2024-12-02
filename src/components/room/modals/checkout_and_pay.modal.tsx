@@ -5,7 +5,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS, PAYMENT_OPTIONS_INVOICE_ROOM } from "@/constants/constants";
-import { ROOM_STATUS } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 import { RequestTransaction } from "@/types/backend";
@@ -13,7 +12,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 
 interface IProps {
     showModal: boolean;
@@ -21,11 +19,8 @@ interface IProps {
     roomName: string;  // Thông tin phòng và giá
     remainingAmount: number;
     invoice_id: number;
-    room_id: number;
-    booking_id: number;
 }
-const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id, room_id, booking_id }) => {
-    const router = useRouter();
+const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id }) => {
     const { formatPrice } = useFormatPriceWithCommas();
     const { user, token } = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -75,10 +70,6 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     await handleSavePayment();
 
                     //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
-                    handleUpdateBookingStatus();
-                    handleUpdateRoomStatus();
-                    router.push('/hotel_management')
-                    toast("Thanh toan thanh cong")
                 }
             } catch (error) {
                 setIsLoading(false);
@@ -116,59 +107,6 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             closeModal();
         }
     };
-
-    const handleUpdateBookingStatus = async () => {
-        try {
-            const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/${booking_id}`,
-                {
-                    status: "Checkout"
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            if (response.status === 200) {
-                // toast("Cap nhat booking thành công!");
-            }
-        } catch (error) {
-            console.error("Failed to create payment:", error);
-            alert("Đã xảy ra lỗi khi thực hiện thanh toán.");
-        } finally {
-            closeModal();
-        }
-    }
-
-    const handleUpdateRoomStatus = async () => {
-        try {
-            const response = await axios.put(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${room_id}`,
-                {
-                    status: ROOM_STATUS.EMPTY,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            if (response.status === 200) {
-                // toast("Cap nhat phong thành công!");
-            }
-        } catch (error) {
-            console.error("Failed to create payment:", error);
-            alert("Đã xảy ra lỗi khi thực hiện cap nhat phong.");
-        } finally {
-            closeModal();
-        }
-    }
-
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
             <DialogContent>
