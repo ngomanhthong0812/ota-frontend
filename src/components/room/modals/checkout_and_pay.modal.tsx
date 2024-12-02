@@ -5,7 +5,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS, PAYMENT_OPTIONS_INVOICE_ROOM } from "@/constants/constants";
-import { ROOM_STATUS } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 import { RequestTransaction } from "@/types/backend";
@@ -13,7 +12,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 
 interface IProps {
     showModal: boolean;
@@ -21,11 +19,8 @@ interface IProps {
     roomName: string;  // Thông tin phòng và giá
     remainingAmount: number;
     invoice_id: number;
-    room_id: number;
-    booking_id: number;
 }
-const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id, room_id, booking_id }) => {
-    const router = useRouter();
+const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id }) => {
     const { formatPrice } = useFormatPriceWithCommas();
     const { user, token } = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,12 +68,15 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     await handleSavePayment();
 
                     //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
+
+
                     await handleUpdateBookingStatus();
                     await handleUpdateRoomStatus();
                     router.push('/hotel_management/room_layout')
                     toast("Thanh toan thanh cong")
                     setIsLoading(false);
                     //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
+
                 }
             } catch (error) {
                 setIsLoading(false);
@@ -123,6 +121,8 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             closeModal();
         }
     };
+
+
 
     const handleUpdateBookingStatus = async () => {
         try {
@@ -175,6 +175,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             closeModal();
         }
     }
+
 
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
