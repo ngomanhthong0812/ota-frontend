@@ -40,14 +40,14 @@ const GeneralInformationPage: React.FC<IProps> = () => {
         if (data) {
             let dataFilter: TypeRoomCard[] = data?.data;
             if (tabActive === TAB_GENERA_INFOMATION.WILL_ARRIVE) {
-                dataFilter = dataFilter.filter(item => {
+                dataFilter = dataFilter?.filter(item => {
                     const bookingDate = new Date(item.bookings?.[0]?.booking_at);
                     bookingDate.setHours(0, 0, 0, 0); // Set giờ về 00:00 để chỉ so sánh ngày
                     return bookingDate.getTime() === today.getTime();
                 })
             }
             if (tabActive === TAB_GENERA_INFOMATION.WILL_DEPART) {
-                dataFilter = dataFilter.filter(item => {
+                dataFilter = dataFilter?.filter(item => {
                     const checkOutDate = new Date(item.bookings?.[0]?.check_out_at);
                     checkOutDate.setHours(0, 0, 0, 0); // Set giờ về 00:00 để chỉ so sánh ngày
                     return checkOutDate.getTime() === today.getTime();
@@ -56,7 +56,7 @@ const GeneralInformationPage: React.FC<IProps> = () => {
             if (tabActive === TAB_GENERA_INFOMATION.OVERDUE_ARRIVE) {
                 const now = new Date();
 
-                dataFilter = dataFilter.filter(item => {
+                dataFilter = dataFilter?.filter(item => {
                     const bookingDate = item.bookings?.[0]?.booking_at
                         ? new Date(item.bookings[0].booking_at)
                         : null;
@@ -74,7 +74,7 @@ const GeneralInformationPage: React.FC<IProps> = () => {
             }
 
             if (tabActive === TAB_GENERA_INFOMATION.CURRENT_GUEST) {
-                dataFilter = dataFilter.filter(item => {
+                dataFilter = dataFilter?.filter(item => {
                     return item.status === ROOM_STATUS.OCCUPIED
                 });
             }

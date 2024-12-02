@@ -25,10 +25,10 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
     const { user, token } = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [transactionRequest, setTransactionRequest] = useState<RequestTransaction>({
-        paymentOption: PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT,
+        paymentOption: remainingAmount > 0 ? PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT : PAYMENT_OPTIONS_INVOICE_ROOM.REFUND,
         paymentMethod: PAYMENT_METHODS.CASH,
         currencyType: CURRENCY_TYPES.VND,
-        price: remainingAmount,
+        price: Math.abs(remainingAmount),
         note: `Thanh toán tiền còn lại của phòng ${roomName}`,
         invoice_id: Number(invoice_id),
         user_id: user?.id,
@@ -39,20 +39,18 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
     useEffect(() => {
         setTransactionRequest(prev => ({
             ...prev,
+            paymentOption: remainingAmount > 0 ? PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT : PAYMENT_OPTIONS_INVOICE_ROOM.REFUND,
             note: `Thanh toán tiền còn lại của phòng ${roomName}`,
-            price: remainingAmount,
+            price: Math.abs(remainingAmount),
             user_id: user?.id,
             hotel_id: user?.hotel_id,
         }))
     }, [user, remainingAmount, roomName]);
 
-
     const handleCheckOut = async () => {
         setIsLoading(true)
 
-        if (transactionRequest.price > 0) {
-            console.log("da nhan");
-
+        if (transactionRequest.price !== 0) {
             try {
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/handleTransaction/`,
                     transactionRequest,
@@ -70,6 +68,15 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     await handleSavePayment();
 
                     //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
+
+
+                    await handleUpdateBookingStatus();
+                    await handleUpdateRoomStatus();
+                    router.push('/hotel_management/room_layout')
+                    toast("Thanh toan thanh cong")
+                    setIsLoading(false);
+                    //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
+
                 }
             } catch (error) {
                 setIsLoading(false);
@@ -77,7 +84,14 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                 console.log("Lỗi khi gửi dữ liệu:", error);
             }
         } else {
-            closeModal()
+            handleSavePayment();
+            //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
+            await handleUpdateBookingStatus();
+            await handleUpdateRoomStatus();
+            router.push('/hotel_management/room_layout')
+            toast("Thanh toan thanh cong")
+            setIsLoading(false);
+            //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
         }
     }
 
@@ -96,9 +110,9 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     },
                 }
             );
-
+            
             if (response.status === 200) {
-                toast("Thanh toán thành công!");
+
             }
         } catch (error) {
             console.error("Failed to create payment:", error);
@@ -107,6 +121,62 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             closeModal();
         }
     };
+
+
+
+    const handleUpdateBookingStatus = async () => {
+        try {
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/${booking_id}`,
+                {
+                    status: "CheckedOut"
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                // toast("Cap nhat booking thành công!");
+            }
+        } catch (error) {
+            console.error("Failed to create payment:", error);
+            alert("Đã xảy ra lỗi khi thực hiện thanh toán.");
+        } finally {
+            closeModal();
+        }
+    }
+
+    const handleUpdateRoomStatus = async () => {
+        try {
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${room_id}`,
+                {
+                    status: ROOM_STATUS.EMPTY,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                // toast("Cap nhat phong thành công!");
+            }
+        } catch (error) {
+            console.error("Failed to create payment:", error);
+            alert("Đã xảy ra lỗi khi thực hiện cap nhat phong.");
+        } finally {
+            closeModal();
+        }
+    }
+
+
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
             <DialogContent>
@@ -117,8 +187,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                         <li>
                             <div className="flex items-center justify-between">
                                 <p className="room-name">{roomName}</p>
-
-                                <p className="room-price">{formatPrice(String(remainingAmount))} VND</p>
+                                <p className="room-price">{remainingAmount >= 0 ? formatPrice(String(remainingAmount)) : '-' + formatPrice(String(remainingAmount))} VND</p>
                             </div>
                         </li>
                     </ul>

@@ -155,6 +155,8 @@ const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo, 
                                         selectedItem.bookings[0].invoice[0]?.id
                                     ) {
                                         setInvoiceId(selectedItem.bookings[0].invoice[0].id);
+                                        console.log(selectedItem.bookings[0].invoice[0].id);
+                                        
                                     } else {
                                         console.warn('Không tìm thấy invoice ID.');
                                     }

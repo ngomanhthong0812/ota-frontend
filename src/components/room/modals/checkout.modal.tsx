@@ -23,7 +23,7 @@ const CheckOutModal = (props: IProps) => {
         // setIsLoading(true)
         if (transactionRequest.price > 0) {
             try {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/handleTransaction/`,
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/handleTransaction`,
                     transactionRequest,
                     {
                         headers: {

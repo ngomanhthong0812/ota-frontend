@@ -5,6 +5,7 @@ import { TypeRoomCard } from "@/types/backend";
 import useSWR from "swr";
 import { useAuth } from "@/context/auth.context";
 import Link from "next/link";
+import AddServicesModal from "./modals/add_services.modal";
 
 interface IProps {
     ref: LegacyRef<HTMLDivElement> | undefined,
@@ -28,6 +29,7 @@ const fetcher = (url: string, token: string | null) =>
 
 const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, handleSetStatusClean, cleanStatus }) => {
     const [showModalBookingRoomList, setShowModalBookingRoomList] = useState<boolean>(false);
+    const [isModalAddServices, setModalAddServices] = useState<boolean>(false);
 
     const { token } = useAuth();
     const { data: bookingRoomList, error, isLoading } = useSWR(
@@ -42,6 +44,8 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
     const handleSetUnModalBookingRoomList = () => {
         setShowModalBookingRoomList(false);
     }
+
+    const closeModalAddServices = () => setModalAddServices(false);
     return (
         <div
             style={{
@@ -54,7 +58,7 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
             id="contextMenu" ref={ref}>
             <ul>
                 <Link
-                    href={`room/room_details/${data?.bookings?.[0]?.invoice_id || ''}`}
+                    href={`/hotel_management/room/room_details/${data?.bookings?.[0]?.invoice_id || ''}`}
                     className="popup-item">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                         <path
@@ -78,7 +82,9 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
                 </li>
             </ul>
             <ul>
-                <li className="popup-item">
+                <li
+                    onClick={() => setModalAddServices(true)}
+                    className="popup-item">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path
                             d=" M19 2H5C3.346 2 2 3.346 2 5v2.831c0 1.053.382 2.01 1 2.746V20a1 1 0
@@ -161,6 +167,11 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
                     <span>Danh sách đặt phòng</span>
                 </li>
             </ul>
+            <AddServicesModal
+                invoiceId={data?.bookings?.[0]?.invoice_id}
+                isOpen={isModalAddServices}
+                onClose={closeModalAddServices}
+            />
             <ModalBookingRoomList
                 bookingRoomList={bookingRoomList?.data}
                 showModalBookingRoomList={showModalBookingRoomList}

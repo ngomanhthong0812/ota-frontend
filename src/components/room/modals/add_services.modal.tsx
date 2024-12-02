@@ -14,6 +14,7 @@ import { Category, Services } from "@/types/backend";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
 import useSWR from "swr";
 
 interface IProps {
@@ -107,6 +108,7 @@ const AddServicesModal = (props: IProps) => {
                     onClose();
                     handleClearAllSelectedService();
                     setIsLoading(false);
+                    toast('Thêm dịch vụ thành công')
                 }
             } catch (error) {
                 setIsLoading(false);
