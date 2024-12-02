@@ -30,10 +30,10 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
     const { user, token } = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [transactionRequest, setTransactionRequest] = useState<RequestTransaction>({
-        paymentOption: PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT,
+        paymentOption: remainingAmount > 0 ? PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT : PAYMENT_OPTIONS_INVOICE_ROOM.REFUND,
         paymentMethod: PAYMENT_METHODS.CASH,
         currencyType: CURRENCY_TYPES.VND,
-        price: remainingAmount,
+        price: Math.abs(remainingAmount),
         note: `Thanh toán tiền còn lại của phòng ${roomName}`,
         invoice_id: Number(invoice_id),
         user_id: user?.id,
@@ -44,20 +44,18 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
     useEffect(() => {
         setTransactionRequest(prev => ({
             ...prev,
+            paymentOption: remainingAmount > 0 ? PAYMENT_OPTIONS_INVOICE_ROOM.PAYMENT : PAYMENT_OPTIONS_INVOICE_ROOM.REFUND,
             note: `Thanh toán tiền còn lại của phòng ${roomName}`,
-            price: remainingAmount,
+            price: Math.abs(remainingAmount),
             user_id: user?.id,
             hotel_id: user?.hotel_id,
         }))
     }, [user, remainingAmount, roomName]);
 
-
     const handleCheckOut = async () => {
         setIsLoading(true)
 
-        if (transactionRequest.price > 0) {
-            console.log("da nhan");
-
+        if (transactionRequest.price !== 0) {
             try {
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/handleTransaction/`,
                     transactionRequest,
@@ -79,6 +77,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     handleUpdateRoomStatus();
                     router.push('/hotel_management')
                     toast("Thanh toan thanh cong")
+                    //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
                 }
             } catch (error) {
                 setIsLoading(false);
@@ -86,7 +85,8 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                 console.log("Lỗi khi gửi dữ liệu:", error);
             }
         } else {
-            closeModal()
+            handleSavePayment();
+            setIsLoading(false)
         }
     }
 
@@ -179,8 +179,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                         <li>
                             <div className="flex items-center justify-between">
                                 <p className="room-name">{roomName}</p>
-
-                                <p className="room-price">{formatPrice(String(remainingAmount))} VND</p>
+                                <p className="room-price">{remainingAmount >= 0 ? formatPrice(String(remainingAmount)) : '-' + formatPrice(String(remainingAmount))} VND</p>
                             </div>
                         </li>
                     </ul>
