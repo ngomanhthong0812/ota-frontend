@@ -35,7 +35,8 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
   const [activeTab, setActiveTab] = useState<string>("denHienTai");
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [roomDetails, setRoomDetails] = useState<{ name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
+  const [roomDetails, setRoomDetails] = useState<{ id:number, name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
+  const [bookingId, setBookingId] = useState<number>(0);
   const [roomPrice, setRoomPrice] = useState<number>(0);
   const [payments, setPayments] = useState<Payments[]>([]);
   const [remainingAmount, setRemainingAmount] = useState<number>(0);
@@ -106,12 +107,15 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
   useEffect(() => {
     if (data && data.invoice) {
+      setRoomPrice(data?.invoice?.invoice?.total)
+      setBookingId(data?.invoice?.bookings.id)
       const today = new Date().toISOString();
       const calculateDateNow = calculateDaysBetween(today, data?.invoice?.invoice?.check_out_at);
       const calculatePriceNow = data?.invoice?.invoice?.total - (calculateDateNow * data.invoice.rooms[0].price);
       setRoomPrice(activeTab === "denHienTai" ? calculatePriceNow : data?.invoice?.invoice?.total)
 
       const roomDetailsList = data.invoice.rooms.map((room: any) => ({
+        id: room.id,
         name: room.name,
         price: room.price,
       }));
@@ -119,6 +123,9 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
       setPayments(data?.payments || []) // Cập nhật state với tên và giá phòng
     }
   }, [data])
+
+  console.log("booking id:", bookingId);
+  
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -595,6 +602,8 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
         roomName={roomDetails[0]?.name}
         remainingAmount={remainingAmount}
         invoice_id={id}
+        room_id={roomDetails[0]?.id}
+        booking_id={bookingId}
       />
 
       <CheckOutModal
