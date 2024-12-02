@@ -73,10 +73,11 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     await handleSavePayment();
 
                     //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
-                    handleUpdateBookingStatus();
-                    handleUpdateRoomStatus();
-                    router.push('/hotel_management')
+                    await handleUpdateBookingStatus();
+                    await handleUpdateRoomStatus();
+                    router.push('/hotel_management/room_layout')
                     toast("Thanh toan thanh cong")
+                    setIsLoading(false);
                     //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
                 }
             } catch (error) {
@@ -86,7 +87,13 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             }
         } else {
             handleSavePayment();
-            setIsLoading(false)
+            //-> cập nhật trạng thái phòng && chuyển tới trang hoá đơn hoặc trang home
+            await handleUpdateBookingStatus();
+            await handleUpdateRoomStatus();
+            router.push('/hotel_management/room_layout')
+            toast("Thanh toan thanh cong")
+            setIsLoading(false);
+            //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
         }
     }
 
@@ -105,9 +112,9 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     },
                 }
             );
-
+            
             if (response.status === 200) {
-                toast("Thanh toán thành công!");
+
             }
         } catch (error) {
             console.error("Failed to create payment:", error);
@@ -122,7 +129,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             const response = await axios.put(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/${booking_id}`,
                 {
-                    status: "Checkout"
+                    status: "CheckedOut"
                 },
                 {
                     headers: {
