@@ -1,6 +1,6 @@
 "use client";
 
-import UserSelect from "@/components/userbyhotel";
+import UserSelect from "@/components/room_admin/Userbyhotel";
 import axios from "axios";
 import { NextPage } from "next";
 import { useRouter } from "next/navigation";

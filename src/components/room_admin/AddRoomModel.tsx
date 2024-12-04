@@ -10,12 +10,12 @@ import { useState } from "react";
 import { FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import ImageInput from "./ImageInput";
-import AddAreaPopUp from "./AddAreaPopUp";
+import AddAreaPopUp from "./AddAreaPopup";
 import { FaPlus } from "react-icons/fa";
 import RoomManagerDialog from "./AddRoomrCategoryModal ";
 import { toast } from "react-toastify";
-import SelectRoomType from "./selectRoomType";
-import SelectFloor from "./selectFloor";
+import SelectRoomType from "./SelectRoomType";
+import SelectFloor from "./SelectFloor";
 import { callApi } from "@/utils/api";
 interface AddRoomModelProps {
   open: boolean;
