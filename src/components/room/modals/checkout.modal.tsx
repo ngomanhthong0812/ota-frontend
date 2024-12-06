@@ -51,22 +51,35 @@ const CheckOutModal = (props: IProps) => {
 
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
-            <DialogContent>
-                <DialogTitle className="font-[500]">Bạn có chắc chắn muốn thanh toán mới !</DialogTitle>
-                <footer className="modal-footer mt-3">
-                    <div className="flex items-center justify-end gap-x-5 font-[500]">
-                        <button
-                            onClick={closeModal}
-                            className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200">
-                            Bỏ qua
-                        </button>
-                        <button
-                            onClick={handleCheckOut}
-                            className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
-                            Lưu
-                        </button>
+            <DialogContent 
+                className="rounded-xl overflow-auto p-0 bg-transparent border-none">
+
+                <div className="rounded-xl">
+                    <DialogTitle 
+                        className="text-white font-[500] text-base bg-[var(--room-empty-color-)] px-4 py-2 rounded-t-xl">
+                        Thanh toán
+                    </DialogTitle>
+
+                    <div className="bg-white p-3">
+                        <p>Bạn có chắc chắn muốn thanh toán mới !</p>
+
+                        <footer className="modal-footer mt-3">
+                            <div className="flex items-center justify-end gap-x-5 font-[500]">
+                                <button
+                                    onClick={closeModal}
+                                    className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200">
+                                    Huỷ
+                                </button>
+                                <button
+                                    onClick={handleCheckOut}
+                                    className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
+                                    Thanh toán
+                                </button>
+                            </div>
+                        </footer>
                     </div>
-                </footer>
+                </div>    
+                
             </DialogContent>
         </Dialog>
     )

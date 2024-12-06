@@ -4,8 +4,8 @@ import { useState } from "react";
 import RoomCategoryPage from "./room_category/page";
 import { Button } from "@mui/material";
 import RoomsPage from "./rooms/page";
-import AddRoomModel from "@/components/AddRoomModel"; // Kiểm tra tên file
-import RoomManagerDialog from "@/components/AddRoomrCategoryModal ";
+import AddRoomModel from "@/components/room_admin/AddRoomModel"; // Kiểm tra tên file
+import RoomManagerDialog from "@/components/room_admin/AddRoomrCategoryModal ";
 
 interface IProps {}
 interface Page {

@@ -383,6 +383,7 @@ body svg {
   background-color: #374151; /* Màu của thumb khi hover */
 }
 
+<<<<<<< HEAD
 
 .menu-item-container-admin {
   @apply md:container md:max-w-[1290px] m-auto px-3 relative z-50;
@@ -399,4 +400,9 @@ body svg {
 
 .menu-item-container-admin .menu-item{
   @apply !gap-2;
+=======
+.IllustrationsNoData svg {
+  width: 30%;
+  height: 30%;
+>>>>>>> e575425b33fd0f5c5eeac63d19378479a48e7dc7
 }
