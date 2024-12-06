@@ -382,3 +382,21 @@ body svg {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #374151; /* Màu của thumb khi hover */
 }
+
+
+.menu-item-container-admin {
+  @apply md:container md:max-w-[1290px] m-auto px-3 relative z-50;
+}
+
+.menu-item-container-admin .menu-item:hover svg,
+.menu-item-container-admin svg{
+  @apply fill-white;
+}
+
+.menu-item-container-admin .active{
+  @apply !bg-[#0078b6];
+}
+
+.menu-item-container-admin .menu-item{
+  @apply !gap-2;
+}

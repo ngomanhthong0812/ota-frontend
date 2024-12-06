@@ -1,34 +1,30 @@
 import { v4 as uuid } from "uuid";
 import {
-  BiSolidCart,
-  BiUserPin,
-  BiSolidStoreAlt,
-  BiSolidWidget,
-  BiCreditCard,
-  BiSolidBuildings,
-  BiSolidFileBlank,
-  BiSolidEnvelope,
-  BiWallet,
-  BiSolidHome,
   BiUserPlus,
 } from "react-icons/bi";
-import { MenuItem } from "@/types/backend";
 import { MdBedroomParent } from "react-icons/md";
+import { FaUserGroup } from "react-icons/fa6";
+import { MdSettings } from "react-icons/md";
+import { RiFlowerLine } from "react-icons/ri";
+import { FaEye } from "react-icons/fa";
+import { RiUser4Fill } from "react-icons/ri";
+
+import { MenuItem } from "@/types/backend";
 
 export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
   {
     id: uuid(),
-    name: "Thông tin chung",
+    name: "Tổng quan",
     href: "/admin_management",
-    icon: <BiSolidWidget size={20} />,
+    icon: <FaEye size={20} />,
     active: true,
     subMenus: [],
   },
   {
     id: uuid(),
-    name: "Quản lý phòng",
+    name: "Phòng",
     href: null,
-    icon: <BiUserPin size={20} />,
+    icon: <MdBedroomParent size={20} />,
     active: false,
     subMenus: [
       {
@@ -51,24 +47,32 @@ export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
   },
   {
     id: uuid(),
-    name: "Thu chi",
+    name: "Nhân viên",
     href: null,
-    icon: <BiCreditCard size={20} />,
+    icon: <FaUserGroup size={18} />,
     active: false,
     subMenus: [
       {
         id: uuid(),
-        name: "Quỹ tiền mặt",
-        href: "/admin_management/cash_fund",
-        icon: <BiWallet size={20} />,
+        name: "Nhân viên",
+        href: "/admin_management/staff",
+        icon: <FaUserGroup size={18} />,
         active: false,
         subMenus: [],
       },
       {
         id: uuid(),
-        name: "Quỹ tiền gửi",
-        href: "/admin_management/deposit_fund",
-        icon: <BiCreditCard size={20} />,
+        name: "Thiết lập nhân viên",
+        href: "/admin_management/staff_setup",
+        icon: <MdSettings size={20} />,
+        active: false,
+        subMenus: [],
+      },
+      {
+        id: uuid(),
+        name: "Tài khoản",
+        href: "/admin_management/users",
+        icon: <RiUser4Fill size={20} />,
         active: false,
         subMenus: [],
       },
@@ -76,58 +80,9 @@ export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
   },
   {
     id: uuid(),
-    name: "Quản lý bán hàng",
-    href: null,
-    icon: <BiSolidCart size={20} />,
-    active: false,
-    subMenus: [
-      {
-        id: uuid(),
-        name: "Tạo hoá đơn",
-        href: "/admin_management/sales_invoice_creation",
-        icon: <BiWallet size={20} />,
-        active: false,
-        subMenus: [],
-      },
-      {
-        id: uuid(),
-        name: "Tìm hoá đơn",
-        href: "/admin_management/sales_invoice_search",
-        icon: <BiCreditCard size={20} />,
-        active: false,
-        subMenus: [],
-      },
-    ],
-  },
-  {
-    id: uuid(),
-    name: "Buồng phòng",
-    href: "/admin_management/buong_phong",
-    icon: <BiSolidBuildings size={20} />,
-    active: false,
-    subMenus: [],
-  },
-  {
-    id: uuid(),
-    name: "Email marketing",
-    href: "/admin_management/email_marketing",
-    icon: <BiSolidEnvelope size={20} />,
-    active: false,
-    subMenus: [],
-  },
-  {
-    id: uuid(),
-    name: "Quản lý kho",
-    href: "/admin_management/quan_ly_kho",
-    icon: <BiSolidStoreAlt size={20} />,
-    active: false,
-    subMenus: [],
-  },
-  {
-    id: uuid(),
-    name: "Báo cáo",
-    href: "/admin_management/bao_cao",
-    icon: <BiSolidFileBlank size={20} />,
+    name: "Lễ tân",
+    href: "/hotel_management",
+    icon: <RiFlowerLine size={20} />,
     active: false,
     subMenus: [],
   },

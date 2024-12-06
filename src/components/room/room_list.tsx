@@ -1,6 +1,6 @@
 "use client"
 
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import RoomCard from "./room_card";
 import { useEffect, useState } from 'react';
 import { Floor, TypeRoomCard } from '@/types/backend';
@@ -33,7 +33,7 @@ const RoomList: React.FC<IProps> = () => {
     const { selectedToolbar } = useToolbar();
 
     const { user, token } = useAuth();
-    const { data, error, isLoading } = useSWR(
+    const { data, error, isLoading, mutate } = useSWR(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}`,
         (url: string) => fetcher(url, token),
         {
@@ -42,6 +42,10 @@ const RoomList: React.FC<IProps> = () => {
             revalidateOnReconnect: false
         }
     );
+
+    const refreshData = async () => {
+        await mutate(); // Re-fetch lại dữ liệu
+    };
 
     useEffect(() => {
         const newFloors = data?.data?.map((item: TypeRoomCard) => {
@@ -87,21 +91,21 @@ const RoomList: React.FC<IProps> = () => {
         <div>
             {selectedToolbar === TAB_ROOM_FINAL.BOOKING_ROOM
                 && roomBookings?.map((roomBooking, index) => (
-                    <RoomBookingSection key={roomBooking + index} roomBooking={roomBooking} data={data?.data || []} />
+                    <RoomBookingSection key={roomBooking + index} roomBooking={roomBooking} data={data?.data || []} refreshData={refreshData} />
                 ))
             }
             {selectedToolbar === TAB_ROOM_FINAL.FLOOR
                 && floors?.map((floor) => (
-                    <FloorSection key={floor.id} floor={floor} data={data?.data || []} />
+                    <FloorSection key={floor.id} floor={floor} data={data?.data || []} refreshData={refreshData} />
                 ))
             }
             {selectedToolbar === TAB_ROOM_FINAL.CATEGORIES
                 && categories?.map((category, index) => (
-                    <CategoriesSection key={category + index} category={category} data={data?.data || []} />
+                    <CategoriesSection key={category + index} category={category} data={data?.data || []} refreshData={refreshData} />
                 ))
             }
             {selectedToolbar === TAB_ROOM_FINAL.ROOM
-                && <RoomSection data={data?.data || []} />
+                && <RoomSection data={data?.data || []} refreshData={refreshData} />
             }
         </div>
     )
@@ -110,9 +114,10 @@ const RoomList: React.FC<IProps> = () => {
 interface RoomBookingSectionProps {
     roomBooking: string;
     data: TypeRoomCard[];
+    refreshData: () => void;
 }
 
-const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, data }) => {
+const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, data, refreshData }) => {
     const [newData, setNewData] = useState<TypeRoomCard[]>([]);
 
     const today = new Date();
@@ -153,7 +158,9 @@ const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, da
                 className="body_content-room grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 py-3 gap-3">
                 {newData?.map((item: TypeRoomCard) => (
                     <div key={item.id}>
-                        <RoomCard data={item} />
+                        <RoomCard
+                            data={item}
+                            refreshData={refreshData} />
                     </div>
                 ))}
             </div>
@@ -165,9 +172,10 @@ const RoomBookingSection: React.FC<RoomBookingSectionProps> = ({ roomBooking, da
 interface FloorSectionProps {
     floor: Floor;
     data: TypeRoomCard[];
+    refreshData: () => void;
 }
 
-const FloorSection: React.FC<FloorSectionProps> = ({ floor, data }) => {
+const FloorSection: React.FC<FloorSectionProps> = ({ floor, data, refreshData }) => {
     return (
         <section>
             <div className="body_content-title flex gap-3">
@@ -183,7 +191,9 @@ const FloorSection: React.FC<FloorSectionProps> = ({ floor, data }) => {
                 {data.map((item: TypeRoomCard) => (
                     item.floor.id === floor.id && (
                         <div key={item.id}>
-                            <RoomCard data={item} />
+                            <RoomCard
+                                data={item}
+                                refreshData={refreshData} />
                         </div>
                     )
                 ))}
@@ -195,9 +205,10 @@ const FloorSection: React.FC<FloorSectionProps> = ({ floor, data }) => {
 interface CategoriesSectionProps {
     category: string;
     data: TypeRoomCard[];
+    refreshData: () => void;
 }
 
-const CategoriesSection: React.FC<CategoriesSectionProps> = ({ category, data }) => {
+const CategoriesSection: React.FC<CategoriesSectionProps> = ({ category, data, refreshData }) => {
     return (
         <section>
             <div className="body_content-title flex gap-3">
@@ -213,7 +224,10 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ category, data })
                 {data.map((item: TypeRoomCard) => (
                     item.room_type === category && (
                         <div key={item.id}>
-                            <RoomCard data={item} />
+                            <RoomCard
+                                data={item}
+                                refreshData={refreshData}
+                            />
                         </div>
                     )
                 ))}
@@ -224,16 +238,19 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ category, data })
 
 interface RoomSectionProps {
     data: TypeRoomCard[];
+    refreshData: () => void;
 }
 
-const RoomSection: React.FC<RoomSectionProps> = ({ data }) => {
+const RoomSection: React.FC<RoomSectionProps> = ({ data, refreshData }) => {
     return (
         <section>
             <div
                 className="body_content-room grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 py-3 gap-3">
                 {data.map((item: TypeRoomCard) => (
                     <div key={item.id}>
-                        <RoomCard data={item} />
+                        <RoomCard
+                            data={item}
+                            refreshData={refreshData} />
                     </div>
                 ))}
             </div>

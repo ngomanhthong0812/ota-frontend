@@ -175,3 +175,23 @@ interface ReceiptAndExpense {
     createdAt: string,
     type: string;
 }
+
+interface Employee {
+    id: number
+    code: string;
+    name: string;
+    birthDate: string;
+    gender: 'Male' | 'Female' | 'Other';
+    idCard: string;
+    position: string;
+    startDate: string;
+    user_id: number;
+    phoneNumber: string;
+    email: string;
+    facebook: string;
+    address: string;
+    notes: string;
+    img: string;
+    status: 'Working' | 'Resigned';
+    hotel_id: number;
+}

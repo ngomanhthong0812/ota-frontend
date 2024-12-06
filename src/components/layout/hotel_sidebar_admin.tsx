@@ -2,72 +2,34 @@
 
 import Link from "next/link";
 
-import {
-    BiChevronRight,
-    BiChevronLeftCircle
-} from "react-icons/bi";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { MenuItem } from "@/types/backend";
 import { usePathname } from 'next/navigation'
 import { HOTELSIDEBARADMIN_NAV } from "@/constants/hotel_sidebar_admin";
-
 
 interface IProps { }
 
 const HotelSidebarAdmin: React.FC<IProps> = () => {
     const [menus, setMenus] = useState<MenuItem[]>(HOTELSIDEBARADMIN_NAV);
-    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
     const pathname = usePathname()
 
     useEffect(() => {
         setShowMenuActive(pathname);
     }, [])
-    const handleActiveMenu = useCallback((e: React.MouseEvent<HTMLLIElement>, id: string, idParent: string, submenusParent: MenuItem[]) => {
-        let newMenus: MenuItem[] = []
-        e.stopPropagation(); // ngăn event ảnh hưởng ptu cha
 
-        if (submenusParent.length > 0) {
-            newMenus = menus.map(menu => {
-                // Kiểm tra nếu là menu chính
-                if (menu.id === id) {
-                    return { ...menu, showSubMenu: !menu.showSubMenu }; // Toggled submenu
-                }
-                if (menu.id !== id && menu.id !== idParent) {
-                    menu.showSubMenu = false;
-                }
-
-                //kiểm tra submenu
-                if (menu.subMenus && menu.subMenus.length > 0) {
-                    menu.subMenus = menu.subMenus.map(subItem => {
-                        if (subItem.id === id) {
-                            menus.forEach(menu => menu.active = false);
-                            return { ...subItem, active: true }
-                        } else {
-                            return { ...subItem, active: false }
-                        }
-                    })
-                }
-                return menu;
-            })
-        } else {
-            newMenus = menus.map(menu => {
-                menu.showSubMenu = false;
-                menu.subMenus.forEach(menu => menu.active = false);
-                return menu.id === id ? { ...menu, active: true } : { ...menu, active: false }
-            })
-        }
-        setMenus(newMenus);
-    }, [menus]);
-
-    const handleToggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    }
     const setShowMenuActive = (pathname: string) => {
         let newMenus: MenuItem[] = []
         newMenus = menus.map(menu => {
+            const menuitem = menu.href === pathname;
             const submenu = menu.subMenus.find(submenu => submenu.href === pathname);
             if (submenu) {
-                menu.showSubMenu = true;
+                menu.active = true;
+            } else {
+                if (menuitem) {
+                    menu.active = true;
+                } else {
+                    menu.active = false;
+                }
             }
             return menu;
         });
@@ -75,42 +37,64 @@ const HotelSidebarAdmin: React.FC<IProps> = () => {
     }
 
     return (
-        <nav className={`menu-item-container ${!isMenuOpen && 'menu-item-container_toggle'}`}>
-            <ul>
-                {menus.map(item => (
-                    <li key={item.id} onClick={(e) => handleActiveMenu(e, item.id, item.id, item.subMenus)} className={`${item.showSubMenu && 'show-submenu'}`}>
-                        <Link href={item.href || ''} className={`menu-item ${item.href === pathname && 'active'}`}>
-                            {item.icon}
-                            <span>
-                                {item.name}
-                                {item.subMenus.length > 0 && <BiChevronRight size={20} className="menu-item_icon" />}
-                            </span>
-                            <p className="hidden-title">{item.name}</p>
-                        </Link>
-                        {item.subMenus.length > 0 &&
-                            (
-                                <ul className="submenu">
-                                    {item.subMenus.map(submenu => (
-                                        <li key={submenu.id} onClick={(e) => handleActiveMenu(e, submenu.id, item.id, item.subMenus)}>
-                                            <Link href={submenu.href || ''} className={`menu-item ${submenu.href === pathname && 'active'}`}>
-                                                {submenu.icon}
-                                                <span>{submenu.name}</span>
-                                                <p className="hidden-title">{submenu.name}</p>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )
-                        }
-                    </li>
-                ))}
-            </ul>
-            <div
-                className="btn-menu_toggle cursor-pointer fixed w-[210px] flex justify-end bottom-0 left-0 bg-[var(--navbar-color-)] p-1"
-                onClick={handleToggleMenu}>
-                <BiChevronLeftCircle size={25} />
-            </div>
-        </nav >
+        <div className="bg-[#0090da] w-full">
+            <nav className={`menu-item-container-admin`}>
+                <div className="flex justify-between">
+                    <ul className="flex">
+                        {menus
+                            .filter(item => item.name !== "Lễ tân")
+                            .map(item => (
+                                <li key={item.id}
+                                    onClick={() => item.subMenus.length <= 0 && setShowMenuActive(item.href || '')}
+                                    className={`group rounded-md truncate`}>
+                                    <Link href={item.href || ''}
+                                        className={`menu-item !bg-transparent hover:!bg-[#0078b6] !text-white !duration-0 ${item.active && 'active'}`}>
+                                        {item.icon}
+                                        <span>
+                                            {item.name}
+                                        </span>
+                                        <p className="hidden-title">{item.name}</p>
+                                    </Link>
+                                    {item.subMenus.length > 0 &&
+                                        <ul
+                                            className="absolute top-10 min-w-[280px] py-2 rounded-md invisible group-hover:visible bg-[#0078b6] shadow-[#808080] shadow-sm">
+                                            {item.subMenus.map(submenu => (
+                                                <li
+                                                    onClick={() => setShowMenuActive(submenu.href || '')}
+                                                    key={submenu.id}>
+                                                    <Link href={submenu.href || ''}
+                                                        className={`menu-item !bg-transparent !text-white !duration-0 hover:!bg-[#0090da] ${submenu.href === pathname && 'active'}`}>
+                                                        {submenu.icon}
+                                                        <span>{submenu.name}</span>
+                                                        <p className="hidden-title">{submenu.name}</p>
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    }
+                                </li>
+                            ))}
+                    </ul>
+                    <ul>
+                        {menus
+                            .filter(item => item.name === "Lễ tân")
+                            .map(item => (
+                                <li
+                                    onClick={() => setShowMenuActive(item.href || '')}
+                                    className={`group rounded-md truncate`}
+                                    key={item.id}>
+                                    <Link href={item.href || ''}
+                                        className={`menu-item !text-white !duration-0 !bg-[#005c8f] hover:!bg-[#004f73] ${item.href === pathname && 'active'}`}>
+                                        {item.icon}
+                                        <span>{item.name}</span>
+                                        <p className="hidden-title">{item.name}</p>
+                                    </Link>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+            </nav >
+        </div>
     );
 }
 

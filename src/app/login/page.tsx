@@ -166,20 +166,20 @@ const LoginPage: React.FC<IProps> = () => {
                                     ? <PuffLoader color="white" size={20} />
                                     : <>
                                         <BiSolidHotel size={23} />
-                                        QL Đặt phòng
+                                        Đặt phòng
                                     </>
                             }
                         </button>
                         <button
                             disabled={(isLoadingHotel || isLoadingStaff) ? true : false}
-                            onClick={(e) => handleSubmit(e, '/staff_management')}
+                            onClick={(e) => handleSubmit(e, '/admin_management')}
                             className="flex item-center justify-center gap-2 bg-[#0070F4] hover:bg-[#005ac3] duration-200 border-none flex-1 rounded-br-2xl px-2 py-3">
                             {
                                 isLoadingStaff
                                     ? <PuffLoader color="white" size={20} />
                                     : <>
                                         <PiUsersFill size={23} />
-                                        QL Nhân viên
+                                        Quản lý
                                     </>
                             }
                         </button>

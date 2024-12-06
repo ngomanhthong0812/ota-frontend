@@ -9,10 +9,11 @@ import axios from "axios";
 import { useAuth } from "@/context/auth.context";
 
 interface IProps {
-    data: TypeRoomCard
+    data: TypeRoomCard,
+    refreshData: () => void
 }
 
-const RoomCard: React.FC<IProps> = ({ data }) => {
+const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
     const [showPopup, setShowPopup] = useState(false);
     const [showPopupStatusClean, setShowPopupStatusClean] = useState(false);
     const [popupPosition, setPopupPosition] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -125,6 +126,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
             if (response.data.statusCode === 200 || response.status === 201) {
                 console.log("Gửi thành công");
                 setCleanStatus(!cleanStatus);
+                refreshData();
             }
         } catch (error) {
             // In thông tin lỗi khi gặp sự cố
@@ -191,7 +193,7 @@ const RoomCard: React.FC<IProps> = ({ data }) => {
                         }
                     </div>
                 </div>
-                <h1 className="text-[18px] font-medium text-black truncate">P.{data.name}</h1>
+                <h1 className="text-[18px] font-medium text-black truncate">{data.name}</h1>
                 {data.bookings &&
                     <div className="flex absolute bottom-3">
                         <div

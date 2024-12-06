@@ -22,14 +22,12 @@ export default function RootLayout({
         <ToastContainer />
         <ToolbarProvider>
           <SelectedServiceProvider>
-            <div>
-              <HotelHeader />
-              <div className="flex">
-                <HotelSidebarAdmin />
-                <main className="container-body ml-[210px] mt-[50px] w-[100%] p-3 text-sm text-[var(--color-menu-icon-)]">
-                  {children}
-                </main>
-              </div>
+            <div className="relative min-h-[100vh]">
+              {/* <HotelHeader /> */}
+              <HotelSidebarAdmin />
+              <main className="md:container md:max-w-[1290px] m-auto px-3 py-4 text-sm text-[var(--color-menu-icon-)]">
+                {children}
+              </main>
             </div>
           </SelectedServiceProvider>
         </ToolbarProvider>
