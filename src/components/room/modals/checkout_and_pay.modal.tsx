@@ -5,6 +5,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { CURRENCY_TYPES, PAYMENT_METHODS, PAYMENT_OPTIONS, PAYMENT_OPTIONS_INVOICE_ROOM } from "@/constants/constants";
+import { ROOM_STATUS } from "@/constants/constants";
 import { useAuth } from "@/context/auth.context";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 import { RequestTransaction } from "@/types/backend";
@@ -12,6 +13,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface IProps {
     showModal: boolean;
@@ -19,8 +21,11 @@ interface IProps {
     roomName: string;  // Thông tin phòng và giá
     remainingAmount: number;
     invoice_id: number;
+    room_id: number;
+    booking_id: number;
 }
-const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id }) => {
+const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName, remainingAmount, invoice_id, room_id, booking_id }) => {
+    const router = useRouter();
     const { formatPrice } = useFormatPriceWithCommas();
     const { user, token } = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,7 +78,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                     await handleUpdateBookingStatus();
                     await handleUpdateRoomStatus();
                     router.push('/hotel_management/room_layout')
-                    toast("Thanh toan thanh cong")
+                    toast("Thanh toán thành công")
                     setIsLoading(false);
                     //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
 
@@ -89,7 +94,7 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
             await handleUpdateBookingStatus();
             await handleUpdateRoomStatus();
             router.push('/hotel_management/room_layout')
-            toast("Thanh toan thanh cong")
+            toast("Thanh toán thành công")
             setIsLoading(false);
             //-> cập nhật trạng thái phòng,booking && chuyển tới trang hoá đơn hoặc trang home
         }
@@ -179,76 +184,86 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
 
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
-            <DialogContent>
-                <DialogTitle>Thanh toán</DialogTitle>
+            <DialogContent className="rounded-xl overflow-auto p-0 bg-transparent border-none">
+                
 
-                <div className="mt-3">
-                    <ul>
-                        <li>
-                            <div className="flex items-center justify-between">
-                                <p className="room-name">{roomName}</p>
-                                <p className="room-price">{remainingAmount >= 0 ? formatPrice(String(remainingAmount)) : '-' + formatPrice(String(remainingAmount))} VND</p>
-                            </div>
-                        </li>
-                    </ul>
+                <div className="rounded-xl">
+                    <DialogTitle 
+                        className="text-white font-medium text-base bg-[var(--room-empty-color-)] px-4 py-2 rounded-t-xl">
+                        Thanh toán
+                    </DialogTitle>
 
-                </div>
+                    <div className="bg-white p-3">
 
-                <div className="grid grid-cols-3 gap-5 mt-5">
-                    <div className="flex flex-col col-span-2">
-                        <select
-                            onChange={e => setTransactionRequest(prev => ({ ...prev, paymentMethod: e.target.value }))}
-                            name="" id="" className="btn">
-                            <option>{PAYMENT_METHODS.CASH}</option>
-                            <option>{PAYMENT_METHODS.BANK_TRANSFER}</option>
-                            <option>{PAYMENT_METHODS.CREDIT_CARD}</option>
-                        </select>
-                    </div>
+                        <div className="">
+                            <ul>
+                                <li>
+                                    <div className="flex items-center justify-between">
+                                        <p className="room-name">{roomName}</p>
+                                        <p className="room-price">{remainingAmount >= 0 ? formatPrice(String(remainingAmount)) : '-' + formatPrice(String(remainingAmount))} VND</p>
+                                    </div>
+                                </li>
+                            </ul>
 
-                    <div className="flex flex-col">
-                        <select
-                            onChange={e => setTransactionRequest(prev => ({ ...prev, currencyType: e.target.value }))}
-                            name="" id=""
-                            className="btn">
-                            <option value="">{CURRENCY_TYPES.VND}</option>
-                            <option value="">{CURRENCY_TYPES.USD}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <div className="flex items-center mt-3">
-                        <label className="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" />
-
-                            <span className="ml-2 text-gray-700">Gửi email cho khách</span>
-                        </label>
-                    </div>
-                </div>
-
-                <footer className="modal-footer">
-                    <div className="flex items-center justify-end gap-x-10 py-3 font-medium">
-                        <div className="flex items-center justify-end gap-x-5 py-3 font-semibold">
-                            <button
-                                className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200"
-                                onClick={closeModal}
-                            >
-                                Bỏ qua
-                            </button>
-                            <button
-                                className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200"
-                                onClick={handleCheckOut}
-                            >
-                                Thanh toán
-                            </button>
                         </div>
+
+                        <div className="grid grid-cols-3 gap-5 mt-5">
+                            <div className="flex flex-col col-span-2">
+                                <select
+                                    onChange={e => setTransactionRequest(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                                    name="" id="" className="btn">
+                                    <option>{PAYMENT_METHODS.CASH}</option>
+                                    <option>{PAYMENT_METHODS.BANK_TRANSFER}</option>
+                                    <option>{PAYMENT_METHODS.CREDIT_CARD}</option>
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col">
+                                <select
+                                    onChange={e => setTransactionRequest(prev => ({ ...prev, currencyType: e.target.value }))}
+                                    name="" id=""
+                                    className="btn">
+                                    <option value="">{CURRENCY_TYPES.VND}</option>
+                                    <option value="">{CURRENCY_TYPES.USD}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="flex items-center mt-3">
+                                <label className="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" />
+
+                                    <span className="ml-2 text-gray-700">Gửi email cho khách</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <footer className="modal-footer">
+                            <div className="flex items-center justify-end gap-x-10 py-3 font-medium">
+                                <div className="flex items-center justify-end gap-x-5 py-3 font-semibold">
+                                    <button
+                                        className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200"
+                                        onClick={closeModal}
+                                    >
+                                        Bỏ qua
+                                    </button>
+                                    <button
+                                        className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200"
+                                        onClick={handleCheckOut}
+                                    >
+                                        Thanh toán
+                                    </button>
+                                </div>
+                            </div>
+                        </footer>
+                        {isLoading
+                            && <div className="fixed z-[999] bg-black bg-opacity-45 top-0 left-0 w-full h-full flex items-center justify-center">
+                                <ClipLoader size={50} color="fffff" />
+                            </div>
+                        }
                     </div>
-                </footer>
-                {isLoading
-                    && <div className="fixed z-[999] bg-black bg-opacity-45 top-0 left-0 w-full h-full flex items-center justify-center">
-                        <ClipLoader size={50} color="fffff" />
-                    </div>
-                }
+                </div>
             </DialogContent>
         </Dialog>
     )
