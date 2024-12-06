@@ -5,14 +5,12 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-import axios from "axios";
-import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
 import { FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import { toast } from "react-toastify";
-import SelectFloor from "./selectFloor";
 import { callApi } from "@/utils/api";
+import SelectFloor from "./SelectFloor";
 
 interface Props {
   open: boolean;

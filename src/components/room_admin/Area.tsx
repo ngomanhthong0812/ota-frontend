@@ -1,9 +1,9 @@
 import { NextPage } from "next";
-import AddAreaPopUp from "./AddAreaPopUp";
 import { useEffect, useState } from "react";
 import { FaPencilAlt, FaPlus } from "react-icons/fa";
 import { callApi } from "@/utils/api";
-import UpdateAreaPopUp from "./UpdateAreaPopUp";
+import AddAreaPopUp from "./AddAreaPopup";
+import UpdateAreaPopUp from "./UpdateAreaPopup";
 
 interface IProps {}
 

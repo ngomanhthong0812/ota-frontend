@@ -1,7 +1,7 @@
 "use client";
-import { ChartRevenue } from "@/components/ChartRevenue";
-import RoomProgressCard from "@/components/RoomProgressCard";
-import RoomUsageLineChart from "@/components/RoomUsageLineChart ";
+import { ChartRevenue } from "@/components/room_admin/ChartRevenue";
+import RoomProgressCard from "@/components/room_admin/RoomProgressCard";
+import RoomUsageLineChart from "@/components/room_admin/RoomUsageLineChart ";
 import { useAuth } from "@/context/auth.context";
 
 interface IProps {}

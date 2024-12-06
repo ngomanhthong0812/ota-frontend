@@ -35,7 +35,7 @@ const RoomProgressCard: React.FC<IProps> = ({}) => {
             {roomStats && (
               <RoomProgressChart
                 totalRooms={roomStats?.totalRooms}
-                occupiedRooms={roomStats?.bookedRooms}
+                occupiedRooms={roomStats?.occupiedRooms}
                 description="Đang có khách"
                 trailColor="#bdf6d4"
                 pathColor="#177f42"

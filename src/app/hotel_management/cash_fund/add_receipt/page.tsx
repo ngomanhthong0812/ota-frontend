@@ -1,5 +1,5 @@
 "use client";
-import UserSelect from "@/components/userbyhotel";
+import UserSelect from "@/components/room_admin/Userbyhotel";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";

@@ -1,5 +1,5 @@
 "use client";
-import SelectUserUpdate from "@/components/selectUser";
+import SelectUserUpdate from "@/components/room_admin/SelectUser";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";
@@ -30,7 +30,8 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const [dateTime, setDateTime] = useState<{ CreatedAt: string }>({
     CreatedAt: "",
   });
-  const { id } = use(params); // Lấy `id` từ `params`
+  const { id } = use(params);
+
   const fetcher = (url: string) =>
     fetch(url, {
       headers: {
@@ -148,7 +149,7 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
         <div className="toolbar-top pb-2 flex items-center justify-between text-xs">
           <div className="flex items-center justify-between px-3 w-full rounded-md">
             <h1 className="text-base font-[600] flex items-center gap-1">
-              {data.data.TransactionType
+              {data.data.TransactionType === "income"
                 ? "Phiếu thu tiền mặt"
                 : "Phiếu chi tiền mặt"}
               <svg
@@ -207,7 +208,11 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
                 Địa chị
               </p>
               <div className="flex items-center gap-3 mb-4">
-                <span>Nội dung chi</span>
+                <span>
+                  {data.data.TransactionType === "income"
+                    ? "nội dung thu"
+                    : "nội dung chi"}
+                </span>
 
                 <div className="flex-1">
                   <input
@@ -225,11 +230,19 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
                 Chứng từ
               </h2>
               <p className="flex flex-col text-[#b2b2b2] border-b border-dashed border-[var(--ht-neutral-100-)] py-1 mb-4 ml-3">
-                <span className="text-xs">Số phiếu chi</span>
+                <span className="text-xs">
+                  {data.data.TransactionType === "income"
+                    ? "Số phiếu thu"
+                    : "Số phiếu chi"}
+                </span>
                 <span>{data.data.Code}</span>
               </p>
               <div className="center !justify-between mb-4 ml-3">
-                <label form="start-date">Ngày chi tiền</label>
+                <label form="start-date">
+                  {data.data.TransactionType === "income"
+                    ? "Ngày thu tiền"
+                    : "Ngày chi tiền"}
+                </label>
                 <input
                   type="date"
                   id="start-date"
@@ -240,7 +253,11 @@ const ViewBallotDetails = ({ params }: { params: Promise<{ id: string }> }) => {
                 {/* <!-- Lấy thời gian hiện tại làm mặt định qua js --> */}
               </div>
               <div className="center !justify-between mb-4 ml-3">
-                <label>Phiếu chi tiền</label>
+                <label>
+                  {data.data.TransactionType === "income"
+                    ? "Phiếu thu tiền"
+                    : "Phiếu chi tiền"}
+                </label>
                 <select className="btn !w-auto">
                   <option value="">Chi khác</option>
                 </select>
