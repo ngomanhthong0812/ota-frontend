@@ -79,7 +79,7 @@ const Staff = () => {
 
       setEmployeeList(newData);
     }
-  }, [search, status, data?.data]);
+  }, [search, status]);
 
   useEffect(() => {
     if (employeeList?.length > 0) {

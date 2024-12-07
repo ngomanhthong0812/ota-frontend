@@ -23,7 +23,7 @@ const EmployeeInfo: React.FC<IProps> = ({ data, index, itemActive, setItemActive
                     onChange={() => { }}
                     checked={checkedItems.includes(data.id)}
                 />
-                <Image src={`${data.img ? data?.img : 'https://f09a3e0wmmobj.vcdn.cloud/default-product.png'}`} alt="" className="w-[35px] h-[25px]" />
+                <img src={`${data.img ? data?.img : 'https://f09a3e0wmmobj.vcdn.cloud/default-product.png'}`} alt="" className="w-[35px] h-[25px]" />
             </td>
             <td className="p-2">{data?.code}</td>
             <td className="p-2">{data?.name}</td>

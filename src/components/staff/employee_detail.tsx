@@ -97,7 +97,7 @@ const EmployeeDetail: React.FC<IProps> = ({ data, itemActive, setShowModalUpdate
                 <div className="content bg-white px-8 py-5  border-t border-[#d1d1d1]">
                     <div className="flex gap-8">
                         <div>
-                            <Image src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png" alt="" className="w-[135px]" />
+                            <img src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png" alt="" className="w-[135px]" />
                         </div>
                         <div className="min-w-[230px]">
                             <p className="py-3 border-b flex gap-5 justify-between items-center w-full">

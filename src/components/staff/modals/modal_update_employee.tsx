@@ -14,7 +14,6 @@ import ModalConfirm from "./modal_confirm";
 import axios from "axios";
 import { useAuth } from "@/context/auth.context";
 import { toast } from "react-toastify";
-import Image from "next/image";
 
 interface IProps {
     data: Employee;
@@ -141,7 +140,7 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
             setSavedScrollY(scrollY)
             window.scrollTo(0, 0);
         }
-    }, [showModalUpdateEmployee, scrollY, savedScrollY]);
+    }, [showModalUpdateEmployee]);
     return (
         <div>
             {/* Modal Overlay */}
@@ -169,7 +168,7 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
                             <div className="flex gap-6">
                                 <div className="flex flex-col gap-3">
                                     <div className="group border-dashed border border-gray-400 relative rounded-sm">
-                                        <Image src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png"
+                                        <img src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png"
                                             alt=""
                                             className="w-[135px] h-[135px] bg-white" />
                                         <MdCameraAlt size={25} className="!fill-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
