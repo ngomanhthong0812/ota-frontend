@@ -11,11 +11,16 @@ import { HiOutlineChevronUp } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Employee } from "@/types/backend";
 import ModalConfirm from "./modal_confirm";
+import axios from "axios";
+import { useAuth } from "@/context/auth.context";
+import { toast } from "react-toastify";
+import Image from "next/image";
 
 interface IProps {
     data: Employee;
     showModalUpdateEmployee: boolean;
     setShowModalUpdateEmployee: (b: boolean) => void;
+    refreshData: () => void;
 }
 interface RequestEmployee {
     id: number
@@ -35,10 +40,11 @@ interface RequestEmployee {
     img: string;
 }
 
-const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, setShowModalUpdateEmployee }) => {
+const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, setShowModalUpdateEmployee, refreshData }) => {
+    const { token } = useAuth();
     const [scrollY, setScrollY] = useState(0); // Biến lưu vị trí cuộn hiện tại
     const [savedScrollY, setSavedScrollY] = useState(0); // Biến lưu vị trí cuộn trước khi mở modal
-    const [showModaConfirm, setShowModaConfirm] = useState<boolean>(false);
+    const [showModalConfirm, setShowModalConfirm] = useState<boolean>(false);
 
     const [employeePayload, setEmployeePayload] = useState<RequestEmployee>({
         id: data?.id,
@@ -83,14 +89,37 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
         e.stopPropagation(); // Ngừng sự kiện lan truyền khi click vào các phần tử con của modal
     };
     const handleClose = () => {
+        setShowModalConfirm(false);
         setShowModalUpdateEmployee(false);
         isSetMore(false);
     }
 
-    const handleSubmit = () => {
-        setShowModaConfirm(false);
-        handleClose();
+    const handleSubmit = async () => {
+        try {
+            const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/employees`,
+                employeePayload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Thay token vào đây
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            // Kiểm tra phản hồi từ API
+            if (response.data.statusCode === 200) {
+                console.log("Gửi thành công");
+                toast('Cập nhật nhân viên thành công');
+                refreshData();
+                handleClose();
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            console.log("Lỗi khi gửi dữ liệu:", error);
+        }
     }
+
     useEffect(() => {
         const handleScroll = () => {
             setScrollY(window.scrollY); // Cập nhật vị trí cuộn hiện tại
@@ -112,7 +141,7 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
             setSavedScrollY(scrollY)
             window.scrollTo(0, 0);
         }
-    }, [showModalUpdateEmployee]);
+    }, [showModalUpdateEmployee, scrollY, savedScrollY]);
     return (
         <div>
             {/* Modal Overlay */}
@@ -140,7 +169,7 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
                             <div className="flex gap-6">
                                 <div className="flex flex-col gap-3">
                                     <div className="group border-dashed border border-gray-400 relative rounded-sm">
-                                        <img src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png"
+                                        <Image src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png"
                                             alt=""
                                             className="w-[135px] h-[135px] bg-white" />
                                         <MdCameraAlt size={25} className="!fill-gray-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -157,7 +186,7 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
                                                 <input
                                                     type="text"
                                                     value={employeePayload.code}
-                                                    onChange={e => setEmployeePayload(prev => ({ ...prev, code: employeePayload.code }))}
+                                                    onChange={() => setEmployeePayload(prev => ({ ...prev, code: employeePayload.code }))}
                                                     placeholder="Mã nhân viên tự động"
                                                     className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da]" />
                                             </div>
@@ -342,7 +371,7 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
                             <footer className="modal-footer mt-10">
                                 <div className="flex items-center justify-end gap-3 font-[500]">
                                     <button
-                                        onClick={() => setShowModaConfirm(true)}
+                                        onClick={() => setShowModalConfirm(true)}
                                         className="flex gap-2 border-none py-[6px] px-4 text-white bg-[#4bac4d] hover:bg-[#419543] rounded-sm duration-200">
                                         <BiSave size={20} /> Lưu
                                     </button>
@@ -356,8 +385,8 @@ const ModalUpdateEmployee: React.FC<IProps> = ({ data, showModalUpdateEmployee, 
                         </div>
                     </div>
                     <ModalConfirm
-                        showModaConfirm={showModaConfirm}
-                        setShowModaConfirm={setShowModaConfirm}
+                        showModalConfirm={showModalConfirm}
+                        setShowModalConfirm={setShowModalConfirm}
                         title={'Xác nhận thay đổi'}
                         content={'Thay đổi này có thể làm ảnh hưởng đến các Phiếu lương tạm tính và các Phiếu thanh toán liên quan của nhân viên nếu có. Bạn có chắc chắn lưu?'}
                         handleSubmit={handleSubmit}

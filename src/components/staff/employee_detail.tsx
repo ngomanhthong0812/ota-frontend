@@ -4,13 +4,14 @@ import { Employee } from "@/types/backend";
 import ModalConfirm from "./modals/modal_confirm";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 import { CgTrash } from "react-icons/cg";
 import { MdOutlineCheckBox } from "react-icons/md";
 import { TbUserX } from "react-icons/tb";
 import { MdRestore } from "react-icons/md";
+import Image from "next/image";
 
 
 interface IProps {
@@ -27,18 +28,20 @@ const EmployeeDetail: React.FC<IProps> = ({ data, itemActive, setShowModalUpdate
     const handleDelete = async () => {
         if (data.id) {
             try {
-                const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/employees/${data.id}`,
+                const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/employees/deleteEmployees`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "application/json",
                         },
+                        data: { id: [data.id] }
                     }
                 );
 
                 // Kiểm tra phản hồi từ API
                 if (response.data.statusCode === 200) {
                     console.log("Gửi thành công");
+                    setShowModalConfirmDelete(false);
                     toast(`Xoá nhân viên ${data?.code} thành công`);
                     refreshData();
                 } else {
@@ -68,6 +71,7 @@ const EmployeeDetail: React.FC<IProps> = ({ data, itemActive, setShowModalUpdate
                 // Kiểm tra phản hồi từ API
                 if (response.data.statusCode === 200) {
                     console.log("Gửi thành công");
+                    setShowModalConfirmUpdateStatus(false);
                     toast(`Cập nhật nhân viên thành công`);
                     refreshData();
                 } else {
@@ -93,7 +97,7 @@ const EmployeeDetail: React.FC<IProps> = ({ data, itemActive, setShowModalUpdate
                 <div className="content bg-white px-8 py-5  border-t border-[#d1d1d1]">
                     <div className="flex gap-8">
                         <div>
-                            <img src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png" alt="" className="w-[135px]" />
+                            <Image src="https://f09a3e0wmmobj.vcdn.cloud/default-product.png" alt="" className="w-[135px]" />
                         </div>
                         <div className="min-w-[230px]">
                             <p className="py-3 border-b flex gap-5 justify-between items-center w-full">
@@ -176,31 +180,31 @@ const EmployeeDetail: React.FC<IProps> = ({ data, itemActive, setShowModalUpdate
                             <CgTrash size={20} />Xoá nhân viên</button>
                     </div>
                 </div>
-            </td>
-            <ModalConfirm
-                showModaConfirm={showModalConfirmDelete}
-                setShowModaConfirm={setShowModalConfirmDelete}
-                title={'Xoá nhân viên'}
-                content={'Hệ thống sẽ <b>xóa hoàn toàn</b> nhân viên này nhưng vẫn giữ các dữ liệu chấm công và các phiếu lương nếu có. Bạn có chắc chắn muốn xóa?'}
-                handleSubmit={handleDelete}
-            />
-            {data?.status === 'Working'
-                ?
                 <ModalConfirm
-                    showModaConfirm={showModalConfirmUpdateStatus}
-                    setShowModaConfirm={setShowModalConfirmUpdateStatus}
-                    title={'Xác nhận nhân viên ngừng làm việc?'}
-                    content={`Hệ thống sẽ ghi nhận nhân viên ${data?.name} ngừng làm việc. Tuy nhiên, các dữ liệu chấm công phiếu lương nếu có của nhân viên này sẽ vẫn được giữ lại.`}
-                    handleSubmit={handleUpdateStatus}
+                    showModalConfirm={showModalConfirmDelete}
+                    setShowModalConfirm={setShowModalConfirmDelete}
+                    title={'Xoá nhân viên'}
+                    content={'Hệ thống sẽ <b>xóa hoàn toàn</b> nhân viên này nhưng vẫn giữ các dữ liệu chấm công và các phiếu lương nếu có. Bạn có chắc chắn muốn xóa?'}
+                    handleSubmit={handleDelete}
                 />
-                :
-                <ModalConfirm
-                    showModaConfirm={showModalConfirmUpdateStatus}
-                    setShowModaConfirm={setShowModalConfirmUpdateStatus}
-                    title={'Xác nhận nhân viên quay lại làm việc?'}
-                    content={`Hệ thống sẽ ghi nhận nhân viên ${data?.name} (Đã nghỉ) quay lại làm việc. Tuy nhiên, các dữ liệu chấm công và phiếu lương nếu có của nhân viên này sẽ vẫn được giữ lại.`}
-                    handleSubmit={handleUpdateStatus}
-                />}
+                {data?.status === 'Working'
+                    ?
+                    <ModalConfirm
+                        showModalConfirm={showModalConfirmUpdateStatus}
+                        setShowModalConfirm={setShowModalConfirmUpdateStatus}
+                        title={'Xác nhận nhân viên ngừng làm việc?'}
+                        content={`Hệ thống sẽ ghi nhận nhân viên ${data?.name} ngừng làm việc. Tuy nhiên, các dữ liệu chấm công phiếu lương nếu có của nhân viên này sẽ vẫn được giữ lại.`}
+                        handleSubmit={handleUpdateStatus}
+                    />
+                    :
+                    <ModalConfirm
+                        showModalConfirm={showModalConfirmUpdateStatus}
+                        setShowModalConfirm={setShowModalConfirmUpdateStatus}
+                        title={'Xác nhận nhân viên quay lại làm việc?'}
+                        content={`Hệ thống sẽ ghi nhận nhân viên ${data?.name} (Đã nghỉ) quay lại làm việc. Tuy nhiên, các dữ liệu chấm công và phiếu lương nếu có của nhân viên này sẽ vẫn được giữ lại.`}
+                        handleSubmit={handleUpdateStatus}
+                    />}
+            </td>
         </tr>
     )
 }

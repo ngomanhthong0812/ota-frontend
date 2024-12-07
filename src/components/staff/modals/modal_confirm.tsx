@@ -8,18 +8,18 @@ import { ClipLoader } from "react-spinners";
 interface IProps {
     title: string;
     content: string;
-    showModaConfirm: boolean;
-    setShowModaConfirm: (b: boolean) => void;
+    showModalConfirm: boolean;
+    setShowModalConfirm: (b: boolean) => void;
     handleSubmit: () => void;
 }
 
-const ModalConfirm: React.FC<IProps> = ({ title, content, showModaConfirm, setShowModaConfirm, handleSubmit }) => {
+const ModalConfirm: React.FC<IProps> = ({ title, content, showModalConfirm, setShowModalConfirm, handleSubmit }) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (showModaConfirm) window.scrollTo(0, 0);
-        if (!showModaConfirm) setIsLoading(false);
-    }, [showModaConfirm])
+        if (showModalConfirm) window.scrollTo(0, 0);
+        if (!showModalConfirm) setIsLoading(false);
+    }, [showModalConfirm])
 
 
     const handleModalClick = (e: React.MouseEvent) => {
@@ -27,17 +27,16 @@ const ModalConfirm: React.FC<IProps> = ({ title, content, showModaConfirm, setSh
     };
 
     const submit = () => {
-        handleSubmit();
-        setShowModaConfirm(false);
         setIsLoading(true);
+        handleSubmit();
     }
 
     return (
         <div>
-            {showModaConfirm && (
+            {showModalConfirm && (
                 <div
                     className={`absolute w-full top-0 left-0 min-h-[100%] bg-black bg-opacity-50 flex justify-center items-start z-50 duration-200`}
-                    onClick={() => setShowModaConfirm(false)}
+                    onClick={() => setShowModalConfirm(false)}
                 >
                     <div
                         onClick={handleModalClick}
@@ -59,7 +58,7 @@ const ModalConfirm: React.FC<IProps> = ({ title, content, showModaConfirm, setSh
                                     <BiSave size={20} /> Đồng ý
                                 </button>
                                 <button
-                                    onClick={() => setShowModaConfirm(false)}
+                                    onClick={() => setShowModalConfirm(false)}
                                     className="flex gap-2 border-none py-[6px] px-4 text-white bg-[#898c8d] hover:bg-[#787b7d] rounded-sm duration-200">
                                     <IoBan size={20} /> Bỏ qua
                                 </button>

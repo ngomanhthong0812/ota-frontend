@@ -16,9 +16,9 @@ const AppHeader = () => {
                 <div className="flex items-center gap-4 py-5">
                     <nav className="menu">
                         <ul className="flex text-[14px] font-[500]">
-                            <li className="px-4 py-[6px] duration-200 rounded-full hover:bg-white hover:shadow">
-                                Dịch  vụ
-                            </li>
+                            <Link href={'/hotel_management'} className="px-4 py-[6px] duration-200 rounded-full hover:bg-white hover:shadow">
+                                Quản lý khách sạn
+                            </Link>
                             <li className="px-4 py-[6px] duration-200 rounded-full hover:bg-white hover:shadow">
                                 Bảng giá
                             </li>

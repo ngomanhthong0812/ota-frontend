@@ -1,6 +1,6 @@
 'use client'
 import { TAB_ROOM_FINAL } from '@/constants/constants';
-import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import React, { createContext, useState, ReactNode, useContext } from 'react';
 
 interface TypeToolbarContext {
     selectedToolbar: string,

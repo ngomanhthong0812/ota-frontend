@@ -5,7 +5,7 @@ import { User } from '@/types/backend';
 
 interface TypeAuthContext {
     token: string | null,
-    user: any;
+    user: User | null;
     saveToken: (newToken: string, rememberMe: boolean, user: User) => void,
     clearToken: () => void,
 }
