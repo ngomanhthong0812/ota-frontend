@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { LegacyRef, useRef } from 'react'
+
 
 const BookingForm = () => {
   return (
+    <div className="fixed inset-0 bg-[#00000080] z-[100] flex justify-end" >
     <div className="absolute max-w-[440px] text-[14px] h-full px-3 text-[var(--color-menu-icon-)] bg-white">
     <div className="absolute top-2 left-[-25px] ">
         <button>
@@ -291,7 +293,7 @@ const BookingForm = () => {
             Nhận Phòng
         </button>
     </div>
-     
+     </div>
 </div>
 
   )
