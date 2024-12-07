@@ -1,12 +1,15 @@
 import React, { LegacyRef, useRef } from 'react'
 
+interface IProps {
+    handleCloseBookingForm: () => void; // Accept the function as a prop
+}
 
-const BookingForm = () => {
+const BookingForm: React.FC<IProps> = ({handleCloseBookingForm}) => {
   return (
     <div className="fixed inset-0 bg-[#00000080] z-[100] flex justify-end" >
     <div className="absolute max-w-[440px] text-[14px] h-full px-3 text-[var(--color-menu-icon-)] bg-white">
     <div className="absolute top-2 left-[-25px] ">
-        <button>
+        <button onClick={handleCloseBookingForm}>
             <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20"
                 viewBox="0 0 512 512">
                 <path fill="#ffffff" stroke="white" stroke-width="10"
