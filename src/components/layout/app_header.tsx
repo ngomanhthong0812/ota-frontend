@@ -1,6 +1,7 @@
 'use client'
 
 import { useAuth } from "@/context/auth.context";
+import Image from "next/image";
 import Link from "next/link";
 
 const AppHeader = () => {
@@ -10,7 +11,7 @@ const AppHeader = () => {
         <>
             <div className="flex justify-between layout-container">
                 <div className="py-5">
-                    <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="" width={150} />
+                    <Image src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="" width={150} />
                 </div>
 
                 <div className="flex items-center gap-4 py-5">

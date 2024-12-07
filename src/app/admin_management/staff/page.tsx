@@ -79,7 +79,7 @@ const Staff = () => {
 
       setEmployeeList(newData);
     }
-  }, [search, status]);
+  }, [search, status, data?.data]);
 
   useEffect(() => {
     if (employeeList?.length > 0) {
@@ -89,7 +89,7 @@ const Staff = () => {
         setCheckedAll(false);
       }
     }
-  }, [checkedItems])
+  }, [checkedItems, employeeList])
 
   const handleChangerStatus = (value: string) => {
     setStatus(prevStatus => {
