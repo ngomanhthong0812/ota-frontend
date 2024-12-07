@@ -1,28 +1,43 @@
-import React from "react";
-import Bookingtable from "./BookingTable";
+import React, { useState } from "react";
+import BookingTable from "./BookingTable";
 import { useAuth } from "@/context/auth.context";
 import useSWR from "swr";
 
-// Định nghĩa kiểu dữ liệu cho phản hồi từ API
 interface RoomAPIResponse {
-  room_type_id: number;
-  room_type: string;
-  price: number;
+  id: number;
+  name: string;
+  standard_capacity: number;
+  max_capacity: number;
+  standard_children: number;
+  max_children: number;
+  hourly_rate: number;
+  daily_rate: number;
+  overnight_rate: number;
+  total_rooms: number;
+  available_rooms: number;
+  rooms: { id: number; name: string }[]; // Danh sách phòng chưa được đặt
 }
 
-// Định nghĩa kiểu dữ liệu cho một phòng
 interface Room {
   id: number;
   name: string;
   price: number;
   available: string;
+  standard_capacity: number; // Thêm thuộc tính mới
+  standard_children: number; // Thêm thuộc tính mới
+  max_capacity: number; // Thêm thuộc tính max_capacity
+  max_children: number; // Thêm thuộc tính max_children
+  room_id: number; // Thêm thuộc tính room_id
+  room_name: string; // Thêm thuộc tính room_name
 }
 
-// Fetcher function sử dụng để gọi API
-const fetcher = async (
-  url: string,
-  token: string | null
-): Promise<RoomAPIResponse[]> => {
+interface BookingListProps {
+  handleShowClick: (roomData: { id: number; name: string; price: number }) => void;
+  startDate: string;
+  endDate: string;
+}
+
+const fetcher = async (url: string, token: string | null) => {
   try {
     const res = await fetch(url, {
       headers: {
@@ -44,63 +59,76 @@ const fetcher = async (
   }
 };
 
-const BookingList: React.FC<{ handleShowClick: () => void }> = ({ handleShowClick }) => {
-  // Nhận `onAddClick` từ CreateBookingPage
-  const { token } = useAuth(); // Lấy token mà không cần sử dụng `user`
+const BookingList: React.FC<{ handleShowClick: (roomData: { id: number; name: string; price: number;  max_capacity: number;  max_children: number; room_id: number; room_name: string;  }) => void;startDate: string; endDate: string }> = ({ handleShowClick,startDate,
+  endDate }) => {
+  const { token } = useAuth();
+  const hotelId = 1;
 
-  // Gọi API bằng `useSWR`
-  const { data, error, isLoading } = useSWR(
+  const { data, error } = useSWR(
     token
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/typeRoom-price`
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/available/rooms?hotelId=${hotelId}&startDate=${startDate}&endDate=${endDate}`
       : null,
     (url: string) => fetcher(url, token),
     {
-      revalidateOnFocus: true, // Tự động tái tải dữ liệu khi người dùng quay lại trang
-      revalidateOnReconnect: true, // Tự động tái tải dữ liệu khi kết nối lại
-      refreshInterval: 60000, // Tái tải dữ liệu mỗi 1 phút
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
   );
 
-  if (!token) {
-    return <div>Loading token...</div>; // Trả về nếu chưa có token
-  }
+  // Xử lý khi đang tải dữ liệu
+  if (!data && !error) return <div>Loading...</div>;
 
-  if (isLoading) {
-    return <div>Loading...</div>; // Trả về nếu đang tải dữ liệu
-  }
-
-  // Kiểm tra và ép kiểu cho 'error'
+  // Xử lý khi có lỗi
   if (error) {
-    const errorMessage = (error as Error).message || "Error fetching data"; // Ép kiểu error thành Error
-    console.error("Error fetching data:", errorMessage);
-    return <div>{errorMessage}</div>; // Hiển thị thông báo lỗi
+    console.error("Error fetching data:", error);
+    return <div>Error fetching data: {error.message}</div>;
   }
 
-  // Kiểm tra và truy cập đúng dữ liệu từ 'data.data'
-  const arooms: Room[] = (data?.data ?? []).map((room: RoomAPIResponse) => ({
-    id: room.room_type_id,
-    name: room.room_type,
-    price: room.price,
-    available: "N/A", // Mặc định giá trị available
-  }));
+ // Lọc và gộp dữ liệu dựa trên id (roomType.id)
+ const roomMap = new Map<number, Room>();
+ (data?.data ?? []).forEach((roomType: RoomAPIResponse) => {
+   roomType.rooms.forEach((room) => {
+     if (!roomMap.has(roomType.id)) {
+       // Nếu id chưa tồn tại, thêm mới
+       roomMap.set(roomType.id, {
+         id: roomType.id,
+         name: roomType.name,
+         price: roomType.daily_rate, // Sử dụng giá hàng ngày
+         available: `${roomType.available_rooms} `, // Số phòng trống
+         standard_capacity: roomType.standard_capacity, // Thêm capacity
+         standard_children: roomType.standard_children, // Thêm standard_children
+         max_capacity: roomType.max_capacity, // Thêm max_capacity
+         max_children: roomType.max_children, // Thêm max_children
+         room_id: room.id, // Thêm room_id
+         room_name: room.name, // Thêm room_name
+       });
+     } else {
+       // Nếu id đã tồn tại, cập nhật số lượng phòng
+       const existingRoom = roomMap.get(roomType.id)!;
+       const updatedAvailable = parseInt(existingRoom.available) + roomType.available_rooms;
+       roomMap.set(roomType.id, {
+         ...existingRoom,
+         available: `${updatedAvailable} `, // Cộng dồn số phòng
+       });
+     }
+   });
+ });
+  // Chuyển dữ liệu từ Map sang danh sách
+  const rooms: Room[] = Array.from(roomMap.values());
 
   return (
     <div>
-      <div>
-        {arooms
-          .filter((aroom) => aroom.id && aroom.name && aroom.price) // Lọc phòng có dữ liệu hợp lệ
-          .map(
-            (
-              aroom: Room // Chỉ định kiểu Room cho 'aroom'
-            ) => (
-              <Bookingtable
-                key={aroom.id}
-                aroom={aroom}
-                handleShowClick={handleShowClick}
-              />
-            )
-          )}
-      </div>
+      {rooms.length > 0 ? (
+        rooms.map((room) => (
+          <BookingTable
+            key={room.id}
+            aroom={room}
+            handleShowClick={handleShowClick}
+          />
+        ))
+      ) : (
+        <p>No available rooms for the selected dates.</p>
+      )}
     </div>
   );
 };
