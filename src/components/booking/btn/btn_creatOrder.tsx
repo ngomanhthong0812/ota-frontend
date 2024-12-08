@@ -1,8 +1,13 @@
 import React from "react";
-
-const BtnCreatOrder = () => {
+interface BtnCreatOrderProps {
+  onToggleView: (e: React.FormEvent) => Promise<void>;
+}
+const BtnCreatOrder: React.FC<BtnCreatOrderProps> = ({ onToggleView }) => {
   return (
-    <button className="w-full flex items-center justify-center  bg-[var(--navbar-color-)] text-white font-bold p-[10px] rounded-md hover:bg-[var(--room-empty-color-hover-)]">
+    <button
+      onClick={onToggleView}
+      className="w-full flex items-center justify-center  bg-[var(--navbar-color-)] text-white font-bold p-[10px] rounded-md hover:bg-[var(--room-empty-color-hover-)]"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         height="15"

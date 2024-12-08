@@ -1,53 +1,85 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-interface BookingTableProps {
-  aroom: {
-    id: number;
-    name: string;
-    price: number;
-    available: string;
-    standard_capacity: number; 
-    standard_children: number; 
-    max_capacity: number; 
-    max_children: number; 
-    room_id: number; 
-    room_name: string; 
-  };
-  handleShowClick: (roomData: { id: number; name: string; price: number;  max_capacity: number;  max_children: number; room_id: number; room_name: string;  }) => void;
+interface Room {
+  room_id: number;
+  room_name: string;
+  room_clean_status: number;
+  room_status: string;
+  room_price: number;
+  room_notes: string;
+  room_start_date_use: string;
+  room_room_type_id: number;
+  room_floor_id: number;
+  room_hotel_id: number;
 }
 
-const BookingTable: React.FC<BookingTableProps> = ({ aroom, handleShowClick }) => {
-  const [roomCount, setRoomCount] = useState<number>(0);//đếm số phòng
-  const [roomData, setRoomData] = useState<{ id: number; name: string; price: number;  max_capacity: number;  max_children: number; room_id: number; room_name: string; }>({
-    id: 0,
-    name: "",
-    price: 0,
-    max_capacity: 0,
-    max_children: 0,
-    room_id: 0,
-    room_name: "",
-  });
+interface RoomType {
+  id: number;
+  name: string;
+  standard_capacity: number;
+  max_capacity: number;
+  standard_children: number;
+  max_children: number;
+  hourly_rate: number;
+  daily_rate: number;
+  overnight_rate: number;
+  total_rooms: number;
+  available_rooms: number;
+  rooms: Room[]; // Mảng phòng
+}
 
-  // Cập nhật roomData khi prop aroom thay đổi
-  useEffect(() => {
-    setRoomData({
-      id: aroom.id,       // Lưu id của phòng
-      name: aroom.name,   // Lưu tên phòng
-      price: aroom.price, // Lưu giá phòng
-      max_capacity: aroom.max_capacity, // Lưu max_capacity
-      max_children: aroom.max_children, // Lưu max_children
-      room_id: aroom.room_id, // Lưu room_id
-      room_name: aroom.room_name, // Lưu room_name
+interface BookingTableProps {
+  aroom: RoomType;
+  handleShowClick: (roomData: RoomType) => void;
+}
+
+const BookingTable: React.FC<BookingTableProps> = ({
+  aroom,
+  handleShowClick,
+}) => {
+  // Quản lý trạng thái cục bộ cho mỗi BookingTable
+  const [roomCount, setRoomCount] = useState<number>(0);
+  const [priceType, setPriceType] = useState<
+    "hourly_rate" | "daily_rate" | "overnight_rate"
+  >("daily_rate");
+
+  const incrementRoom = () => {
+    setRoomCount((prev) => {
+      const newRoomCount = prev + 1;
+
+      return newRoomCount;
     });
-    console.log("Dữ liệu phòng đã được cập nhật:", roomData);
-  }, [aroom]);
-
-  const incrementRoom = ({}) => {
-    setRoomCount((prev) => prev + 1);
-    handleShowClick(roomData); // Gọi hàm từ cha để hiển thị CreateOrderTable
+    handleShowClick(aroom); // Gọi hàm từ cha để hiển thị CreateOrderTable
   };
 
-  const decrementRoom = () => setRoomCount((prev) => (prev > 0 ? prev - 1 : 0));
+  const decrementRoom = () => {
+    setRoomCount((prev) => {
+      const newRoomCount = prev > 0 ? prev - 1 : 0;
+      return newRoomCount;
+    });
+  };
+
+  const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setPriceType(
+      event.target.value as "hourly_rate" | "daily_rate" | "overnight_rate"
+    );
+  };
+
+  // Lấy giá tương ứng với loại giá được chọn
+  const getPrice = () => {
+    switch (priceType) {
+      case "hourly_rate":
+        return aroom.hourly_rate ? aroom.hourly_rate.toLocaleString() : "N/A";
+      case "overnight_rate":
+        return aroom.overnight_rate
+          ? aroom.overnight_rate.toLocaleString()
+          : "N/A";
+      case "daily_rate":
+      default:
+        return aroom.daily_rate ? aroom.daily_rate.toLocaleString() : "N/A";
+    }
+  };
+  
 
   return (
     <div className="flex-1 duration-300 border border-[var(--ht-neutral-100-)] rounded-md bg-white">
@@ -99,41 +131,60 @@ const BookingTable: React.FC<BookingTableProps> = ({ aroom, handleShowClick }) =
               </svg>
             </button>
           </div>
-
-          {/* <p>{aroom.available}/{aroom.available} còn lại *</p> */}
         </div>
 
         <div className="w-2/12">
-          <select id="room" name="room" className="btn-loaigia">
-            <option value="FR">Giá mặc định</option>
-            <option value="US">Giá được giảm</option>
+          <select
+            id="room"
+            name="room"
+            className="btn-loaigia"
+            value={priceType}
+            onChange={handlePriceChange}
+          >
+            <option value="daily_rate">Giá theo ngày</option>
+            <option value="hourly_rate">Giá theo giờ</option>
+            <option value="overnight_rate">Giá qua đêm</option>
           </select>
         </div>
 
         <div className="w-2/12 flex justify-end items-center">
-          <p>{aroom.price ? aroom.price.toLocaleString() : 'N/A'} VND</p>
+          <span>{getPrice()} VND</span>
         </div>
 
         <div className="w-2/12 flex justify-end items-center">
           <div className="flex gap-2">
             <div className="flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" height="13" width="13" viewBox="0 0 448 512">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="13"
+                width="13"
+                viewBox="0 0 448 512"
+              >
                 <path
                   fill="#a0a2a7"
                   d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"
                 />
               </svg>
-              <span className="text-black font-medium">{aroom.standard_capacity}</span>
+              <span className="text-black font-medium">
+                {aroom.standard_capacity}
+              </span>
             </div>
 
             <div className="flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" height="13" width="13" viewBox="0 0 448 512">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="13"
+                width="13"
+                viewBox="0 0 448 512"
+              >
                 <path
                   fill="#a0a2a7"
                   d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"
                 />
               </svg>
-              <span className="text-black font-medium">{aroom.standard_children}</span>
+              <span className="text-black font-medium">
+                {aroom.standard_children}
+              </span>
             </div>
           </div>
         </div>

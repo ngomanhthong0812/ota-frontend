@@ -1,3 +1,4 @@
+"use client"
 import { callApi } from "@/utils/api";
 import axios from "axios";
 import { NextPage } from "next";

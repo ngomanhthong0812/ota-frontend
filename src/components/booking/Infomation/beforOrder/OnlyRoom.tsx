@@ -1,6 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const OnlyRoom = () => {
+interface IProps {
+  onCustomerData: (
+    nameCustomer: string,
+    customer_phone: string,
+    customer_email: string,
+    customer_gender: string
+  ) => void;
+}
+
+const OnlyRoom: React.FC<IProps> = ({ onCustomerData }) => {
   const [formData, setFormData] = useState({
     notes: "",
     company: "",
@@ -23,7 +32,20 @@ const OnlyRoom = () => {
       [name]: value,
     }));
   };
-
+  useEffect(() => {
+    onCustomerData(
+      formData.guestName,
+      formData.phone,
+      formData.email,
+      formData.gender
+    );
+  }, [
+    formData.guestName,
+    formData.phone,
+    formData.email,
+    formData.gender,
+    onCustomerData,
+  ]);
   return (
     <section>
       <div>
@@ -115,7 +137,7 @@ const OnlyRoom = () => {
               <div className="w-[70%] relative">
                 <input
                   id="country"
-                  name="country"
+                  name="guestName"
                   className="btn"
                   placeholder="Tên khách"
                   value={formData.guestName}
@@ -130,12 +152,12 @@ const OnlyRoom = () => {
                   id="male"
                   value="male"
                   checked={formData.gender === "male"}
-                  onChange={handleChange}
+                  onChange={handleChange} // Đảm bảo có onChange
                   className="sr-only peer/male"
                 />
                 <label
                   htmlFor="male"
-                  className="w-1/2 text-center text-gray-500 flex items-center justify-center cursor-pointer transition-colors duration-300  peer-checked/male:rounded-md peer-checked/male:border peer-checked/male:border-[var(--room-empty-color-)] peer-checked/male:bg-white peer-checked/male:text-[var(--room-empty-color-)]"
+                  className="w-1/2 text-center text-gray-500 flex items-center justify-center cursor-pointer transition-colors duration-300 peer-checked/male:rounded-md peer-checked/male:border peer-checked/male:border-[var(--room-empty-color-)] peer-checked/male:bg-white peer-checked/male:text-[var(--room-empty-color-)]"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -149,18 +171,19 @@ const OnlyRoom = () => {
                     ></path>
                   </svg>
                 </label>
+
                 <input
                   type="radio"
                   name="gender"
                   id="female"
                   value="female"
                   checked={formData.gender === "female"}
-                  onChange={handleChange}
+                  onChange={handleChange} // Đảm bảo có onChange
                   className="sr-only peer/female"
                 />
                 <label
                   htmlFor="female"
-                  className="w-1/2 text-center text-gray-500 flex items-center justify-center  cursor-pointer transition-colors duration-300 peer-checked/female:rounded-md peer-checked/female:border peer-checked/female:border-[var(--room-empty-color-)] peer-checked/female:bg-white peer-checked/female:text-[var(--room-empty-color-)]"
+                  className="w-1/2 text-center text-gray-500 flex items-center justify-center cursor-pointer transition-colors duration-300 peer-checked/female:rounded-md peer-checked/female:border peer-checked/female:border-[var(--room-empty-color-)] peer-checked/female:bg-white peer-checked/female:text-[var(--room-empty-color-)]"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +241,7 @@ const OnlyRoom = () => {
                 <input
                   type="text"
                   id="Email"
-                  name="Email"
+                  name="email"
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
@@ -242,7 +265,7 @@ const OnlyRoom = () => {
                 <input
                   type="text"
                   id="SĐT"
-                  name="SĐT"
+                  name="phone"
                   placeholder="SĐT"
                   value={formData.phone}
                   onChange={handleChange}

@@ -1,4 +1,4 @@
-// Import các thành phần liên quan
+"use client"
 import AreaComponent from "@/components/room_admin/Area";
 import RoomTable from "@/components/room_admin/RoomTable";
 import UpdateRoomModel from "@/components/room_admin/UpdateRoomModel";
