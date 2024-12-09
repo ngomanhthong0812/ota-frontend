@@ -1,7 +1,7 @@
 'use client'
 import { useAuth } from "@/context/auth.context";
 import { Employee } from "@/types/backend";
-import ModalConfirm from "./modals/modal_confirm";
+import ModalConfirm from "@/components/modal_confirm";
 
 import axios from "axios";
 import { useState } from "react";
@@ -11,8 +11,6 @@ import { CgTrash } from "react-icons/cg";
 import { MdOutlineCheckBox } from "react-icons/md";
 import { TbUserX } from "react-icons/tb";
 import { MdRestore } from "react-icons/md";
-import Image from "next/image";
-
 
 interface IProps {
     data: Employee;

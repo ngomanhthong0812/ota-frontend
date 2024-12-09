@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
 import { PuffLoader } from "react-spinners";
 
-interface IProps { }
 interface FormDataType {
     userName: string,
     hotelName: string,
@@ -32,7 +31,7 @@ const CustomTextField = styled(TextField)({
     },
 });
 
-const RegisterPage: React.FC<IProps> = () => {
+const RegisterPage = () => {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);

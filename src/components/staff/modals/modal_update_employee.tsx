@@ -10,7 +10,7 @@ import { HiOutlineChevronUp } from "react-icons/hi";
 
 import { useEffect, useState } from "react";
 import { Employee } from "@/types/backend";
-import ModalConfirm from "./modal_confirm";
+import ModalConfirm from "@/components/modal_confirm";
 import axios from "axios";
 import { useAuth } from "@/context/auth.context";
 import { toast } from "react-toastify";

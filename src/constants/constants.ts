@@ -48,3 +48,8 @@ export const PAYMENT_OPTIONS_INVOICE_ROOM = {
     REFUND: 'Hoàn tiền',
     PAYMENT: 'Thanh toán'
 };
+
+export const STATUS_USER = {
+    ACTIVE: 'Đang hoạt động',
+    INACTIVE: 'Ngừng hoạt động',
+}

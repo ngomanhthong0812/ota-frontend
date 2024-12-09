@@ -55,6 +55,19 @@ interface User {
     isActive: boolean,
 }
 
+interface UserAdmin {
+    id: number,
+    email: string,
+    password: string,
+    user_name: string,
+    phone: string,
+    code: string,
+    hotel_id: number,
+    note: string,
+    status: string,
+    isActive: boolean,
+}
+
 interface Category {
     id: number,
     name: string,
@@ -91,6 +104,13 @@ interface Customer {
     hotel_id: number,
     birthday: string,
     name: string,
+}
+
+interface Role {
+    id: number,
+    name: string,
+    description: string,
+    hotel_id: number,
 }
 
 interface SelectedServiceType {

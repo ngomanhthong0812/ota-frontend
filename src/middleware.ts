@@ -5,7 +5,7 @@ export const middleware = (request: NextRequest) => {
     if (token && (request.nextUrl.pathname === '/login')) {
         return NextResponse.redirect(new URL('/', request.url));
     }
-    
+
     if (token && (request.nextUrl.pathname === '/register')) {
         return NextResponse.redirect(new URL('/', request.url));
     }
@@ -21,7 +21,7 @@ export const middleware = (request: NextRequest) => {
 export const config = {
     matcher: [
         '/hotel_management/:path*',
-        '/staff_management/:path*',
+        '/admin_management/:path*',
         '/login',
         '/register',
     ],

@@ -55,7 +55,7 @@ export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
       {
         id: uuid(),
         name: "Nhân viên",
-        href: "/admin_management/staff",
+        href: "/admin_management/employees",
         icon: <FaUserGroup size={18} />,
         active: false,
         subMenus: [],

@@ -1,14 +1,15 @@
-import { Employee } from "@/types/backend";
+import { STATUS_USER } from "@/constants/constants";
+import { UserAdmin } from "@/types/backend";
 
 interface IProps {
-    data: Employee;
+    data: UserAdmin;
     index: number,
     itemActive: number | null;
     setItemActive: (id: number | null) => void;
     checkedItems: number[];
     setCheckedItems: (e: React.MouseEvent, id: number) => void;
 }
-const EmployeeInfo: React.FC<IProps> = ({ data, index, itemActive, setItemActive, checkedItems, setCheckedItems }) => {
+const UserInfo: React.FC<IProps> = ({ data, index, itemActive, setItemActive, checkedItems, setCheckedItems }) => {
 
     return (
         <tr
@@ -22,14 +23,12 @@ const EmployeeInfo: React.FC<IProps> = ({ data, index, itemActive, setItemActive
                     onChange={() => { }}
                     checked={checkedItems.includes(data.id)}
                 />
-                <img src={`${data.img ? data?.img : 'https://f09a3e0wmmobj.vcdn.cloud/default-product.png'}`} alt="" className="w-[35px] h-[25px]" />
             </td>
-            <td className="p-2">{data?.code}</td>
-            <td className="p-2">{data?.name}</td>
-            <td className="p-2">{data?.phoneNumber}</td>
-            <td className="p-2">{data?.idCard}</td>
-            <td className="p-2">{data?.notes}</td>
+            <td className="p-2">{data?.user_name}</td>
+            <td className="p-2">{data?.phone}</td>
+            <td className="p-2">{data?.note}</td>
+            <td className="p-2">{data?.status === 'active' ? STATUS_USER.ACTIVE : STATUS_USER.INACTIVE}</td>
         </tr>
     )
 }
-export default EmployeeInfo
+export default UserInfo

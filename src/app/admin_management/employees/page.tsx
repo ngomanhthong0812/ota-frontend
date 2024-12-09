@@ -14,7 +14,7 @@ import { BiMenuAltLeft, BiChevronDown } from "react-icons/bi";
 import { CgTrash } from "react-icons/cg";
 import { toast } from "react-toastify";
 import axios from "axios";
-import ModalConfirm from "@/components/staff/modals/modal_confirm";
+import ModalConfirm from "@/components/modal_confirm";
 
 const fetcher = (url: string, token: string | null) =>
   fetch(url,
@@ -24,7 +24,7 @@ const fetcher = (url: string, token: string | null) =>
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-const Staff = () => {
+const Employees = () => {
   const [itemActive, setItemActive] = useState<number | null>(null);
   const [showModalUpdateEmployee, setShowModalUpdateEmployee] = useState<boolean>(false);
   const [showModalAddEmployee, setShowModalAddEmployee] = useState<boolean>(false);
@@ -79,7 +79,7 @@ const Staff = () => {
 
       setEmployeeList(newData);
     }
-  }, [search, status]);
+  }, [search, status,data?.data]);
 
   useEffect(() => {
     if (employeeList?.length > 0) {
@@ -274,4 +274,4 @@ const Staff = () => {
   );
 };
 
-export default Staff;
+export default Employees;

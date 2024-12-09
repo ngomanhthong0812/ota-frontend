@@ -46,9 +46,9 @@ const HotelSidebarAdmin: React.FC<IProps> = () => {
                             .map(item => (
                                 <li key={item.id}
                                     onClick={() => item.subMenus.length <= 0 && setShowMenuActive(item.href || '')}
-                                    className={`group rounded-md truncate`}>
+                                    className={`group rounded-md truncate hover:!bg-[#0078b6]`}>
                                     <Link href={item.href || ''}
-                                        className={`menu-item !bg-transparent hover:!bg-[#0078b6] !text-white !duration-0 ${item.active && 'active'}`}>
+                                        className={`menu-item !bg-transparent  !text-white !duration-0 ${item.active && 'active'}`}>
                                         {item.icon}
                                         <span>
                                             {item.name}
