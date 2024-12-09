@@ -1,34 +1,64 @@
-import React, { useState } from "react";
-import BtnCreatOrder from "../btn/btn_creatOrder";
-import InputDay from "../btn/inputDay";
-import { useAuth } from "@/context/auth.context";
-import useSWR from "swr";
+import React, { useEffect, useState } from "react";
+interface Room {
+  room_id: number;
+  room_name: string;
+  room_clean_status: number;
+  room_status: string;
+  room_price: number;
+  room_notes: string;
+  room_start_date_use: string;
+  room_room_type_id: number;
+  room_floor_id: number;
+  room_hotel_id: number;
+}
 
+interface RoomType {
+  id: number;
+  name: string;
+  standard_capacity: number;
+  max_capacity: number;
+  standard_children: number;
+  max_children: number;
+  hourly_rate: number;
+  daily_rate: number;
+  overnight_rate: number;
+  total_rooms: number;
+  available_rooms: number;
+  rooms: Room[];
+}
 interface CreatOrderTableProps {
   startDate: string;
   endDate: string;
-  roomData: {
-    id: number;
-    name: string;
-    price: number;
-    max_capacity: number;
-    max_children: number;
-    room_id: number;
-    room_name: string;
-  } | null; // Dữ liệu phòng được truyền vào
+  roomData: RoomType | null; // Dữ liệu phòng được truyền vào
+  onOrderData: (
+    roomId: number,
+    adultCount: number,
+    childrenCount: number,
+    totalAmount: number,
+    priceRoom: number
+  ) => void;
 }
 const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   startDate,
   endDate,
   roomData, // Nhận roomData từ props
+  onOrderData,
 }) => {
-  const { token } = useAuth();
-  const hotelId = 1;
   const [paidAmount, setPaidAmount] = useState(0); // Số tiền đã thanh toán
   // Khởi tạo state cho số lượng người lớn và trẻ em
   const [quantityCapaciti, setQuantityCapaciti] = useState<number>(0); // Số lượng của người lớn
   const [quantityChildren, setQuantityChildren] = useState<number>(0); // Số lượng của trẻ em
+  const [selectedRoomId, setSelectedRoomId] = useState<number>(0);
+  const [isChecked, setIsChecked] = useState(false); // Theo dõi trạng thái checkbox
 
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked); // Cập nhật trạng thái checkbox
+  };
+  const handleRoomChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const roomId = parseInt(event.target.value, 10); // Chuyển đổi value thành số
+    setSelectedRoomId(roomId); // Cập nhật ID của phòng đã chọn
+    console.log("Selected room ID:", roomId); // Kiểm tra ID của phòng
+  };
   // Hàm định dạng ngày và giờ
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -82,28 +112,25 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
 
   const totalDays = calculateDaysBetweenDates(startDate, endDate); // Tính số ngày giữa startDate và endDate
   const taxRate = 0.1; // 10% thuế/phí
-  const roomPrice = roomData?.price || 0; // Giá phòng
 
+  // Hàm tính toán tổng tiền
   const calculateTotalAmount = (
-    roomPrice: number,
+    roomPrice: number = 0,
     totalDays: number,
     taxRate: number = 0
   ): { subTotal: number; tax: number; totalAmount: number } => {
-    // Tính thành tiền
     const subTotal = roomPrice * totalDays;
 
-    // Tính thuế/phí
-    const tax = subTotal * taxRate;
+    // Tính thuế chỉ khi checkbox được tích vào
+    const tax = isChecked ? subTotal * taxRate : 0;
 
-    // Tính tổng tiền
     const totalAmount = subTotal + tax;
 
-    // Trả về kết quả
     return { subTotal, tax, totalAmount };
   };
 
   const { subTotal, tax, totalAmount } = calculateTotalAmount(
-    roomPrice,
+    roomData?.daily_rate,
     totalDays,
     taxRate
   );
@@ -111,13 +138,29 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   // Tính phần còn lại
   const remainingAmount = Math.max(totalAmount - paidAmount, 0); // Không cho âm
 
+  console.log("id", selectedRoomId);
+  const priceRoom = roomData?.daily_rate ?? 0;
+
+  useEffect(() => {
+    onOrderData(
+      selectedRoomId,
+      quantityCapaciti,
+      quantityChildren,
+      totalAmount,
+      priceRoom
+    );
+  }, [
+    selectedRoomId,
+    quantityCapaciti,
+    quantityChildren,
+    totalAmount,
+    priceRoom,
+    onOrderData,
+  ]);
+
   return (
     <div className="">
-      <section className="col-span-3 duration-300">
-        {/* <!-- start dat phong- nhan phong --> */}
-        <BtnCreatOrder />
-        {/* <!-- end dat phong- nhan phong --> */}
-
+      <section className="">
         <div className="px-3 rounded-md bg-white border border-[var(--ht-neutral-100-)] mt-2">
           <div className="grid grid-cols-12 text-sm border-b border-[var(--ht-neutral-100-)] text-black font-medium py-2">
             <div className="flex gap-2 col-span-10">
@@ -140,14 +183,23 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                   id="room"
                   name="room"
                   className="btn text-black font-normal"
+                  onChange={handleRoomChange}
                 >
-                  <option value={roomData?.room_id}>{roomData?.room_name}</option>
-                 
+                  <option></option>
+                  {roomData?.rooms && roomData.rooms.length > 0 ? (
+                    roomData.rooms.map((room, index) => (
+                      <option key={index} value={room.room_id}>
+                        {room.room_name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>Loading...</option> // Thêm thông báo nếu chưa có phòng
+                  )}
                 </select>
               </div>
             </div>
             <div className="flex justify-end items-center text-black font-medium">
-              <p>{roomData?.price.toLocaleString()} VNĐ</p>
+              <span>{roomData?.daily_rate.toLocaleString()} VNĐ</span>
             </div>
           </div>
 
@@ -253,7 +305,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
             </div>
             <div className="flex justify-end">
               <span className=" text-xz ">
-                <p>{subTotal.toLocaleString()} </p>
+                <span>{subTotal.toLocaleString()}</span>
               </span>
             </div>
           </div>
@@ -267,9 +319,10 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                 <input
                   type="checkbox"
                   id="subscribe"
-                  checked
                   name="subscribe"
                   className="checkbox-thuephi"
+                  checked={isChecked}
+                  onChange={handleCheckboxChange}
                 />
                 <span className="text-xz">Thuế/Phí</span>
               </label>

@@ -1,3 +1,4 @@
+"use client";
 import DateFilter from "@/components/fund/DateFilter";
 import FinancialSummary from "@/components/fund/FinancialSummary";
 import Pagination from "@/components/fund/Pagination";
