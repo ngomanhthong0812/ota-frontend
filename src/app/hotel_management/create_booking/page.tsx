@@ -124,7 +124,7 @@ const CreateBookingPage: React.FC = () => {
     total_amount: totalAmount,
     check_in_at: startDate,
     check_out_at: endDate,
-    paidAmount: paidAmountDad,
+    paidAmount: paidAmountDad || 0,
     paymentMethod: paymentMethod,
   };
   const validateBookingData = (data: any) => {
