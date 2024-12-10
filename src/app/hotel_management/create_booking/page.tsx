@@ -17,16 +17,8 @@ import { useRouter } from "next/navigation";
 interface Room {
   room_id: number;
   room_name: string;
-  room_clean_status: number;
-  room_status: string;
   room_price: number;
-  room_notes: string;
-  room_start_date_use: string;
-  room_room_type_id: number;
-  room_floor_id: number;
-  room_hotel_id: number;
 }
-
 interface RoomType {
   id: number;
   name: string;
@@ -54,11 +46,29 @@ const CreateBookingPage: React.FC = () => {
   const [adultCount, setAdultCount] = useState<number>(1);
   const [childrenCount, setChildrenCount] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [priceRoom, setPriceRoom] = useState<number>(0);
   const [nameCustomer, setNameCustomer] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerGender, setCustomerGender] = useState<string>("");
+
+  const [priceTypeDad, setPriceTypeDad] = useState<string>("");
+  const [roomCountDad, setRoomCountDad] = useState<number>(0);
+
+  const [bookingRooms, setBookingRooms] = useState<
+    { room_id: number; price: number; price_type: string }[]
+  >([]);
+
+  const handlebookingRoomsChange = (roomData: Room[]) => {
+    const updatedRooms = roomData.map((room) => ({
+      room_id: room.room_id,
+      price: room.room_price,
+      price_type: priceTypeDad || "daily_rate",
+    }));
+
+    // Cập nhật state với mảng đã chuyển đổi
+    setBookingRooms(updatedRooms);
+  };
+  console.log("Số phòng ở cha:", roomCountDad);
 
   const router = useRouter();
   // Hàm xử lý hiển thị bảng CreatOrderTable khi click vào nút "+"
@@ -76,17 +86,14 @@ const CreateBookingPage: React.FC = () => {
   // Hàm xử lý dữ liệu phòng khi người dùng chọn
   const handleOrderData = useCallback(
     (
-      roomId: number | null,
       adultCount: number,
       childrenCount: number,
       totalAmount: number,
       priceRoom: number
     ) => {
-      setRoomId(roomId);
       setAdultCount(adultCount);
       setChildrenCount(childrenCount);
       setTotalAmount(totalAmount);
-      setPriceRoom(priceRoom);
     },
     [] // chỉ cần gọi lại khi không có dependencies thay đổi
   );
@@ -112,11 +119,11 @@ const CreateBookingPage: React.FC = () => {
     customer_email: customerEmail,
     customer_gender: customerGender,
     hotel_id: hotelId, // Hotel ID, có thể thay đổi tùy thuộc vào logic
-    booking_rooms: [{ room_id: roomId, price: priceRoom }],
+    booking_rooms: bookingRooms,
     children: childrenCount,
     adults: adultCount,
     total_amount: totalAmount,
-    check_in_at: null,
+    check_in_at: startDate,
     check_out_at: endDate,
   };
   const validateBookingData = (data: any) => {
@@ -201,6 +208,8 @@ const CreateBookingPage: React.FC = () => {
                     setEndDate={setEndDate}
                     showBookingTab={showBookingTab}
                     handleShowClick={handleShowClick}
+                    setPriceTypeDad={setPriceTypeDad}
+                    setRoomCountDad={setRoomCountDad}
                   />
                 )}
                 {currentView === "info" && (
@@ -223,7 +232,10 @@ const CreateBookingPage: React.FC = () => {
                       roomData={selectedRoom}
                       startDate={startDate}
                       endDate={endDate}
+                      priceTypeDad={priceTypeDad}
+                      roomCountDad={roomCountDad}
                       onOrderData={handleOrderData} // Đảm bảo gọi ngoài render
+                      handlebookingRoomsChange={handlebookingRoomsChange}
                     />
                   </div>
                 )}

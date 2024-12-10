@@ -1,15 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 interface Room {
   room_id: number;
   room_name: string;
-  room_clean_status: number;
-  room_status: string;
   room_price: number;
-  room_notes: string;
-  room_start_date_use: string;
-  room_room_type_id: number;
-  room_floor_id: number;
-  room_hotel_id: number;
+  [key: string]: any;
 }
 
 interface RoomType {
@@ -31,18 +25,23 @@ interface CreatOrderTableProps {
   endDate: string;
   roomData: RoomType | null; // Dữ liệu phòng được truyền vào
   onOrderData: (
-    roomId: number,
     adultCount: number,
     childrenCount: number,
     totalAmount: number,
     priceRoom: number
   ) => void;
+  priceTypeDad: string;
+  roomCountDad: number;
+  handlebookingRoomsChange: (selectedRooms: Room[]) => void;
 }
 const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   startDate,
   endDate,
   roomData, // Nhận roomData từ props
   onOrderData,
+  priceTypeDad,
+  roomCountDad,
+  handlebookingRoomsChange,
 }) => {
   const [paidAmount, setPaidAmount] = useState(0); // Số tiền đã thanh toán
   // Khởi tạo state cho số lượng người lớn và trẻ em
@@ -112,49 +111,104 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
 
   const totalDays = calculateDaysBetweenDates(startDate, endDate); // Tính số ngày giữa startDate và endDate
   const taxRate = 0.1; // 10% thuế/phí
-
+  let priceRoomType = 0;
+  switch (priceTypeDad) {
+    case "hourly_rate":
+      priceRoomType = roomData?.hourly_rate ?? 0;
+      break;
+    case "daily_rate":
+      priceRoomType = roomData?.daily_rate ?? 0;
+      break;
+    case "overnight_rate":
+      priceRoomType = roomData?.overnight_rate ?? 0;
+      break;
+    default:
+      priceRoomType = roomData?.daily_rate ?? 0;
+      break;
+  }
   // Hàm tính toán tổng tiền
   const calculateTotalAmount = (
-    roomPrice: number = 0,
-    totalDays: number,
-    taxRate: number = 0
+    roomPrice: number = 0, // Giá tiền mỗi phòng
+    totalDays: number = 1, // Tổng số ngày (mặc định 1 nếu không được truyền)
+    taxRate: number = 0, // Tỉ lệ thuế (mặc định 0)
+    roomCountDad: number = 1 // Số lượng phòng (mặc định 1)
   ): { subTotal: number; tax: number; totalAmount: number } => {
-    const subTotal = roomPrice * totalDays;
+    // Tính tiền trước thuế (subtotal)
+    const subTotal = roomPrice * totalDays * roomCountDad;
 
-    // Tính thuế chỉ khi checkbox được tích vào
+    // Tính thuế (chỉ khi checkbox được chọn)
     const tax = isChecked ? subTotal * taxRate : 0;
 
+    // Tính tổng tiền (total)
     const totalAmount = subTotal + tax;
 
     return { subTotal, tax, totalAmount };
   };
 
+  // Sử dụng hàm
   const { subTotal, tax, totalAmount } = calculateTotalAmount(
-    roomData?.daily_rate,
-    totalDays,
-    taxRate
+    priceRoomType, // Giá tiền mỗi phòng
+    totalDays, // Tổng số ngày
+    taxRate, // Tỉ lệ thuế
+    roomCountDad // Số lượng phòng
   );
 
   // Tính phần còn lại
   const remainingAmount = Math.max(totalAmount - paidAmount, 0); // Không cho âm
 
-  console.log("id", selectedRoomId);
-  const priceRoom = roomData?.daily_rate ?? 0;
-
+  // Gửi dữ liệu phòng về cha khi roomCountDad > 1
+  const prevRoomCountDad = useRef(roomCountDad);
+  const prevRoomData = useRef(roomData);
+  const prevPriceTypeDad = useRef(priceTypeDad);
+  const prevSelectedRoomId = useRef(selectedRoomId);
   useEffect(() => {
-    onOrderData(
-      selectedRoomId,
-      quantityCapaciti,
-      quantityChildren,
-      totalAmount,
-      priceRoom
-    );
+    // Kiểm tra nếu giá trị thay đổi thực sự
+    if (
+      roomCountDad > 1 &&
+      (roomCountDad !== prevRoomCountDad.current ||
+        roomData !== prevRoomData.current ||
+        priceTypeDad !== prevPriceTypeDad.current)
+    ) {
+      const selectedRooms = roomData?.rooms
+        .slice(0, roomCountDad)
+        .map((room) => ({
+          room_id: room.room_id,
+          room_name: room.room_name,
+          room_price: priceRoomType, // Lấy giá theo priceTypeDad hoặc default là hourly_rate
+        }));
+      handlebookingRoomsChange(selectedRooms ?? []); // Gửi mảng phòng đã chọn về cha
+
+      // Lưu lại giá trị cũ để so sánh trong lần sau
+      prevRoomCountDad.current = roomCountDad;
+      prevRoomData.current = roomData;
+      prevPriceTypeDad.current = priceTypeDad;
+    }
+
+    // Kiểm tra nếu chỉ có 1 phòng được chọn và selectedRoomId thay đổi
+    if (roomCountDad === 1 && selectedRoomId !== prevSelectedRoomId.current) {
+      const selectedRoom = roomData?.rooms.find(
+        (room) => room.room_id === selectedRoomId
+      );
+      if (selectedRoom) {
+        handlebookingRoomsChange([
+          {
+            room_id: selectedRoom.room_id,
+            room_name: selectedRoom.room_name,
+            room_price: priceRoomType,
+          },
+        ]);
+      }
+      prevSelectedRoomId.current = selectedRoomId; // Cập nhật selectedRoomId
+    }
+  }, [roomCountDad, roomData, priceTypeDad, handlebookingRoomsChange]);
+  // ------------------------
+  useEffect(() => {
+    onOrderData(quantityCapaciti, quantityChildren, totalAmount, priceRoomType);
   }, [
-    selectedRoomId,
     quantityCapaciti,
     quantityChildren,
     totalAmount,
-    priceRoom,
+    priceRoomType,
     onOrderData,
   ]);
 
@@ -179,29 +233,42 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                 </p>
               </div>
               <div>
-                <select
-                  id="room"
-                  name="room"
-                  className="btn text-black font-normal"
-                  onChange={handleRoomChange}
-                >
-                  <option></option>
-                  {roomData?.rooms && roomData.rooms.length > 0 ? (
-                    roomData.rooms.map((room, index) => (
-                      <option key={index} value={room.room_id}>
-                        {room.room_name}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>Loading...</option> // Thêm thông báo nếu chưa có phòng
-                  )}
-                </select>
+                {roomCountDad > 1 ? (
+                  <div className="text-black font-normal">x {roomCountDad}</div> // Nếu số phòng > 1, hiển thị số phòng
+                ) : (
+                  <select
+                    id="room"
+                    name="room"
+                    className="btn text-black font-normal"
+                    onChange={handleRoomChange}
+                  >
+                    <option></option>
+                    {roomData?.rooms && roomData.rooms.length > 0 ? (
+                      roomData.rooms.map((room, index) => (
+                        <option key={index} value={room.room_id}>
+                          {room.room_name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Loading...</option> // Thêm thông báo nếu chưa có phòng
+                    )}
+                  </select>
+                )}
               </div>
             </div>
-            <div className="flex justify-end items-center text-black font-medium">
-              <span>{roomData?.daily_rate.toLocaleString()} VNĐ</span>
+            <div className="flex justify-end items-center text-black font-medium flex-col">
+              <span>{priceRoomType.toLocaleString()} VNĐ</span>
             </div>
           </div>
+          {roomCountDad > 1 ? (
+            <ul className="flex gap-5">
+              {roomData?.rooms.slice(0, roomCountDad).map((room, index) => (
+                <li key={index}>{room.room_name}</li>
+              ))}
+            </ul>
+          ) : (
+            <div></div>
+          )}
 
           <div className="flex gap-2 border-b border-[var(--ht-neutral-100-)] py-3 pb-28">
             <div className="flex gap-2">
@@ -294,7 +361,9 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
               </div>
             </div>
             <div className="flex justify-end ">
-              <span className="text-black font-medium">1 Phòng</span>
+              <span className="text-black font-medium">
+                {roomCountDad} Phòng
+              </span>
             </div>
           </div>
 
