@@ -7,6 +7,7 @@ import { TypeRoomCard } from "@/types/backend";
 import { HOTEL_ROOMSTATUS_NAV } from "@/constants/hotel_room-status";
 import axios from "axios";
 import { useAuth } from "@/context/auth.context";
+import BookingForm from "../booking/FastOrder/BookingForm";
 
 interface IProps {
     data: TypeRoomCard,
@@ -23,6 +24,7 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
     const [status, setStatus] = useState(HOTEL_ROOMSTATUS_NAV.find(item => item.name === data.status));
     const [cleanStatus, setCleanStatus] = useState<boolean>(data.clean_status);
     const { token } = useAuth();
+    const [showBookingForm, setShowBookingForm] = useState(false); // State hiển thị form đặt phòng
 
     const handleClickOutside = (e: MouseEvent) => {
         // Kiểm tra nếu click không phải trong phần tử đã tham chiếu
@@ -133,6 +135,15 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
             console.error("Lỗi khi gửi dữ liệu:", error);
         }
     }
+    // Hàm hiển thị form đặt phòng
+    const toggleBookingForm = () => {
+        setShowBookingForm(!showBookingForm);
+    };
+    // Hàm đóng form đặt phòng
+    const closeBookingForm = () => {
+        setShowBookingForm(false);
+    };
+
     return (
         <section
             ref={roomCardRef}
@@ -218,6 +229,7 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
                     position={popupPosition}
                     data={data}
                     handleSetStatusClean={handleSetStatusClean}
+                    toggleBookingForm={toggleBookingForm} // Truyền hàm vào đây
                     cleanStatus={cleanStatus} />
                 :
                 <InusedRoomPopup
@@ -228,6 +240,8 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
                     handleSetStatusClean={handleSetStatusClean}
                     cleanStatus={cleanStatus} />
             }
+            {/* Điều kiện hiển thị BookingForm */}
+            {showBookingForm && <BookingForm closeBookingForm={closeBookingForm}  data={data}/>}
 
         </section>
     )

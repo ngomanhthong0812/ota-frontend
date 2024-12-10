@@ -6,11 +6,9 @@ export default function LoginLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body>
+       <div>
                 {children}
                 <Toaster />
-            </body>
-        </html>
+                </div>
     );
 }

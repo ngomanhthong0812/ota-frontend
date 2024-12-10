@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { JSX, ReactNode } from 'react';
 interface MenuItem {
     id: string,
     name: string,
@@ -19,6 +19,7 @@ interface RoomStatus {
 }
 
 interface TypeRoomCard {
+    map(arg0: (item: any, index: any) => JSX.Element): ReactNode;
     id: number,
     name: string,
     clean_status: false,
@@ -195,3 +196,18 @@ interface Employee {
     status: 'Working' | 'Resigned';
     hotel_id: number;
 }
+
+interface RoomAPIResponse {
+    id: number;
+    name: string;
+    standard_capacity: number;
+    max_capacity: number;
+    standard_children: number;
+    max_children: number;
+    hourly_rate: number;
+    daily_rate: number;
+    overnight_rate: number;
+    total_rooms: number;
+    available_rooms: number;
+    rooms: { id: number; name: string }[]; // Danh sách phòng chưa được đặt
+  }
