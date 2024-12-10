@@ -3,11 +3,15 @@
 import { useSelectedService } from "@/context/selectedService.context";
 import { SelectedServiceType } from "@/types/backend";
 import SelectedItems from "./selected_items";
+import { useEffect } from "react";
 
 interface IProps { }
 
 const SelectedList: React.FC<IProps> = () => {
-    const { selectedService } = useSelectedService();
+    const { selectedService, handleClearAllSelectedService } = useSelectedService();
+    useEffect(() => {
+        handleClearAllSelectedService();
+    }, [])
 
     return (
         <div

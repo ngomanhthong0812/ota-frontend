@@ -41,6 +41,11 @@ const AddServicesModal = (props: IProps) => {
     const [tabActive, setTabActive] = useState<string>(TAB_SERVICE_FINAL.ALL);
     const [search, setSearch] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { handleAddSelectedService, handleClearAllSelectedService, totalServicePrice, selectedService } = useSelectedService();
+
+    useEffect(() => {
+        handleClearAllSelectedService();
+    }, [])
 
     const { data } = useSWR(
         user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services/servicesByHotelId/${user?.hotel_id}` : null,
@@ -62,7 +67,6 @@ const AddServicesModal = (props: IProps) => {
         }
     );
 
-    const { handleAddSelectedService, handleClearAllSelectedService, totalServicePrice, selectedService } = useSelectedService();
 
     useEffect(() => {
         let newData: Services[] = data?.data;
