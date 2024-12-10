@@ -116,30 +116,73 @@ const CreateBookingPage: React.FC = () => {
     children: childrenCount,
     adults: adultCount,
     total_amount: totalAmount,
-    check_in_at: startDate,
+    check_in_at: null,
     check_out_at: endDate,
   };
+  const validateBookingData = (data: any) => {
+    // Kiểm tra trường bắt buộc: customer_name
+    if (!data.customer_name || data.customer_name.trim() === "") {
+      return "Tên khách hàng không được để trống.";
+    }
 
-  // Hàm gửi API khi nhấn nút tạo đặt phòng
+    // Kiểm tra trường bắt buộc: customer_phone (có thể kiểm tra định dạng số điện thoại)
+    if (!data.customer_phone || data.customer_phone.trim() === "") {
+      return "Số điện thoại không được để trống.";
+    }
+
+    // Kiểm tra trường bắt buộc: hotel_id
+    if (!data.hotel_id) {
+      return "ID khách sạn không được để trống.";
+    }
+
+    // Kiểm tra trường bắt buộc: booking_rooms (có ít nhất 1 phòng được chọn)
+    if (!data.booking_rooms || data.booking_rooms.length === 0) {
+      return "Cần chọn ít nhất 1 phòng.";
+    }
+
+    // Kiểm tra các phòng trong booking_rooms (đảm bảo mỗi phòng có room_id và price hợp lệ)
+    for (const room of data.booking_rooms) {
+      if (!room.room_id || !room.price) {
+        return "Thông tin phòng không hợp lệ.";
+      }
+    }
+
+    // Kiểm tra ngày check-in và check-out (check-in phải nhỏ hơn check-out)
+    if (!data.check_out_at) {
+      return "Ngày nhận phòng ko được để trống.";
+    }
+
+    // Nếu không có lỗi, trả về null
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Ngừng việc gửi lại form mặc định
-    console.log("data trước khi gửi", bookingData);
+    e.preventDefault();
+    console.log("Data trước khi gửi:", bookingData);
+    // Kiểm tra dữ liệu trước khi gửi API
+    const validationError = validateBookingData(bookingData);
+
+    // Nếu có lỗi, hiển thị thông báo lỗi và dừng lại
+    if (validationError) {
+      toast.error(validationError);
+      return; // Dừng lại nếu có lỗi
+    }
     try {
+      // Gọi API và xử lý phản hồi
       const response = await callApi<any>("/api/bookings", "POST", bookingData);
 
+      // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
+        // Nếu thành công, thông báo thành công
         toast.success(`Đặt phòng thành công`);
         router.push("/hotel_management/room_layout");
       } else {
-        console.log(response);
-
         toast.error(
-          response.data.message || "Có lỗi xảy ra, vui lòng thử lại."
+          response.data.message || "Có lỗi xảy ra vui lòng thử lại sau."
         );
       }
-    } catch (err: any) {
-      console.error("Error: ", err.message);
-      toast.error(err.message);
+    } catch (error) {
+      toast.error("Vui lòng nhập đầy đủ thông tin");
     }
   };
 
