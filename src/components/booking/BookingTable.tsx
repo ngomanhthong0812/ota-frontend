@@ -31,11 +31,15 @@ interface RoomType {
 interface BookingTableProps {
   aroom: RoomType;
   handleShowClick: (roomData: RoomType) => void;
+  setPriceTypeDad: React.Dispatch<React.SetStateAction<string>>;
+  setRoomCountDad: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const BookingTable: React.FC<BookingTableProps> = ({
   aroom,
   handleShowClick,
+  setPriceTypeDad,
+  setRoomCountDad,
 }) => {
   // Quản lý trạng thái cục bộ cho mỗi BookingTable
   const [roomCount, setRoomCount] = useState<number>(0);
@@ -46,8 +50,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
   const incrementRoom = () => {
     setRoomCount((prev) => {
       const newRoomCount = prev + 1;
-
-      return newRoomCount;
+      return newRoomCount <= aroom.available_rooms ? newRoomCount : prev;
     });
     handleShowClick(aroom); // Gọi hàm từ cha để hiển thị CreateOrderTable
   };
@@ -58,9 +61,14 @@ const BookingTable: React.FC<BookingTableProps> = ({
       return newRoomCount;
     });
   };
-
+  useEffect(() => {
+    setRoomCountDad(roomCount);
+  }, [roomCount, setRoomCountDad]);
   const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPriceType(
+      event.target.value as "hourly_rate" | "daily_rate" | "overnight_rate"
+    );
+    setPriceTypeDad(
       event.target.value as "hourly_rate" | "daily_rate" | "overnight_rate"
     );
   };
@@ -79,7 +87,6 @@ const BookingTable: React.FC<BookingTableProps> = ({
         return aroom.daily_rate ? aroom.daily_rate.toLocaleString() : "N/A";
     }
   };
-  
 
   return (
     <div className="flex-1 duration-300 border border-[var(--ht-neutral-100-)] rounded-md bg-white">
@@ -130,6 +137,9 @@ const BookingTable: React.FC<BookingTableProps> = ({
                 />
               </svg>
             </button>
+          </div>
+          <div className="flex">
+            {aroom.available_rooms}/{aroom.available_rooms} phòng
           </div>
         </div>
 

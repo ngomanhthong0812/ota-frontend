@@ -37,18 +37,23 @@ interface BookingSectionProps {
   setEndDate: React.Dispatch<React.SetStateAction<string>>;
   showBookingTab: boolean;
   handleShowClick: (roomData: RoomType) => void;
+  setPriceTypeDad: React.Dispatch<React.SetStateAction<string>>;
+  setRoomCountDad: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const BookingSection: React.FC<BookingSectionProps> = ({
   setStartDate,
   setEndDate,
   handleShowClick,
+  setPriceTypeDad,
+  setRoomCountDad,
 }) => {
   // Tạo state cho startDate và endDate
   const [startDate, setStartDateS] = useState<string>(""); // Ban đầu là chuỗi rỗng
   const [endDate, setEndDateS] = useState<string>(""); // Ban đầu là chuỗi rỗng
   const [dataResponse, setDataResponse] = useState<RoomType[]>([]);
   const [totalRooms, settotalRoom] = useState<number>(0);
+
   const { user } = useAuth();
   const hotelId = user?.hotel_id;
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,7 +101,10 @@ const BookingSection: React.FC<BookingSectionProps> = ({
                 placeholder="Ngày giờ nhận phòng"
                 value={startDate}
                 onChange={(e) => setStartDateS(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)} // Giới hạn startDate không nhỏ hơn thời gian hiện tại
+                max={endDate} // startDate không được lớn hơn endDate
               />
+
               <span className="flex justify-center items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -110,6 +118,7 @@ const BookingSection: React.FC<BookingSectionProps> = ({
                   />
                 </svg>
               </span>
+
               <input
                 type="datetime-local"
                 id="check-out"
@@ -117,6 +126,7 @@ const BookingSection: React.FC<BookingSectionProps> = ({
                 placeholder="Ngày giờ trả phòng"
                 value={endDate}
                 onChange={(e) => setEndDateS(e.target.value)}
+                min={startDate} // endDate không được nhỏ hơn startDate
               />
             </div>
           </div>
@@ -155,6 +165,8 @@ const BookingSection: React.FC<BookingSectionProps> = ({
             totalRooms={totalRooms}
             handleShowClick={handleShowClick}
             dataResponse={dataResponse}
+            setPriceTypeDad={setPriceTypeDad}
+            setRoomCountDad={setRoomCountDad}
           />
         )}
       </section>
