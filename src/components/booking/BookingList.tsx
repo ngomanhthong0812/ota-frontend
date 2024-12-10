@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import BookingTable from "./BookingTable";
 
-
 interface Room {
   room_id: number;
   room_name: string;
@@ -33,7 +32,9 @@ interface RoomType {
 const BookingList: React.FC<{
   handleShowClick: (roomData: RoomType) => void;
   data: RoomType[];
-}> = ({ handleShowClick, data }) => {
+  setPriceTypeDad: React.Dispatch<React.SetStateAction<string>>;
+  setRoomCountDad: React.Dispatch<React.SetStateAction<number>>;
+}> = ({ handleShowClick, data, setPriceTypeDad, setRoomCountDad }) => {
   const roomTypes = data;
 
   return (
@@ -44,6 +45,8 @@ const BookingList: React.FC<{
             key={roomType.id}
             aroom={roomType}
             handleShowClick={handleShowClick}
+            setPriceTypeDad={setPriceTypeDad}
+            setRoomCountDad={setRoomCountDad}
           />
         ))
       ) : (

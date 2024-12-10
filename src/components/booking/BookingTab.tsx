@@ -31,15 +31,17 @@ interface BookingTabProps {
   handleShowClick: (roomData: RoomType) => void;
   dataResponse: RoomType[];
   totalRooms: number;
+  setPriceTypeDad: React.Dispatch<React.SetStateAction<string>>;
+  setRoomCountDad: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const BookingTab: React.FC<BookingTabProps> = ({
   handleShowClick,
   dataResponse,
   totalRooms,
+  setPriceTypeDad,
+  setRoomCountDad,
 }) => {
-  console.log(dataResponse);
-
   return (
     <div className="body_content-room ">
       <div className="col-span-7 flex flex-col">
@@ -65,7 +67,12 @@ const BookingTab: React.FC<BookingTabProps> = ({
         </section>
 
         {/* Bảng booking */}
-        <BookingList handleShowClick={handleShowClick} data={dataResponse} />
+        <BookingList
+          handleShowClick={handleShowClick}
+          data={dataResponse}
+          setPriceTypeDad={setPriceTypeDad}
+          setRoomCountDad={setRoomCountDad}
+        />
       </div>
     </div>
   );
