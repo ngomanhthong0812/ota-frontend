@@ -28,7 +28,8 @@ interface CreatOrderTableProps {
     adultCount: number,
     childrenCount: number,
     totalAmount: number,
-    priceRoom: number
+    paidAmount: number | string,
+    paymentMethod: string | "Cash"
   ) => void;
   priceTypeDad: string;
   roomCountDad: number;
@@ -43,12 +44,31 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   roomCountDad,
   handlebookingRoomsChange,
 }) => {
-  const [paidAmount, setPaidAmount] = useState(0); // Số tiền đã thanh toán
+  const [paidAmount, setPaidAmount] = useState<number | string>(""); // Giá trị thô
+  const [paymentMethod, setPaymentMethod] = useState<string>("Cash");
   // Khởi tạo state cho số lượng người lớn và trẻ em
   const [quantityCapaciti, setQuantityCapaciti] = useState<number>(0); // Số lượng của người lớn
   const [quantityChildren, setQuantityChildren] = useState<number>(0); // Số lượng của trẻ em
   const [selectedRoomId, setSelectedRoomId] = useState<number>(0);
   const [isChecked, setIsChecked] = useState(false); // Theo dõi trạng thái checkbox
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\./g, ""); // Xóa dấu chấm
+    if (!isNaN(Number(rawValue)) || rawValue === "") {
+      setPaidAmount(rawValue); // Lưu giá trị thô
+    }
+  };
+  const handlePaymentMethodChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setPaymentMethod(e.target.value); // Cập nhật phương thức thanh toán
+  };
+  const handleBlur = () => {
+    const numericPaidAmount = Number(paidAmount);
+    if (!isNaN(numericPaidAmount)) {
+      setPaidAmount(numericPaidAmount); // Lưu lại giá trị thô dưới dạng số
+    }
+  };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(event.target.checked); // Cập nhật trạng thái checkbox
@@ -56,7 +76,6 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   const handleRoomChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const roomId = parseInt(event.target.value, 10); // Chuyển đổi value thành số
     setSelectedRoomId(roomId); // Cập nhật ID của phòng đã chọn
-    console.log("Selected room ID:", roomId); // Kiểm tra ID của phòng
   };
   // Hàm định dạng ngày và giờ
   const formatDateTime = (dateString: string) => {
@@ -154,7 +173,11 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   );
 
   // Tính phần còn lại
-  const remainingAmount = Math.max(totalAmount - paidAmount, 0); // Không cho âm
+  const numericPaidAmount =
+    typeof paidAmount === "number" ? paidAmount : parseFloat(paidAmount);
+  const remainingAmount = Math.max(
+    totalAmount - (isNaN(numericPaidAmount) ? 0 : numericPaidAmount)
+  );
 
   // Gửi dữ liệu phòng về cha khi roomCountDad > 1
   const prevRoomCountDad = useRef(roomCountDad);
@@ -203,12 +226,19 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   }, [roomCountDad, roomData, priceTypeDad, handlebookingRoomsChange]);
   // ------------------------
   useEffect(() => {
-    onOrderData(quantityCapaciti, quantityChildren, totalAmount, priceRoomType);
+    onOrderData(
+      quantityCapaciti,
+      quantityChildren,
+      remainingAmount,
+      paidAmount,
+      paymentMethod
+    );
   }, [
     quantityCapaciti,
     quantityChildren,
-    totalAmount,
-    priceRoomType,
+    remainingAmount,
+    paidAmount,
+    paymentMethod,
     onOrderData,
   ]);
 
@@ -428,17 +458,24 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
               <option value="JP">EUR</option>
             </select>
 
-            <select id="a" name="a" className="btn !w-auto">
-              <option value="FR">Tiền mặt</option>
-              <option value="US">Chuyển khoản</option>
+            <select
+              id="a"
+              name="a"
+              className="btn !w-auto"
+              value={paymentMethod} // Liên kết với state
+              onChange={handlePaymentMethodChange} // Xử lý sự kiện khi thay đổi
+            >
+              <option value="Cash">Tiền mặt</option>
+              <option value="Bank_transfer">Chuyển khoản</option>
             </select>
 
             <input
               type="text"
-              id="passport"
-              name="passport"
-              value={paidAmount}
-              onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
+              id="paidAmount"
+              name="paidAmount"
+              value={paidAmount.toLocaleString()}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
               className="btn"
             />
           </div>

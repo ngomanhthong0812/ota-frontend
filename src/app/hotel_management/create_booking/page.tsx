@@ -42,7 +42,6 @@ const CreateBookingPage: React.FC = () => {
   const [endDate, setEndDate] = useState<string>("");
   const [selectedRoom, setSelectedRoom] = useState<RoomType | null>(null);
   const [isNextStep, setIsNextStep] = useState(false);
-  const [roomId, setRoomId] = useState<number | null>(null);
   const [adultCount, setAdultCount] = useState<number>(1);
   const [childrenCount, setChildrenCount] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
@@ -50,10 +49,10 @@ const CreateBookingPage: React.FC = () => {
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerGender, setCustomerGender] = useState<string>("");
-
+  const [paidAmountDad, setPaidAmountDad] = useState<number | string>("");
   const [priceTypeDad, setPriceTypeDad] = useState<string>("");
   const [roomCountDad, setRoomCountDad] = useState<number>(0);
-
+  const [paymentMethod, setPaymentMethod] = useState<string>("Cash");
   const [bookingRooms, setBookingRooms] = useState<
     { room_id: number; price: number; price_type: string }[]
   >([]);
@@ -68,8 +67,6 @@ const CreateBookingPage: React.FC = () => {
     // Cập nhật state với mảng đã chuyển đổi
     setBookingRooms(updatedRooms);
   };
-  console.log("Số phòng ở cha:", roomCountDad);
-
   const router = useRouter();
   // Hàm xử lý hiển thị bảng CreatOrderTable khi click vào nút "+"
   const handleShowClick = (roomData: RoomType) => {
@@ -89,15 +86,17 @@ const CreateBookingPage: React.FC = () => {
       adultCount: number,
       childrenCount: number,
       totalAmount: number,
-      priceRoom: number
+      paidAmount: number | string,
+      paymentMethod: string | "Cash"
     ) => {
       setAdultCount(adultCount);
       setChildrenCount(childrenCount);
+      setPaidAmountDad(paidAmount);
       setTotalAmount(totalAmount);
+      setPaymentMethod(paymentMethod);
     },
     [] // chỉ cần gọi lại khi không có dependencies thay đổi
   );
-
   // Hàm xử lý dữ liệu khách hàng khi điền thông tin
   const handleCustomerData = (
     nameCustomer: string,
@@ -118,13 +117,15 @@ const CreateBookingPage: React.FC = () => {
     customer_phone: customerPhone,
     customer_email: customerEmail,
     customer_gender: customerGender,
-    hotel_id: hotelId, // Hotel ID, có thể thay đổi tùy thuộc vào logic
+    hotel_id: hotelId,
     booking_rooms: bookingRooms,
     children: childrenCount,
     adults: adultCount,
     total_amount: totalAmount,
     check_in_at: startDate,
     check_out_at: endDate,
+    paidAmount: paidAmountDad,
+    paymentMethod: paymentMethod,
   };
   const validateBookingData = (data: any) => {
     // Kiểm tra trường bắt buộc: customer_name
@@ -181,7 +182,7 @@ const CreateBookingPage: React.FC = () => {
       // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công
-        toast.success(`Đặt phòng thành công`);
+        toast.success(`Đặt phòng thành công `);
         router.push("/hotel_management/room_layout");
       } else {
         toast.error(
