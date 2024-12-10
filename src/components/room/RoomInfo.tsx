@@ -6,6 +6,7 @@ import useSWR from "swr";
 import ChangeDateModal from "./modals/change_date.modal";
 import CheckInModal from "./modals/check_in.modal";
 import UpdateCustomerInfoModal from "./modals/update_customer_info.modal";
+import { FaBed } from "react-icons/fa6";
 
 const fetcher = (url: string, token: string | null) =>
     fetch(url,
@@ -67,7 +68,7 @@ const RoomInfo = () => {
     const { data, error, isLoading } = useSWR(
         token ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoices/room-details/${id}` : null,
         (url: string) => fetcher(url, token),
-        
+
     );
 
     useEffect(() => {
@@ -78,10 +79,10 @@ const RoomInfo = () => {
             setNumberOfCustomer(data?.data.booking);
         }
     }, [data])
-    
+
     if (isLoading) return <div>Đang tải dữ liệu...</div>;
     if (error) return <div>Đã xảy ra lỗi: {error.message}</div>;
-    
+
 
     const formatDateTime = (dateString: string): string => {
         const date = new Date(dateString);
@@ -92,7 +93,7 @@ const RoomInfo = () => {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${day}/${month}/${year} - ${hours}:${minutes}`;
     };
-    
+
     const formatForInput = (dateString: string): string => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -100,10 +101,10 @@ const RoomInfo = () => {
         const year = date.getFullYear();
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-    
+
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
-    
+
     const formatCurrency = (amount: number): string => {
         return new Intl.NumberFormat('vi-VN', {
             minimumFractionDigits: 0,
@@ -135,7 +136,7 @@ const RoomInfo = () => {
             birthday: birthday
         }))
     };
-    
+
     const handleUpdateNumberOfCusTomers = (children: number, adults: number) => {
         setNumberOfCustomer((prev) => ({
             ...prev!,
@@ -150,48 +151,46 @@ const RoomInfo = () => {
                 <div>
                     <div className="flex items-center justify-between p-3 border-b !border-[var(--ht-neutral-100-)]">
                         <div className="flex items-center gap-3">
-                                <div className="font-semibold text-black text-base">
-                                    {rooms.map((item) => (
-                                        <div key={item.id}>
+                            <div className="font-semibold text-black text-base">
+                                {rooms.map((item) => (
+                                    <div key={item.id}>
                                         <p>{item.name}</p>
-                                        </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ))}
+                            </div>
 
-                                <button className="group mt-1 relative">
+                            <button className="group mt-1 relative">
                                 <div className="bg-gray-500 w-24 text-white rounded-md py-1 hidden absolute top-full left-1/2 -translate-x-1/2 group-hover:block">
                                     Tuỳ chọn
                                     <div className="absolute -top-2 left-1/2 -translate-x-1/2"></div>
                                 </div>
-                                </button>
+                            </button>
                         </div>
 
                         <div>
                             <div>
                                 {booking?.check_in_at ? (
                                     <Link href={`/hotel_management/room/room_invoice/${id}`}>
-                                    <button className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-pink-500">
-                                        <path d="M11 3L10.3374 3.23384C7.75867 4.144 6.46928 4.59908 5.73464 5.63742C5 6.67576 5 8.0431 5 10.7778V13.2222C5 15.9569 5 17.3242 5.73464 18.3626C6.46928 19.4009 7.75867 19.856 10.3374 20.7662L11 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                        <path d="M21 12L11 12M21 12C21 11.2998 19.0057 9.99153 18.5 9.5M21 12C21 12.7002 19.0057 14.0085 18.5 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                        Trả phòng
-                                    </button>
+                                        <button className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 512 512"
+                                                width={18}
+                                                height={18}
+                                                style={{ fill: 'var(--room-not-arrived-color-)' }}
+                                            >
+                                                <path
+                                                    d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z" />
+                                            </svg>
+                                            Trả phòng
+                                        </button>
                                     </Link>
                                 ) : (
                                     <button className="btn-fn bg-[var(--room-not-checked-out-color-200-)] text-white"
-                                    onClick={() => setShowModalCheckIn(true)}
+                                        onClick={() => setShowModalCheckIn(true)}
                                     >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-white">
-                                        <path d="M2 3.5V20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M22 8.5L22 20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M2 8.5L6 10.5H22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M2 15.5H6M22 15.5H19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M6 10.5V16.5C6 18.1547 6.34533 18.5 8 18.5H17C18.6547 18.5 19 18.1547 19 16.5V10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M6.81362 10.5C6.89385 10.076 7.0202 9.63248 6.99567 9.19713C6.95941 8.5536 6.63697 7.96625 6.1264 7.61368C5.92478 7.47446 5.48 7.33239 5.01268 7.21093C4.3308 7.0337 3.98986 6.94508 3.59142 7.03644C3.30841 7.10133 3.06258 7.25187 2.71115 7.52079C2.67243 7.55042 2.65307 7.56523 2.62289 7.59026C2.3843 7.78812 2.17276 8.07424 2.05352 8.36034C2.03844 8.39653 2.02562 8.43102 2 8.5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    Nhận phòng
+                                        <FaBed className="!w-[18px] !h-[18px]" />
+                                        Nhận phòng
                                     </button>
                                 )}
                             </div>
@@ -214,8 +213,8 @@ const RoomInfo = () => {
 
                                         <div className="flex flex-col">
                                             <p>
-                                            {booking?.check_in_at ? "Nhận phòng" : "Đặt phòng"}:{" "}
-                                            {formatDateTime(booking?.check_in_at ?? booking?.booking_at ?? "")}
+                                                {booking?.check_in_at ? "Nhận phòng" : "Đặt phòng"}:{" "}
+                                                {formatDateTime(booking?.check_in_at ?? booking?.booking_at ?? "")}
                                             </p>
                                             <p>Trả phòng: {formatDateTime(booking?.check_out_at ?? "")}</p>
                                         </div>
@@ -237,7 +236,7 @@ const RoomInfo = () => {
                             <li className="py-4 border-b !border-[var(--ht-neutral-100-)]">
                                 <div className="flex items-center gap-2">
                                     {rooms.map((room, index) => (
-                                    <div key={index}>Mặc định: {formatCurrency(room.price)}</div>
+                                        <div key={index}>Mặc định: {formatCurrency(room.price)}</div>
                                     ))}
                                 </div>
 
@@ -260,18 +259,18 @@ const RoomInfo = () => {
                                     onClick={() => setShowModalUpdateCustomerInfo(true)}
                                 >
                                     <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    className="text-green-500 w-4 h-4 group-hover:text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        className="text-green-500 w-4 h-4 group-hover:text-white"
                                     >
-                                    <path
-                                        d="M12 4V20M20 12H4"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
+                                        <path
+                                            d="M12 4V20M20 12H4"
+                                            stroke="currentColor"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
                                     </svg>
                                 </button>
                             </li>
@@ -284,8 +283,8 @@ const RoomInfo = () => {
                 showModal={showModal}
                 closeModal={() => setShowModal(false)}
                 roomName={
-                rooms.length > 0 && rooms[0].name
-                    ? rooms[0].name : ""
+                    rooms.length > 0 && rooms[0].name
+                        ? rooms[0].name : ""
                 }
                 customerName={booking?.customer.name ?? ""}
 
@@ -293,8 +292,8 @@ const RoomInfo = () => {
                     booking?.check_in_at
                         ? formatForInput(booking?.check_in_at)
                         : booking?.booking_at
-                        ? formatForInput(booking?.booking_at)
-                        : ""
+                            ? formatForInput(booking?.booking_at)
+                            : ""
                 }
 
                 checkOutDate={

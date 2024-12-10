@@ -15,6 +15,7 @@ import { CgTrash } from "react-icons/cg";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ModalConfirm from "@/components/modal_confirm";
+import PaginationGlobal from "@/components/pagination_global";
 
 const fetcher = (url: string, token: string | null) =>
   fetch(url,
@@ -32,13 +33,24 @@ const Employees = () => {
 
   const [employeeList, setEmployeeList] = useState<Employee[]>([]);
   const [search, setSearch] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState<string[]>(['Working', 'Resigned']);
   const [checkedItems, setCheckedItems] = useState<number[]>([]);
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
 
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 8;
+
   const { user, token } = useAuth();
-  const { data, error, isLoading, mutate } = useSWR(
-    user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/employees/${user?.hotel_id}` : null,
+  const { data, error, mutate } = useSWR(
+    user?.hotel_id
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/employees` +
+      `?hotel_id=${user.hotel_id}` +
+      `&currentPage=${currentPage}` +
+      `&pageSize=${pageSize}` +
+      `&status=${status}` +
+      `&search=${searchQuery}`
+      : null,
     (url: string) => fetcher(url, token),
     {
       revalidateIfStale: false,
@@ -46,40 +58,23 @@ const Employees = () => {
       revalidateOnReconnect: false
     }
   );
-  useEffect(() => {
-    setEmployeeList(data?.data);
-  }, [data]);
 
-  const refreshData = async () => {
-    await mutate(); // Re-fetch lại dữ liệu
-  };
+  useEffect(() => {
+    setEmployeeList(data?.data?.employees);
+  }, [data?.data?.employees]);
 
   useEffect(() => {
     setItemActive(null);
     setCheckedItems([]);
-    let newData: Employee[] = data?.data || [];
-    if (newData?.length > 0) {
-      if (search) {
-        // lọc theo key Search
-        newData = newData?.filter((employee: Employee) =>
-          employee.name.toLowerCase().trim().includes(search.toLowerCase().trim()) ||
-          employee.code.toLowerCase().trim().includes(search.toLowerCase().trim()) ||
-          employee.phoneNumber.toLowerCase().trim().includes(search.toLowerCase().trim()) ||
-          employee.idCard.toLowerCase().trim().includes(search.toLowerCase().trim())
-        );
-      }
-      if (search === "") {
-        setEmployeeList(data?.data);
-      }
-
-      // lọc theo trạng thái
-      if (status?.length > 0) {
-        newData = newData.filter(employee => status.includes(employee.status));
-      }
-
-      setEmployeeList(newData);
+    if (!search) {
+      setSearchQuery('');
     }
-  }, [search, status,data?.data]);
+  }, [search, status])
+
+
+  const refreshData = async () => {
+    await mutate(); // Re-fetch lại dữ liệu
+  };
 
   useEffect(() => {
     if (employeeList?.length > 0) {
@@ -155,7 +150,10 @@ const Employees = () => {
 
   }
 
-  if (isLoading) return "Loading...";
+  const handleSearch = () => {
+    setSearchQuery(search);
+  };
+
   if (error) return "An error has occurred.";
 
   return (
@@ -190,7 +188,12 @@ const Employees = () => {
           <div className="relative flex-1 max-w-[400px]">
             <input type="text"
               onChange={e => setSearch(e.target.value)}
-              placeholder="Tìm theo mã, tên nhân viên" className="w-full rounded-lg px-6 py-[6px] text-[13px] text-black border outline-none" />
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
+              placeholder="Tìm theo tên nhân viên" className="w-full rounded-lg px-6 py-[6px] text-[13px] text-black border outline-none" />
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
               className="absolute top-[50%] translate-y-[-45%] left-1 fill-[--ht-neutral-300-]">
               <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z">
@@ -252,9 +255,14 @@ const Employees = () => {
             }
           </tbody>
         </table>
+        <PaginationGlobal
+          countPage={data?.data?.count}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage} />
       </div >
+
       <ModalUpdateEmployee
-        data={data?.data?.find((item: Employee) => item.id === itemActive)}
+        data={data?.data?.employees?.find((item: Employee) => item.id === itemActive)}
         showModalUpdateEmployee={showModalUpdateEmployee}
         setShowModalUpdateEmployee={setShowModalUpdateEmployee}
         refreshData={refreshData}

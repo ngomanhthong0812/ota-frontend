@@ -35,7 +35,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
   const [activeTab, setActiveTab] = useState<string>("denHienTai");
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [roomDetails, setRoomDetails] = useState<{ id:number, name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
+  const [roomDetails, setRoomDetails] = useState<{ id: number, name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
   const [roomPrice, setRoomPrice] = useState<number>(0);
   const [bookingId, setBookingId] = useState<number>(0);
   const [payments, setPayments] = useState<Payments[]>([]);
@@ -108,14 +108,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
   useEffect(() => {
     if (data && data.invoice) {
       setRoomPrice(data?.invoice?.invoice?.total)
-
-
       setBookingId(data?.invoice?.bookings.id)
-      const today = new Date().toISOString();
-      const calculateDateNow = calculateDaysBetween(today, data?.invoice?.invoice?.check_out_at);
-      const calculatePriceNow = data?.invoice?.invoice?.total - (calculateDateNow * data.invoice.rooms[0].price);
-      setRoomPrice(activeTab === "denHienTai" ? calculatePriceNow : data?.invoice?.invoice?.total)
-
 
       const roomDetailsList = data.invoice.rooms.map((room: any) => ({
         id: room.id,
@@ -230,12 +223,10 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
 
   useEffect(() => {
     if (data) {
-      const today = new Date().toISOString();
-      const calculateDateNow = calculateDaysBetween(today, data?.invoice?.invoice?.check_out_at);
-      const calculatePriceNow = data?.invoice?.invoice?.total - (calculateDateNow * data.invoice.rooms[0].price);
+      const calculatePriceNow = (calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * data.invoice.rooms[0].price);
       setRoomPrice(activeTab === "denHienTai" ? calculatePriceNow : data?.invoice?.invoice?.total)
     }
-  }, [activeTab])
+  }, [activeTab, data])
 
 
   if (isLoading) return "Loading...";
@@ -295,7 +286,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                 <div className="flex justify-between py-1">
                   <span>Giá đêm
                     ({formatDate(data?.invoice?.invoice?.booking_at)} - {activeTab === "denHienTai" ? formatDate(getCurrentDateTime()) : formatDate(data?.invoice?.invoice?.check_out_at)})</span>
-                  <div>{activeTab === "denHienTai" ? formatPrice(String(calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * roomDetails[0]?.price)) : formatPrice(String(invoiceItemBooking?.data?.total_price))}</div>
+                  <div>{activeTab === "denHienTai" ? formatPrice(String(calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * roomDetails[0]?.price)) : formatPrice(String(roomPrice))}</div>
                 </div>
                 {/* <div className="flex justify-between py-1">
                   <span>Nhận phòng sớm (49 phút)</span>
@@ -417,27 +408,14 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
             <button className="btn-fn bg-[var(--room-not-arrived-color-100-)] text-[var(--room-not-arrived-color-)]"
               onClick={() => setShowModalCheckOutAndPay(true)}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width={24}
-                height={24}
-                color={"#EA3DA1"}
-                fill={"none"}
+              <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                width={18}
+                height={18}
+                style={{ fill: 'var(--room-not-arrived-color-)' }}
               >
                 <path
-                  d="M11 3L10.3374 3.23384C7.75867 4.144 6.46928 4.59908 5.73464 5.63742C5 6.67576 5 8.0431 5 10.7778V13.2222C5 15.9569 5 17.3242 5.73464 18.3626C6.46928 19.4009 7.75867 19.856 10.3374 20.7662L11 21"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M21 12L11 12M21 12C21 11.2998 19.0057 9.99153 18.5 9.5M21 12C21 12.7002 19.0057 14.0085 18.5 14.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                  d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z" />
               </svg>
               <p>
                 <span>Trả phòng</span>
@@ -616,7 +594,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
         showModal={showModalRemoveServices}
         closeModal={() => setShowModalRemoveServices(false)}
       />
-    </div>
+    </div >
   );
 }
 

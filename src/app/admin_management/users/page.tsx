@@ -33,21 +33,23 @@ const Users = () => {
 
   const [userList, setUserList] = useState<UserAdmin[]>([]);
   const [search, setSearch] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [status, setStatus] = useState<string>('active');
   const [checkedItems, setCheckedItems] = useState<number[]>([]);
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 15;
+  const pageSize = 12;
 
   const { user, token } = useAuth();
-
-  const { data, error, isLoading, mutate } = useSWR(
+  const { data, error, mutate } = useSWR(
     user?.hotel_id
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/getUsersByHotelIdNotRoleAdmin` +
       `?hotel_id=${user.hotel_id}` +
       `&currentPage=${currentPage}` +
-      `&pageSize=${pageSize}`
+      `&pageSize=${pageSize}` +
+      `&status=${status}` +
+      `&search=${searchQuery}`
       : null,
     (url: string) => fetcher(url, token),
     {
@@ -69,7 +71,15 @@ const Users = () => {
 
   useEffect(() => {
     setUserList(data?.data?.users);
-  }, []);
+  }, [data?.data]);
+
+  useEffect(() => {
+    setItemActive(null);
+    setCheckedItems([]);
+    if (!search) {
+      setSearchQuery('');
+    }
+  }, [search, status])
 
   const refreshData = async () => {
     await mutate(); // Re-fetch lại dữ liệu
@@ -84,29 +94,6 @@ const Users = () => {
       }
     }
   }, [checkedItems, userList])
-
-  useEffect(() => {
-    setItemActive(null);
-    setCheckedItems([]);
-    let newData: UserAdmin[] = data?.data?.users || [];
-    if (newData?.length > 0) {
-      if (search) {
-        // lọc theo key Search
-        newData = newData?.filter((user: UserAdmin) =>
-          user.user_name.toLowerCase().trim().includes(search.toLowerCase().trim()) ||
-          user.code.toLowerCase().trim().includes(search.toLowerCase().trim())
-        );
-      }
-      if (search === "") {
-        setUserList(data?.data?.users);
-      }
-
-      // lọc theo trạng thái
-      if (status !== "all") newData = newData.filter(user => status === user.status);
-
-      setUserList(newData);
-    }
-  }, [search, status, data?.data?.users])
 
   const handleSetCheckedItem = (e: React.MouseEvent, id: number) => {
     e.stopPropagation()
@@ -163,7 +150,10 @@ const Users = () => {
 
   }
 
-  if (isLoading) return "Loading...";
+  const handleSearch = () => {
+    setSearchQuery(search);
+  };
+
   if (error) return "An error has occurred.";
 
   return (
@@ -174,9 +164,14 @@ const Users = () => {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
             type="text"
             className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[var(--room-empty-color-)] focus:border-b-2"
-            placeholder="Theo tên đăng nhập, mã nhân viên" />
+            placeholder="Theo tên đăng nhập" />
         </section>
         <section className="mb-4 bg-white p-3 pb-4 rounded-md flex flex-col gap-3 text-[13px] shadow-sm shadow-[#d6d6d6]">
           <h3 className="text-black font-[600]">Trạng thái</h3>
