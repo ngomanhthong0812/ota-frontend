@@ -17,8 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <div>
         <ToastContainer />
         <ToolbarProvider>
           <SelectedServiceProvider>
@@ -31,7 +30,6 @@ export default function RootLayout({
             </div>
           </SelectedServiceProvider>
         </ToolbarProvider>
-      </body>
-    </html>
+      </div>
   );
 }
