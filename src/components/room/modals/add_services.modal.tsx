@@ -219,12 +219,14 @@ const AddServicesModal = (props: IProps) => {
                             </div>
 
                             <div className="">
-                                <button className="group flex items-center justify-center w-full gap-2 bg-white py-1 border border-[var(--navbar-color-)] text-[var(--navbar-color-)] font-semibold rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
+                                <button
+                                    onClick={handleSubmit}
+                                    className="group flex items-center justify-center w-full gap-2 bg-white py-1 border border-[var(--navbar-color-)] text-[var(--navbar-color-)] font-semibold rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={20} height={20} fill={"none"} className="text-[var(--navbar-color-)] group-hover:text-white">
                                         <path d="M12 4V20M20 12H4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
 
-                                    <p className="font-[500]" onClick={handleSubmit}>Thêm vào phòng</p>
+                                    <p className="font-[500]">Thêm vào phòng</p>
                                 </button>
                             </div>
                         </div>

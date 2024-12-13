@@ -224,7 +224,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
   useEffect(() => {
     if (data) {
       const calculatePriceNow = (calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * data.invoice.rooms[0].price);
-      setRoomPrice(activeTab === "denHienTai" ? calculatePriceNow : data?.invoice?.invoice?.total)
+      setRoomPrice(activeTab === "denHienTai" ? data?.invoice?.invoice?.total - (data?.invoice?.bookings?.total - calculatePriceNow) : data?.invoice?.invoice?.total)
     }
   }, [activeTab, data])
 
@@ -286,7 +286,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                 <div className="flex justify-between py-1">
                   <span>Giá đêm
                     ({formatDate(data?.invoice?.invoice?.booking_at)} - {activeTab === "denHienTai" ? formatDate(getCurrentDateTime()) : formatDate(data?.invoice?.invoice?.check_out_at)})</span>
-                  <div>{activeTab === "denHienTai" ? formatPrice(String(calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * roomDetails[0]?.price)) : formatPrice(String(roomPrice))}</div>
+                  <div>{activeTab === "denHienTai" ? formatPrice(String(calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * roomDetails[0]?.price)) : formatPrice(String(data?.invoice?.bookings?.total))}</div>
                 </div>
                 {/* <div className="flex justify-between py-1">
                   <span>Nhận phòng sớm (49 phút)</span>

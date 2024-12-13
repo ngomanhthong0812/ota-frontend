@@ -33,7 +33,7 @@ export const HOTELSIDEBAR_NAV: MenuItem[] = [
             {
                 id: uuid(),
                 name: 'Sơ đồ phòng',
-                href: '/hotel_management/room_layout',
+                href: '/hotel_management/room_layout/home',
                 icon: <BiSolidHome size={20} />,
                 active: false,
                 subMenus: []
