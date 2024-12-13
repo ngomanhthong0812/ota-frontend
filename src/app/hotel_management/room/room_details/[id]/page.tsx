@@ -23,6 +23,8 @@ const ViewDetailRoom = () => {
   const [showModalRemoveServices, setShowModalRemoveServices] = useState<boolean>(false);
   const [showModalAddServices, setShowModalAddServices] = useState<boolean>(false);
   const [services, setServices] = useState<ResponseInvoiceItem[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+
 
   const { id } = useParams();
 
@@ -59,6 +61,10 @@ const ViewDetailRoom = () => {
     return count;
   }
 
+  const handleRemoveService = (id: number) => {
+    setShowModalRemoveServices(true);
+    setSelectedServiceId(id);
+  };
 
   return (
     <div>
@@ -256,7 +262,7 @@ const ViewDetailRoom = () => {
                           <p>{formatPrice(String(item.total_price))}</p>
 
                           <button className="border border-red-500 rounded-full "
-                            onClick={() => setShowModalRemoveServices(true)}
+                            onClick={() => handleRemoveService(item.id)}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-red-500">
                               <path d="M19.0005 4.99988L5.00049 18.9999M5.00049 4.99988L19.0005 18.9999" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -281,6 +287,10 @@ const ViewDetailRoom = () => {
       <RemoveServicesModal
         showModal={showModalRemoveServices}
         closeModal={() => setShowModalRemoveServices(false)}
+        serviceItem_id={selectedServiceId ?? 0}
+        onServiceDeleted={(deletedId) => {
+          setServices((prev) => prev.filter((service) => service.id !== deletedId));
+        }}
       />
 
       <AddServicesModal
