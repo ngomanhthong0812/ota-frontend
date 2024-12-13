@@ -55,6 +55,7 @@ const CheckInModal = (props: IProps) => {
                 {
                     check_in_at: currentDateTime,
                     check_out_at: checkOutAt,
+                    status: "CheckedIn",
                 },
                 {
                     headers: {
