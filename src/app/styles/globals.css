@@ -388,18 +388,21 @@ body svg {
 }
 
 .menu-item-container-admin .menu-item:hover svg,
-.menu-item-container-admin svg{
+.menu-item-container-admin svg {
   @apply fill-white;
 }
 
-.menu-item-container-admin .active{
+.menu-item-container-admin .active {
   @apply !bg-[#0078b6];
 }
 
-.menu-item-container-admin .menu-item{
+.menu-item-container-admin .menu-item {
   @apply !gap-2;
 }
 .IllustrationsNoData svg {
   width: 30%;
   height: 30%;
+}
+.sc-fmKESZ svg {
+  fill: initial !important;
 }
