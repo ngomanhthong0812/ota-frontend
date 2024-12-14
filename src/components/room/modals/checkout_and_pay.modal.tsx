@@ -144,9 +144,6 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                 }
             );
 
-            if (response.status === 200) {
-                // toast("Cap nhat booking thành công!");
-            }
         } catch (error) {
             console.error("Failed to create payment:", error);
             alert("Đã xảy ra lỗi khi thực hiện thanh toán.");
@@ -170,12 +167,9 @@ const CheckOutAndPayModal: React.FC<IProps> = ({ showModal, closeModal, roomName
                 }
             );
 
-            if (response.status === 200) {
-                // toast("Cap nhat phong thành công!");
-            }
         } catch (error) {
             console.error("Failed to create payment:", error);
-            alert("Đã xảy ra lỗi khi thực hiện cap nhat phong.");
+            alert("Đã xảy ra lỗi khi thực hiện cập nhật phòng.");
         } finally {
             closeModal();
         }
