@@ -9,6 +9,7 @@ import useSWR from "swr";
 
 import { RiLayoutGridLine } from "react-icons/ri";
 import { CiViewTimeline } from "react-icons/ci";
+import Link from "next/link";
 
 interface IProps { }
 
@@ -100,9 +101,9 @@ const ToolbarTop: React.FC<IProps> = () => {
                         <button className={`toolbar-top-type_item !min-w-[auto] !py-[6px] !px-3 active`}>
                             <RiLayoutGridLine size={20} className="fill-[var(--room-empty-color-)]" />
                         </button>
-                        <button className={`toolbar-top-type_item !min-w-[auto] !py-[6px] !px-3`}>
+                        <Link href={'/hotel_management/room_layout/calendar_scheduler'} className={`toolbar-top-type_item !min-w-[auto] !py-[6px] !px-3`}>
                             <CiViewTimeline size={20} className="fill-[var(--color-menu-icon-)]" />
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

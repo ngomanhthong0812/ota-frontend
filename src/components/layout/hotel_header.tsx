@@ -2,11 +2,9 @@
 import { useAuth } from '@/context/auth.context';
 import { FiSearch } from 'react-icons/fi';
 import { DropdownMenuHotel } from './hotel_dropdown_menu';
-import { useState } from 'react';
 
 const HotelHeader = () => {
     const { user } = useAuth();
-    const [isShowDropdownMenu, setIsShowDropdownMenu] = useState<boolean>(true);
 
     return (
         <header className="bg-[var(--navbar-color-)] flex justify-between p-2 h-[50px] fixed w-full text-white z-10">

@@ -1,34 +1,33 @@
 'use client'
 import {
     LogOut,
-    Mail,
-    MessageSquare,
-    Plus,
-    PlusCircle,
     User,
-    UserPlus,
     Phone,
     Users,
 } from "lucide-react"
+
+import { useRouter } from 'next/navigation'
 
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@/context/auth.context";
 
 export function DropdownMenuHotel() {
+    const router = useRouter();
+    const { clearToken } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
+    const logout = () => {
+        router.push('/');
+        clearToken();
+    }
     return (
         <DropdownMenu
             onOpenChange={(open) => setIsOpen(open)}
@@ -51,10 +50,12 @@ export function DropdownMenuHotel() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56  -translate-x-3">
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <User />
-                        <span>Quản lý</span>
-                    </DropdownMenuItem>
+                    <Link href={'/admin_management'}>
+                        <DropdownMenuItem>
+                            <User />
+                            <span>Quản lý</span>
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -68,7 +69,7 @@ export function DropdownMenuHotel() {
                     <Phone />
                     <span>Hổ trợ: <span className="text-[var(--room-empty-color-)]">039287demo</span></span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
                     <LogOut />
                     <span>Đăng xuất</span>
                 </DropdownMenuItem>
