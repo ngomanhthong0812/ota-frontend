@@ -10,7 +10,8 @@ const AppHeader = () => {
         <>
             <div className="flex justify-between layout-container">
                 <div className="py-5">
-                    <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="" width={150} />
+                    <img src="https://i0.wp.com/www.writefromscratch.com/wp-content/uploads/2018/12/demo-logo.png?fit=539%2C244&ssl=1&w=640"
+                        alt="" width={90} />
                 </div>
 
                 <div className="flex items-center gap-4 py-5">

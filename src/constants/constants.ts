@@ -53,3 +53,9 @@ export const STATUS_USER = {
     ACTIVE: 'Đang hoạt động',
     INACTIVE: 'Ngừng hoạt động',
 }
+
+export const STATUS_SERVICE = {
+    IN_BUSINESS: 'Hàng đang kinh doanh',
+    OUT_OF_BUSINESS: 'Hàng ngừng kinh doanh',
+}
+
