@@ -13,29 +13,25 @@ interface Page {
   component: React.ReactNode;
 }
 
-const pages: Page[] = [
-  { title: "Hạng phòng", component: <RoomCategoryPage /> },
-  { title: "Phòng", component: <RoomsPage /> },
-];
+// const pages: Page[] = [
+//   { title: "Hạng phòng", component: <RoomCategoryPage /> },
+//   { title: "Phòng", component: <RoomsPage /> },
+// ];
 
 const RoomManagerPage: React.FC<IProps> = () => {
-  // State để theo dõi nội dung trang đang được hiển thị
   const [activePage, setActivePage] = useState<string>("Hạng phòng");
-
-  // State cho từng modal
   const [isRoomCategoryDialogOpen, setRoomCategoryDialogOpen] = useState(false);
   const [isRoomDialogOpen, setRoomDialogOpen] = useState(false);
+  const [reloadRooms, setReloadRooms] = useState(0); // State reload RoomsPage
+  const [reloadRoomTypes, setReloadRoomTypes] = useState(0); // State reload RoomCategoryPage
 
-  // Xử lý mở/đóng modal
-  const handleRoomCategoryDialogOpen = () => setRoomCategoryDialogOpen(true);
-  const handleRoomCategoryDialogClose = () => setRoomCategoryDialogOpen(false);
+  // Callback khi thêm thành công
+  const handleAddRoomSuccess = () => {
+    setReloadRooms((prev) => prev + 1);
+  };
 
-  const handleRoomDialogOpen = () => setRoomDialogOpen(true);
-  const handleRoomDialogClose = () => setRoomDialogOpen(false);
-
-  // Hàm để thay đổi nội dung khi click vào các tab
-  const handlePageChange = (pageTitle: string) => {
-    setActivePage(pageTitle);
+  const handleAddRoomCategorySuccess = () => {
+    setReloadRoomTypes((prev) => prev + 1);
   };
 
   return (
@@ -44,15 +40,15 @@ const RoomManagerPage: React.FC<IProps> = () => {
       <div className="toolbar-top rounded-t-md pb-2 flex items-center justify-between text-xs">
         <div className="flex items-center justify-between w-full">
           <div className="toolbar-top-room-detail flex rounded-3xl p-1 font-[600] bg-white">
-            {pages.map((page) => (
+            {["Hạng phòng", "Phòng"].map((pageTitle) => (
               <div
-                key={page.title}
-                onClick={() => handlePageChange(page.title)}
+                key={pageTitle}
+                onClick={() => setActivePage(pageTitle)}
                 className={`toolbar-top-type_item ${
-                  activePage === page.title ? "active" : ""
+                  activePage === pageTitle ? "active" : ""
                 }`}
               >
-                {page.title}
+                {pageTitle}
               </div>
             ))}
           </div>
@@ -61,7 +57,7 @@ const RoomManagerPage: React.FC<IProps> = () => {
               <Button
                 variant="contained"
                 className="!bg-[var(--room-empty-color-)]"
-                onClick={handleRoomCategoryDialogOpen}
+                onClick={() => setRoomCategoryDialogOpen(true)}
               >
                 Thêm hạng phòng
               </Button>
@@ -69,7 +65,7 @@ const RoomManagerPage: React.FC<IProps> = () => {
               <Button
                 variant="contained"
                 className="!bg-[var(--room-empty-color-)]"
-                onClick={handleRoomDialogOpen}
+                onClick={() => setRoomDialogOpen(true)}
               >
                 Thêm phòng
               </Button>
@@ -79,16 +75,27 @@ const RoomManagerPage: React.FC<IProps> = () => {
       </div>
 
       {/* Nội dung thay đổi dựa trên activePage */}
-      <div>{pages.find((page) => page.title === activePage)?.component}</div>
+      <div>
+        {activePage === "Hạng phòng" ? (
+          <RoomCategoryPage reloadTrigger={reloadRoomTypes} />
+        ) : (
+          <RoomsPage reloadTrigger={reloadRooms} />
+        )}
+      </div>
 
       {/* Modal cho Hạng phòng */}
       <RoomManagerDialog
         open={isRoomCategoryDialogOpen}
-        onClose={handleRoomCategoryDialogClose}
+        onClose={() => setRoomCategoryDialogOpen(false)}
+        onAddSuccess={handleAddRoomCategorySuccess}
       />
 
       {/* Modal cho Phòng */}
-      <AddRoomModel open={isRoomDialogOpen} onClose={handleRoomDialogClose} />
+      <AddRoomModel
+        open={isRoomDialogOpen}
+        onClose={() => setRoomDialogOpen(false)}
+        onAddSuccess={handleAddRoomSuccess}
+      />
     </div>
   );
 };

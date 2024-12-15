@@ -15,9 +15,14 @@ import SelectFloor from "./SelectFloor";
 interface Props {
   open: boolean;
   onClose: () => void;
+  handleUpdateSuccess: () => void;
 }
 
-const AddAreaPopUp: React.FC<Props> = ({ open, onClose }) => {
+const AddAreaPopUp: React.FC<Props> = ({
+  open,
+  onClose,
+  handleUpdateSuccess,
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     note: "",
@@ -55,6 +60,7 @@ const AddAreaPopUp: React.FC<Props> = ({ open, onClose }) => {
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công
         toast.success(`Thêm thành công !`);
+        handleUpdateSuccess();
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         toast.error(

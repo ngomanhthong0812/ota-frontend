@@ -14,8 +14,6 @@ import { useState } from "react";
 import { FaPencilAlt, FaRegSave } from "react-icons/fa";
 import { FaBan } from "react-icons/fa6";
 import ImageInput from "./ImageInput";
-import axios from "axios";
-import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 import { callApi } from "@/utils/api";
 

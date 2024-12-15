@@ -23,12 +23,14 @@ import { callApi } from "@/utils/api";
 interface UpdateRoomModelProps {
   open: boolean;
   onClose: () => void;
+  handleUpdateSuccess: () => void;
   idRoom: number | null;
 }
 const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
   open,
   onClose,
   idRoom,
+  handleUpdateSuccess,
 }) => {
   const [openAreaPopup, setOpenAreaPopup] = useState(false); // Trạng thái để điều khiển popup con
   const [isRoomCategoryDialogOpen, setRoomCategoryDialogOpen] = useState(false);
@@ -121,6 +123,7 @@ const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
 
       if (response.data.statusCode === 200) {
         toast.success(`Cập nhật thành công!`);
+        handleUpdateSuccess();
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         toast.error(
@@ -258,7 +261,11 @@ const UpdateRoomModel: React.FC<UpdateRoomModelProps> = ({
       </Dialog>
 
       {/* Hiển thị AddAreaPopUp khi openAreaPopup là true */}
-      <AddAreaPopUp open={openAreaPopup} onClose={handleCloseAreaPopup} />
+      <AddAreaPopUp
+        open={openAreaPopup}
+        onClose={handleCloseAreaPopup}
+        handleUpdateSuccess={handleUpdateSuccess}
+      />
       <RoomManagerDialog
         open={isRoomCategoryDialogOpen}
         onClose={handleRoomCategoryDialogClose}
