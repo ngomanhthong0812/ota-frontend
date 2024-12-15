@@ -7,21 +7,19 @@ import axios from "axios";
 import { useAuth } from "@/context/auth.context";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ROOM_STATUS } from "@/constants/constants";
 
 interface IProps {
     showModal: boolean;
     closeModal: () => void;
     checkOutAt: string;
     bookingId: number | undefined;
+    roomId: number | undefined
     onCreateCheckInDate: (createCheckIn: string, createCheckOut: string) => void;
 }
 
 const CheckInModal = (props: IProps) => {
-    
-    
-    const { showModal, closeModal, checkOutAt, bookingId, onCreateCheckInDate } = props;
-    console.log(bookingId);
-    console.log(checkOutAt);
+    const { showModal, closeModal, checkOutAt, bookingId, onCreateCheckInDate, roomId } = props;
 
     const { token } = useAuth(); // Lấy token từ context
     const [isLoading, setIsLoading] = useState(false);
@@ -66,9 +64,10 @@ const CheckInModal = (props: IProps) => {
             );
 
             if (response.status === 200) {
-                toast.success("Nhận phòng thành công!");
+                handleUpdateRoomStatus();
                 onCreateCheckInDate(currentDateTime, checkOutAt);
                 closeModal(); // Đóng modal sau khi hoàn thành
+                toast.success("Nhận phòng thành công!");
             } else {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
@@ -82,6 +81,29 @@ const CheckInModal = (props: IProps) => {
             setIsLoading(false);
         }
     };
+
+    const handleUpdateRoomStatus = async () => {
+        try {
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${roomId}`,
+                {
+                    status: ROOM_STATUS.OCCUPIED,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+        } catch (error) {
+            console.error("Failed to create payment:", error);
+            alert("Đã xảy ra lỗi khi thực hiện cập nhật phòng.");
+        } finally {
+            closeModal();
+        }
+    }
 
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
