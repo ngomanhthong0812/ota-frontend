@@ -92,7 +92,10 @@ const BookingTable: React.FC<BookingTableProps> = ({
     <div className="flex-1 duration-300 border border-[var(--ht-neutral-100-)] rounded-md bg-white">
       <div className="flex border-b border-stone-300 p-3 font-medium">
         <div className="w-2/12 flex justify-start items-center">
-          <p>{aroom.name}</p>
+          <p>
+            {aroom.name}
+            {aroom.overnight_rate}
+          </p>
         </div>
 
         <div className="flex items-center w-4/12 gap-2 number-group">

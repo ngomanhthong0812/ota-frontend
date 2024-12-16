@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BookingTab from "@/components/booking/BookingTab";
 import { toast } from "react-toastify";
 import { callApi } from "@/utils/api";
@@ -85,6 +85,10 @@ const BookingSection: React.FC<BookingSectionProps> = ({
       toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
     }
   };
+
+    useEffect(() => {
+      console.log('Dữ liệu của aroom:', dataResponse);  // Kiểm tra dữ liệu `data` 
+    }, [dataResponse]);
 
   return (
     <div>
