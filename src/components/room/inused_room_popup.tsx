@@ -8,7 +8,6 @@ import Link from "next/link";
 import AddServicesModal from "./modals/add_services.modal";
 import { ROOM_STATUS } from "@/constants/constants";
 import { FaBed } from "react-icons/fa6";
-import CheckInModal from "./modals/check_in.modal";
 
 interface IProps {
     ref: LegacyRef<HTMLDivElement> | undefined,
@@ -180,16 +179,6 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
                     <span>Danh sách đặt phòng</span>
                 </li>
             </ul>
-            <CheckInModal
-                showModal={showModalCheckIn}
-                closeModal={() => setShowModalCheckIn(false)}
-
-                checkOutAt={
-                    data?.bookings[0].check_out_at ? data?.bookings[0].check_out_at : ""
-                }
-                bookingId={data?.bookings[0].id ?? 0}
-                onCreateCheckInDate={() => { }}
-            />
             <AddServicesModal
                 invoiceId={data?.bookings?.[0]?.invoice_id}
                 isOpen={isModalAddServices}

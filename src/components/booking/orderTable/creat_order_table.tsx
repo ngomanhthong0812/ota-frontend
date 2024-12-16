@@ -52,6 +52,12 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   const [selectedRoomId, setSelectedRoomId] = useState<number>(0);
   const [isChecked, setIsChecked] = useState(false); // Theo dõi trạng thái checkbox
 
+  useEffect(() => {
+    if (roomData?.rooms[0]?.room_id) {
+      setSelectedRoomId(roomData.rooms[0].room_id);
+    }
+  }, [roomData?.rooms])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\./g, ""); // Xóa dấu chấm
     if (!isNaN(Number(rawValue)) || rawValue === "") {
@@ -272,7 +278,6 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                     className="btn text-black font-normal"
                     onChange={handleRoomChange}
                   >
-                    <option></option>
                     {roomData?.rooms && roomData.rooms.length > 0 ? (
                       roomData.rooms.map((room, index) => (
                         <option key={index} value={room.room_id}>
