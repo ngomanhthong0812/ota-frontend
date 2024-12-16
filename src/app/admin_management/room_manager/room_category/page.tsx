@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import axios from "axios";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
@@ -7,7 +7,9 @@ import { toast } from "react-toastify";
 import UpdateRoomManagerDialog from "@/components/room_admin/UpdateRoomType";
 import { callApi } from "@/utils/api";
 import TableRoomType from "@/components/room_admin/TableRoomType";
-interface Props {}
+interface Props {
+  reloadTrigger: number;
+}
 interface Room {
   roomId: number;
   roomName: string;
@@ -33,7 +35,7 @@ interface RoomType {
   rooms: Room[];
 }
 
-const RoomCategoryPage: NextPage<Props> = ({}) => {
+const RoomCategoryPage: NextPage<Props> = ({ reloadTrigger }) => {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,7 +122,7 @@ const RoomCategoryPage: NextPage<Props> = ({}) => {
   // Gọi fetchRoomTypes khi component mount
   useEffect(() => {
     fetchRoomTypes();
-  }, []); // Chạy 1 lần khi component mount
+  }, [reloadTrigger]); // Chạy 1 lần khi component mount
 
   const removeVietnameseTones = (str: string): string => {
     return str

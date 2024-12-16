@@ -3,9 +3,7 @@ import { FaChartColumn } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa6";
 import {
     Sheet,
-    SheetClose,
     SheetContent,
-    SheetDescription,
     SheetFooter,
     SheetHeader,
     SheetTitle,

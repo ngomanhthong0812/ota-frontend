@@ -34,7 +34,7 @@ const RoomList: React.FC<IProps> = () => {
 
     const { user, token } = useAuth();
     const { data, error, isLoading, mutate } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}`,
+        user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}` : null,
         (url: string) => fetcher(url, token),
         {
             revalidateIfStale: false,
@@ -46,6 +46,7 @@ const RoomList: React.FC<IProps> = () => {
     const refreshData = async () => {
         await mutate(); // Re-fetch lại dữ liệu
     };
+    useEffect(() => { refreshData() }, [])
 
     useEffect(() => {
         const newFloors = data?.data?.map((item: TypeRoomCard) => {

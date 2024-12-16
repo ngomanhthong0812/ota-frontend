@@ -31,6 +31,7 @@ const fetcher = (url: string, token: string | null) =>
 
 const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, handleSetStatusClean, cleanStatus }) => {
     const [showModalBookingRoomList, setShowModalBookingRoomList] = useState<boolean>(false);
+    const [showModalCheckIn, setShowModalCheckIn] = useState<boolean>(false);
     const [isModalAddServices, setModalAddServices] = useState<boolean>(false);
 
     const { token } = useAuth();
@@ -70,7 +71,9 @@ const InusedRoomPopup: React.FC<IProps> = ({ ref, showPopup, data, position, han
                 </Link>
                 {data.status === ROOM_STATUS.BOOKED
                     ?
-                    <li className="popup-item">
+                    <li
+                        onClick={() => setShowModalCheckIn(true)}
+                        className="popup-item">
                         <FaBed className="!w-[17px] !h-[17px]" />
                         <span>Nhận phòng</span>
                     </li>

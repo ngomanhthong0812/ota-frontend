@@ -20,9 +20,14 @@ import { callApi } from "@/utils/api";
 interface AddRoomModelProps {
   open: boolean;
   onClose: () => void;
+  onAddSuccess: () => void;
 }
 
-const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
+const AddRoomModel: React.FC<AddRoomModelProps> = ({
+  open,
+  onClose,
+  onAddSuccess,
+}) => {
   const [openAreaPopup, setOpenAreaPopup] = useState(false); // Trạng thái để điều khiển popup con
   const [isRoomCategoryDialogOpen, setRoomCategoryDialogOpen] = useState(false);
   const handleRoomCategoryDialogOpen = () => setRoomCategoryDialogOpen(true);
@@ -78,6 +83,7 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công
         toast.success(`Thêm thành công !`);
+        onAddSuccess();
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         toast.error(
@@ -227,10 +233,15 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ open, onClose }) => {
       </Dialog>
 
       {/* Hiển thị AddAreaPopUp khi openAreaPopup là true */}
-      <AddAreaPopUp open={openAreaPopup} onClose={handleCloseAreaPopup} />
+      <AddAreaPopUp
+        open={openAreaPopup}
+        onClose={handleCloseAreaPopup}
+        handleUpdateSuccess={onAddSuccess}
+      />
       <RoomManagerDialog
         open={isRoomCategoryDialogOpen}
         onClose={handleRoomCategoryDialogClose}
+        onAddSuccess={onAddSuccess}
       />
     </div>
   );

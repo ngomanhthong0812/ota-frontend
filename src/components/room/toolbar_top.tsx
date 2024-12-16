@@ -7,6 +7,10 @@ import { RoomStatus, TypeRoomCard } from "@/types/backend";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
+import { RiLayoutGridLine } from "react-icons/ri";
+import { CiViewTimeline } from "react-icons/ci";
+import Link from "next/link";
+
 interface IProps { }
 
 const fetcher = (url: string, token: string | null) =>
@@ -24,7 +28,7 @@ const ToolbarTop: React.FC<IProps> = () => {
     const { user, token } = useAuth();
 
     const { data, error, isLoading } = useSWR(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}`,
+        user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/info-bookingsToday/${user?.hotel_id}` : null,
         (url: string) => fetcher(url, token),
         {
             revalidateIfStale: false,
@@ -90,6 +94,16 @@ const ToolbarTop: React.FC<IProps> = () => {
                                 d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z">
                             </path>
                         </svg>
+                    </div>
+                </div>
+                <div className="flex">
+                    <div className="toolbar-top-type bg-[var(--ht-body-bg-)] flex rounded-3xl p-1 font-[500]">
+                        <button className={`toolbar-top-type_item !min-w-[auto] !py-[6px] !px-3 active`}>
+                            <RiLayoutGridLine size={20} className="fill-[var(--room-empty-color-)]" />
+                        </button>
+                        <Link href={'/hotel_management/room_layout/calendar_scheduler'} className={`toolbar-top-type_item !min-w-[auto] !py-[6px] !px-3`}>
+                            <CiViewTimeline size={20} className="fill-[var(--color-menu-icon-)]" />
+                        </Link>
                     </div>
                 </div>
             </div>

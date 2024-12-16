@@ -7,7 +7,6 @@ import { parseCookies } from "nookies";
 import useSWR, { mutate } from "swr";
 import CheckOutModal from "@/components/room/modals/checkout.modal";
 import CheckOutAndPayModal from "@/components/room/modals/checkout_and_pay.modal";
-import RemoveServicesModal from "@/components/room/modals/remove_services.modal";
 import { ReceiptAndExpense, RequestTransaction, ResponseInvoiceItem } from "@/types/backend";
 import axios from "axios";
 import useFormatDate from "@/hook/useFormatDate";
@@ -37,6 +36,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [roomDetails, setRoomDetails] = useState<{ id: number, name: string; price: number }[]>([]);  // Mảng lưu tên và giá phòng
   const [roomPrice, setRoomPrice] = useState<number>(0);
+  const [ roomDiscount, setRoomDiscount ] = useState<number>(0);
   const [bookingId, setBookingId] = useState<number>(0);
   const [payments, setPayments] = useState<Payments[]>([]);
   const [remainingAmount, setRemainingAmount] = useState<number>(0);
@@ -110,6 +110,12 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
       setRoomPrice(data?.invoice?.invoice?.total)
       setBookingId(data?.invoice?.bookings.id)
 
+      if(data.invoice.invoice?.discount_percentage > 0) {
+        setRoomDiscount(data?.invoice?.invoice?.discount_percentage);
+      } else {
+        setRoomDiscount(0);
+      }
+
       const roomDetailsList = data.invoice.rooms.map((room: any) => ({
         id: room.id,
         name: room.name,
@@ -119,6 +125,16 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
       setPayments(data?.payments || []) // Cập nhật state với tên và giá phòng
     }
   }, [data])
+
+  const calculateFinalPriceAfterDiscount = (originalPrice: number, discountPercentage: number) => {
+    if (discountPercentage > 0) {
+      const discountAmount = (originalPrice * discountPercentage) / 100;
+      return originalPrice - discountAmount;
+    }
+    return originalPrice;
+  }
+
+  const finalPrice = calculateFinalPriceAfterDiscount(roomPrice, roomDiscount);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -204,8 +220,8 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
   useEffect(() => {
     // Cập nhật số tiền còn lại sau khi trừ tổng amount payments
     const totalPaid = calculateTotalAmount(transactions);
-    setRemainingAmount(roomPrice - totalPaid);
-  }, [transactions, roomPrice]); // Chạy lại khi payments hoặc totalInvoice thay đổi
+    setRemainingAmount(finalPrice - totalPaid);
+  }, [transactions, finalPrice]); // Chạy lại khi payments hoặc totalInvoice thay đổi
 
   const calculateTotalAmount = (transactions: ReceiptAndExpense[]): number => {
     const totalAmountTransactions = transactions.reduce((sum, transaction) => transaction.type === "expense" ? sum - (transaction.amount) : sum + (transaction.amount), 0);
@@ -224,7 +240,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
   useEffect(() => {
     if (data) {
       const calculatePriceNow = (calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * data.invoice.rooms[0].price);
-      setRoomPrice(activeTab === "denHienTai" ? calculatePriceNow : data?.invoice?.invoice?.total)
+      setRoomPrice(activeTab === "denHienTai" ? data?.invoice?.invoice?.total - (data?.invoice?.bookings?.total - calculatePriceNow) : data?.invoice?.invoice?.total)
     }
   }, [activeTab, data])
 
@@ -286,12 +302,8 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                 <div className="flex justify-between py-1">
                   <span>Giá đêm
                     ({formatDate(data?.invoice?.invoice?.booking_at)} - {activeTab === "denHienTai" ? formatDate(getCurrentDateTime()) : formatDate(data?.invoice?.invoice?.check_out_at)})</span>
-                  <div>{activeTab === "denHienTai" ? formatPrice(String(calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * roomDetails[0]?.price)) : formatPrice(String(roomPrice))}</div>
+                  <div>{activeTab === "denHienTai" ? formatPrice(String(calculateDaysBetween(data?.invoice?.invoice?.booking_at, getCurrentDateTime()) * roomDetails[0]?.price)) : formatPrice(String(data?.invoice?.bookings?.total))}</div>
                 </div>
-                {/* <div className="flex justify-between py-1">
-                  <span>Nhận phòng sớm (49 phút)</span>
-                  <div>50,000demo</div>
-                </div> */}
               </div>
             </div>
 
@@ -347,12 +359,12 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
               </div>
               <div className="flex flex-col col-span-2">
                 <p>
-                  <span>0</span>
+                  <span>{roomDiscount > 0 && <p>{roomDiscount}%</p>}</span>
                 </p>
               </div>
               <div className="col-span-1 text-right">
                 <p>
-                  <span>0</span>
+                  <span>{roomDiscount > 0 ? formatPrice(String(finalPrice)) : 0}</span>
                 </p>
               </div>
             </div>
@@ -375,7 +387,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                       <span>Cần thanh toán</span>
                     </p>
                     <p>
-                      <span>{formatPrice(String(roomPrice))}</span>
+                      <span>{formatPrice(String(finalPrice))}</span>
                     </p>
                   </div>
 
@@ -384,7 +396,7 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                       <span>Đã thanh toán</span>
                     </p>
                     <p>
-                      <span>{formatPrice(String(roomPrice - remainingAmount))}</span>
+                      <span>{formatPrice(String(finalPrice - remainingAmount))}</span>
                     </p>
                   </div>
 
@@ -561,7 +573,6 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
                 </span>
                 <div className="gap-2 select hidden">
                   <button className="border border-red-500 rounded-full"
-                    onClick={() => setShowModalRemoveServices(true)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-red-500">
                       <path d="M19.0005 4.99988L5.00049 18.9999M5.00049 4.99988L19.0005 18.9999" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -588,11 +599,6 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
         showModal={showModalCheckOut}
         closeModal={() => setShowModalCheckOut(false)}
         transactionRequest={transactionRequest}
-      />
-
-      <RemoveServicesModal
-        showModal={showModalRemoveServices}
-        closeModal={() => setShowModalRemoveServices(false)}
       />
     </div >
   );

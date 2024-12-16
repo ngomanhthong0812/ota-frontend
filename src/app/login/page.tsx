@@ -118,7 +118,9 @@ const LoginPage: React.FC<IProps> = () => {
                 <div className="form-login">
                     <form action="" className="w-[420px] bg-white py-7 px-5 rounded-t-2xl">
                         <div className="flex items-center justify-center">
-                            <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="" width={130} />
+                            <img
+                                src="https://i0.wp.com/www.writefromscratch.com/wp-content/uploads/2018/12/demo-logo.png?fit=539%2C244&ssl=1&w=640"
+                                alt="" width={90} />
                         </div>
                         <div className="flex flex-col mt-6 gap-4">
                             <input

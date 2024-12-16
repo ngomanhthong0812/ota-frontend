@@ -6,60 +6,48 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useAuth } from "@/context/auth.context";
 import { ClipLoader } from "react-spinners";
-import { Role, UserAdmin } from "@/types/backend";
+import { Services } from "@/types/backend";
 
 interface IProps {
-    data?: UserAdmin;
-    showModalAddAndUpdateUser: boolean;
-    setShowModalAddAndUpdateUser: (b: boolean) => void;
+    data?: Services;
+    showModalAddAndUpdateService: boolean;
+    setShowModalAddAndUpdateService: (b: boolean) => void;
     refreshData: () => void;
-    roleList?: Role[];
+    serviceList?: Services[];
 }
-interface UserForm {
-    user_name: string,
-    password: string,
-    confirmPassword: string,
-    position?: string,
-    email: string,
-    phoneNumber: string,
-    note: string,
+interface ServiceForm {
+    name: string,
+    description: string,
+    unit_price: number,
+    category: string,
 }
 
-interface UserRequest {
+interface ServiceRequest {
     id: number | undefined,
-    user_name: string,
-    password: string,
-    role_id: number | undefined,
-    email: string,
-    phone: string,
-    note: string,
-    hotel_id: number | undefined,
+    name: string,
+    description: string,
+    unit_price: number,
+    category_id: number | undefined,
 }
 
-const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUser, setShowModalAddAndUpdateUser, refreshData, roleList }) => {
+const ModalAddAndUpdateService: React.FC<IProps> = ({ data, showModalAddAndUpdateService, setShowModalAddAndUpdateService, refreshData, serviceList }) => {
     const { token, user } = useAuth();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [scrollY, setScrollY] = useState(0); // Biến lưu vị trí cuộn hiện tại
     const [savedScrollY, setSavedScrollY] = useState(0); // Biến lưu vị trí cuộn trước khi mở modal
 
-    const [userForm, setUserForm] = useState<UserForm>({
-        user_name: '',
-        password: '',
-        confirmPassword: '',
-        position: '',
-        email: '',
-        phoneNumber: '',
-        note: '',
+    const [serviceForm, setServiceForm] = useState<ServiceForm>({
+        name: '',
+        description: '',
+        unit_price: 0,
+        category: '',
     });
-    const [userRequest, setUserRequest] = useState<UserRequest>({
+    const [serviceRequest, setServiceRequest] = useState<ServiceRequest>({
         id: undefined,
-        user_name: '',
-        password: '',
-        role_id: undefined,
-        email: '',
-        phone: '',
-        note: '',
-        hotel_id: undefined,
+        name: '',
+        description: '',
+        unit_price: 0,
+        category_id: undefined,
     });
 
     useEffect(() => {
@@ -69,29 +57,23 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
     }, [data])
 
     useEffect(() => {
-        const role = roleList?.find(role => role.name === userForm.position);
+        const category = serviceList?.find(role => role.name === serviceForm.category);
 
-        setUserRequest({
+        setServiceRequest({
             id: data?.id,
-            user_name: userForm.user_name,
-            password: userForm.password,
-            role_id: role?.id,
-            email: userForm.email,
-            phone: userForm.phoneNumber,
-            note: userForm.note,
-            hotel_id: user?.hotel_id,
+            name: serviceForm.name,
+            description: serviceForm.description,
+            unit_price: serviceForm.unit_price,
+            category_id: category?.id,
         })
-    }, [userForm, user])
+    }, [serviceForm, user])
 
     const resetForm = () => {
-        setUserForm({
-            user_name: data?.user_name || '',
-            password: '',
-            confirmPassword: '',
-            position: '',
-            email: data?.email || '',
-            phoneNumber: data?.phone || '',
-            note: data?.note || '',
+        setServiceForm({
+            name: data?.name || '',
+            description: data?.description || '',
+            unit_price: data?.unit_price || 0,
+            category: data?.category.name || '',
         })
     }
     const handleModalClick = (e: React.MouseEvent) => {
@@ -100,51 +82,28 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
 
     const handleClose = () => {
         resetForm();
-        setShowModalAddAndUpdateUser(false);
+        setShowModalAddAndUpdateService(false);
     }
     const validateForm = (): boolean => {
-        if (!userForm?.user_name?.trim()) {
-            toast.error("Bạn chưa nhập tên đăng nhập")
+        if (!serviceForm?.name?.trim()) {
+            toast.error("Vui lòng nhập Tên dịch vụ trước khi lưu.")
             return false;
         }
-        if (!data) {
-            if (!userForm?.password?.trim()) {
-                toast.error("Bạn chưa nhập mật khẩu")
-                return false;
-            }
-
-            if (!userForm?.position?.trim()) {
-                toast.error("Bạn chưa phân quyền cho người dùng")
-                return false;
-            }
-        }
-        if (userForm?.password.trim() && userForm?.password?.length < 6) {
-            toast.error("Mật khẩu chứa ít nhất 6 ký tự")
+        if (serviceForm?.unit_price <= 0) {
+            toast.error("Vui lòng nhập Giá dịch vụ trước khi lưu.")
             return false;
         }
-        if (userForm?.confirmPassword !== userForm?.password) {
-            toast.error("Mật khẩu xác nhận không giống nhau")
-            return false;
-        }
-        if (userForm.email.trim() && !isValidEmail(userForm.email.trim())) {
-            toast.error("Định dạng email không hợp lệ");
-            return false;
-        }
-        if (userForm.phoneNumber.trim() && userForm?.phoneNumber?.length < 10) {
-            toast.error("Số điện thoại có ít nhất 10 số")
+        if (!serviceForm?.category?.trim()) {
+            toast.error("Vui lòng chọn loại dịch vụ.")
             return false;
         }
         return true;
     }
-    const isValidEmail = (email: string): boolean => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Biểu thức chính quy để kiểm tra định dạng email
-        return emailRegex.test(email);
-    };
     const handleAdd = async () => {
         if (validateForm()) {
             setIsLoading(true);
             try {
-                const response = await axios.post('http://localhost:8080/api/users', cleanRequestData(userRequest), {
+                const response = await axios.post('http://localhost:8080/api/services', cleanRequestData(serviceRequest), {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
@@ -173,7 +132,7 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
         if (validateForm()) {
             setIsLoading(true);
             try {
-                const response = await axios.put('http://localhost:8080/api/users', cleanRequestData(userRequest), {
+                const response = await axios.put('http://localhost:8080/api/services', cleanRequestData(serviceRequest), {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
@@ -206,19 +165,19 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
     }
 
     useEffect(() => {
-        if (!showModalAddAndUpdateUser) {
+        if (!showModalAddAndUpdateService) {
             window.scrollTo(0, savedScrollY);
         } else {
             setSavedScrollY(scrollY)
             window.scrollTo(0, 0);
         }
-    }, [showModalAddAndUpdateUser]);
+    }, [showModalAddAndUpdateService]);
 
 
     return (
         <div>
             {/* Modal Overlay */}
-            {showModalAddAndUpdateUser && (
+            {showModalAddAndUpdateService && (
                 <div
                     className={`absolute w-full top-0 left-0 min-h-[100%] bg-black bg-opacity-50 flex justify-center items-start z-50 duration-200`}
                     onClick={handleClose}
@@ -230,9 +189,9 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
                             <h1 >
                                 <span className="text-black text-[16px] font-[600]">
                                     {!data
-                                        ? 'Thêm mới tài khoản'
-                                        : 'Sửa tài khoản'
-                                    }</span></h1>
+                                        ? 'Thêm dịch vụ'
+                                        : 'Sửa dịch vụ'}
+                                </span></h1>
                             <IoClose
                                 onClick={handleClose}
                                 size={20}
@@ -241,66 +200,45 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
                         <div className="text-[13px] rounded-b-md mt-3">
                             <div className="grid grid-cols-2 gap-y-3 gap-x-8">
                                 <div className="flex-1 flex gap-3 justify-between items-center">
-                                    <span className="font-[500]">Tên đăng nhập</span>
+                                    <span className="font-[500]">Tên dịch vụ</span>
                                     <input
-                                        value={userForm?.user_name}
-                                        onChange={e => setUserForm(prev => ({ ...prev, user_name: e.target.value }))}
+                                        value={serviceForm?.name}
+                                        onChange={e => setServiceForm(prev => ({ ...prev, name: e.target.value }))}
                                         type="text"
                                         className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da]" />
                                 </div>
                                 <div className="flex-1 flex gap-3 justify-between items-center">
-                                    <span className="font-[500]">Email</span>
+                                    <span className="font-[500]">Giá dịch vụ</span>
                                     <input
-                                        value={userForm?.email}
-                                        onChange={e => setUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                        type="text"
+                                        value={serviceForm?.unit_price}
+                                        onChange={e => setServiceForm(prev => ({ ...prev, unit_price: Number(e.target.value) }))}
+                                        type="number"
                                         className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da]" />
                                 </div>
                                 <div className="flex-1 flex gap-3 justify-between items-center">
-                                    <span className="font-[500]">Mật khẩu</span>
-                                    <input
-                                        value={userForm?.password}
-                                        onChange={e => setUserForm(prev => ({ ...prev, password: e.target.value }))}
-                                        type="text"
-                                        className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da]" />
+                                    <span className="font-[500]">Mô tả</span>
+                                    <textarea
+                                        value={serviceForm?.description}
+                                        onChange={e => {
+                                            setServiceForm(prev => ({ ...prev, description: e.target.value }));
+                                            e.target.style.height = "auto"; // Reset chiều cao để đo lại
+                                            e.target.style.height = `${e.target.scrollHeight}px`; // Điều chỉnh chiều cao theo nội dung
+                                        }}
+                                        rows={1} // Số dòng hiển thị mặc định
+                                        className="outline-none border border-[#9d9d9d] w-[230px] py-2 px-2 rounded-sm overflow-hidden" />
                                 </div>
-                                <div className="flex-1 flex gap-3 justify-between items-center">
-                                    <span className="font-[500]">SĐT</span>
-                                    <input
-                                        value={userForm?.phoneNumber}
-                                        onChange={e => setUserForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                                        type="text"
-                                        className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da]" />
-                                </div>
-                                <div className="flex-1 flex gap-3 justify-between items-center">
-                                    <span className="font-[500]">Nhập lại mật khẩu</span>
-                                    <input
-                                        value={userForm?.confirmPassword}
-                                        onChange={e => setUserForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                                        type="text"
-                                        className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da]" />
-                                </div>
-                                <div className="flex-1 flex gap-3 justify-between items-center relative">
-                                    <span className="font-[500]">Ghi chú</span>
-                                    <input
-                                        value={userForm?.note}
-                                        onChange={e => setUserForm(prev => ({ ...prev, note: e.target.value }))}
-                                        type="text"
-                                        className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da] !pr-5" />
-                                    <BiPencil size={18} className="!fill-gray-400 absolute top-1/2 right-0 -translate-y-1/2" />
-                                </div>
-                                {roleList && (
+                                {serviceList && (
                                     <div className="flex-1 flex gap-3 justify-between items-center">
                                         <span className="font-[500]">Vai trò</span>
                                         <select
-                                            value={userForm?.position}
-                                            onChange={(e) => setUserForm((prev) => ({ ...prev, position: e.target.value }))}
+                                            value={serviceForm?.category}
+                                            onChange={(e) => setServiceForm((prev) => ({ ...prev, category: e.target.value }))}
                                             className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[#0090da] bg-white">
                                             <option value="" disabled hidden>--Chọn vai trò--</option>
-                                            {roleList?.map((role: Role) => (
+                                            {serviceList?.map((service: Services) => (
                                                 <option
-                                                    value={role.name}
-                                                    key={role.id}>{role.name}
+                                                    value={service.name}
+                                                    key={service.id}>{service.name}
                                                 </option>
                                             ))}
                                         </select>
@@ -335,4 +273,4 @@ const ModalAddAndUpdateUser: React.FC<IProps> = ({ data, showModalAddAndUpdateUs
         </div>
     )
 }
-export default ModalAddAndUpdateUser;
+export default ModalAddAndUpdateService;

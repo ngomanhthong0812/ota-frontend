@@ -286,7 +286,7 @@ const RoomInfo = () => {
                     rooms.length > 0 && rooms[0].name
                         ? rooms[0].name : ""
                 }
-                customerName={booking?.customer.name ?? ""}
+                customerName={customer?.name ?? ""}
 
                 checkInDate={
                     booking?.check_in_at
@@ -315,6 +315,10 @@ const RoomInfo = () => {
                     booking?.check_out_at ? booking?.check_out_at : ""
                 }
                 bookingId={booking?.id ?? 0}
+                roomId={
+                    rooms.length > 0 && rooms[0].id
+                        ? rooms[0].id : 0
+                }
                 onCreateCheckInDate={handleCheckIn}
             />
 

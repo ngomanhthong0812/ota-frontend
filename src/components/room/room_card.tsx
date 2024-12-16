@@ -330,38 +330,30 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData, roomData }) => {
         )}
       </div>
 
-      {data.status === "Trống" ? (
-        <UnusedRoomPopup
-          ref={popupRef}
-          showPopup={showPopup}
-          position={popupPosition}
-          data={data}
-          handleSetStatusClean={handleSetStatusClean}
-          toggleBookingForm={toggleBookingForm} // Truyền hàm vào đây
-          cleanStatus={cleanStatus}
-        />
-      ) : (
-        <InusedRoomPopup
-          ref={popupRef}
-          showPopup={showPopup}
-          position={popupPosition}
-          data={data}
-          handleSetStatusClean={handleSetStatusClean}
-          cleanStatus={cleanStatus}
-        />
-      )}
-      {/* Điều kiện hiển thị BookingForm */}
-      {showBookingForm &&
-        dataResponsess?.map((roomType) => (
-          <BookingForm
-            key={roomType.id}
-            closeBookingForm={closeBookingForm}
-            data={data}
-            dataResponses={dataResponsess} // Truyền thông tin của từng loại phòng
-          />
-        ))}
-    </section>
-  );
-};
+            {data.status === "Trống"
+                ?
+                <UnusedRoomPopup
+                    ref={popupRef}
+                    showPopup={showPopup}
+                    position={popupPosition}
+                    data={data}
+                    handleSetStatusClean={handleSetStatusClean}
+                    toggleBookingForm={toggleBookingForm} // Truyền hàm vào đây
+                    cleanStatus={cleanStatus} />
+                :
+                <InusedRoomPopup
+                    ref={popupRef}
+                    showPopup={showPopup}
+                    position={popupPosition}
+                    data={data}
+                    handleSetStatusClean={handleSetStatusClean}
+                    cleanStatus={cleanStatus} />
+            }
+            {/* Điều kiện hiển thị BookingForm */}
+            {showBookingForm && <BookingForm closeBookingForm={closeBookingForm}  data={data}/>}
+
+        </section>
+    )
+}
 
 export default RoomCard;

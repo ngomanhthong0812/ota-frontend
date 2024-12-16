@@ -16,9 +16,15 @@ interface Props {
   open: boolean;
   onClose: () => void;
   idAre: number;
+  handleUpdateSuccess: () => void;
 }
 
-const UpdateAreaPopUp: React.FC<Props> = ({ open, onClose, idAre }) => {
+const UpdateAreaPopUp: React.FC<Props> = ({
+  open,
+  onClose,
+  idAre,
+  handleUpdateSuccess,
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     note: "",
@@ -56,6 +62,7 @@ const UpdateAreaPopUp: React.FC<Props> = ({ open, onClose, idAre }) => {
       if (response?.data?.statusCode === 200) {
         // Nếu thành công, thông báo thành công
         toast.success(`Cập nhật ${formData.name} thành công!`);
+        handleUpdateSuccess();
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         // Nếu có lỗi trả về từ server
@@ -114,6 +121,7 @@ const UpdateAreaPopUp: React.FC<Props> = ({ open, onClose, idAre }) => {
       if (response?.data?.statusCode === 200) {
         // Nếu thành công, thông báo thành công
         toast.success(`Xóa ${formData.name} thành công!`);
+        handleUpdateSuccess();
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         // Nếu có lỗi trả về từ server

@@ -8,6 +8,7 @@ import { MdSettings } from "react-icons/md";
 import { RiFlowerLine } from "react-icons/ri";
 import { FaEye } from "react-icons/fa";
 import { RiUser4Fill } from "react-icons/ri";
+import { GiStoneBlock } from "react-icons/gi";
 
 import { MenuItem } from "@/types/backend";
 
@@ -73,6 +74,23 @@ export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
         name: "Tài khoản",
         href: "/admin_management/users",
         icon: <RiUser4Fill size={20} />,
+        active: false,
+        subMenus: [],
+      },
+    ],
+  },
+  {
+    id: uuid(),
+    name: "Hàng hoá",
+    href: null,
+    icon: <GiStoneBlock size={18} />,
+    active: false,
+    subMenus: [
+      {
+        id: uuid(),
+        name: "Hàng hoá",
+        href: "/admin_management/services",
+        icon: <GiStoneBlock size={18} />,
         active: false,
         subMenus: [],
       },

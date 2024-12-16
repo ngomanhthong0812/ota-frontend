@@ -81,7 +81,8 @@ interface Services {
     name: string,
     description: string,
     unit_price: number,
-    category: Category
+    status:string,
+    category: Category,
 }
 
 

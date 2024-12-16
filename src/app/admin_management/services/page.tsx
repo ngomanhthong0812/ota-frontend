@@ -1,20 +1,23 @@
 'use client'
-import UserDetail from "@/components/user/user_detail";
-import UserInfo from "@/components/user/user_info";
-
 import { useAuth } from "@/context/auth.context";
-import { UserAdmin } from "@/types/backend";
+import { Category, Services, UserAdmin } from "@/types/backend";
+import { STATUS_SERVICE } from "@/constants/constants";
 
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
+import axios from "axios";
+
 import { IoMdAdd } from "react-icons/io";
 import { BiMenuAltLeft, BiChevronDown } from "react-icons/bi";
 import { CgTrash } from "react-icons/cg";
 import { toast } from "react-toastify";
-import axios from "axios";
+import { LuPencil } from "react-icons/lu";
+import { IoIosSearch } from "react-icons/io";
+
+import ServiceDetail from "@/components/service/admin/service_detail";
+import ServiceInfo from "@/components/service/admin/service_info";
 import ModalConfirm from "@/components/modal_confirm";
-import { STATUS_USER } from "@/constants/constants";
-import ModalAddAndUpdateUser from "@/components/user/modals/modal_add_update_user";
+import ModalAddAndUpdateService from "@/components/service/admin/modals/modal_add_update_service";
 import PaginationGlobal from "@/components/pagination_global";
 
 const fetcher = (url: string, token: string | null) =>
@@ -25,18 +28,21 @@ const fetcher = (url: string, token: string | null) =>
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-const Users = () => {
+const ServicesAdmin = () => {
   const [itemActive, setItemActive] = useState<number | null>(null);
-  const [showModalUpdateUser, setShowModalUpdateUser] = useState<boolean>(false);
-  const [showModalAddUser, setShowModalAddUser] = useState<boolean>(false);
+  const [showModalUpdateService, setShowModalUpdateService] = useState<boolean>(false);
+  const [showModalAddService, setShowModalAddService] = useState<boolean>(false);
   const [showModalConfirmDeletes, setShowModalConfirmDeletes] = useState<boolean>(false);
 
-  const [userList, setUserList] = useState<UserAdmin[]>([]);
-  const [search, setSearch] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [status, setStatus] = useState<string>('active');
+  const [serviceList, setServiceList] = useState<Services[]>([]);
   const [checkedItems, setCheckedItems] = useState<number[]>([]);
   const [checkedAll, setCheckedAll] = useState<boolean>(false);
+
+  const [search, setSearch] = useState<string>('');
+  const [searchCategories, setSearchCategories] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [status, setStatus] = useState<string>('in_business');
+  const [category, setCategory] = useState<string>('all');
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 12;
@@ -44,12 +50,13 @@ const Users = () => {
   const { user, token } = useAuth();
   const { data, error, mutate } = useSWR(
     user?.hotel_id
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/getUsersByHotelIdNotRoleAdmin` +
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services/getServicesByHotelIdAdmin` +
       `?hotel_id=${user.hotel_id}` +
       `&currentPage=${currentPage}` +
       `&pageSize=${pageSize}` +
       `&status=${status}` +
-      `&search=${searchQuery}`
+      `&search=${searchQuery}` +
+      `&name_category=${category}`
       : null,
     (url: string) => fetcher(url, token),
     {
@@ -59,8 +66,12 @@ const Users = () => {
     }
   );
 
-  const { data: roles } = useSWR(
-    user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/roles/getRolesByHotelIdNotAdmin/${user?.hotel_id}` : null,
+  const { data: catetories } = useSWR(
+    user?.hotel_id
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories/getCategoriesByHotelIdAdmin` +
+      `?hotel_id=${user.hotel_id}` +
+      `&search=${searchCategories}`
+      : null,
     (url: string) => fetcher(url, token),
     {
       revalidateIfStale: false,
@@ -70,7 +81,7 @@ const Users = () => {
   );
 
   useEffect(() => {
-    setUserList(data?.data?.users);
+    setServiceList(data?.data?.services);
   }, [data?.data]);
 
   useEffect(() => {
@@ -86,14 +97,14 @@ const Users = () => {
   };
 
   useEffect(() => {
-    if (userList?.length > 0) {
-      if (userList?.length === checkedItems.length) {
+    if (serviceList?.length > 0) {
+      if (serviceList?.length === checkedItems.length) {
         setCheckedAll(true);
       } else {
         setCheckedAll(false);
       }
     }
-  }, [checkedItems, userList])
+  }, [checkedItems, serviceList])
 
   const handleSetCheckedItem = (e: React.MouseEvent, id: number) => {
     e.stopPropagation()
@@ -110,7 +121,7 @@ const Users = () => {
     setCheckedAll(b);
     if (b) {
       const items: number[] = [];
-      userList.map(item => {
+      serviceList.map(item => {
         items.push(item.id);
       });
       setCheckedItems(items);
@@ -122,7 +133,7 @@ const Users = () => {
   const handleDeletes = async () => {
     if (checkedItems.length > 0) {
       try {
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/deleteUsers`,
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services/deleteServices`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -171,7 +182,48 @@ const Users = () => {
             }}
             type="text"
             className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 focus:border-[var(--room-empty-color-)] focus:border-b-2"
-            placeholder="Theo tên đăng nhập" />
+            placeholder="Theo tên dịch vụ" />
+        </section>
+        <section className="mb-4 bg-white p-3 pb-4 rounded-md flex flex-col gap-3 text-[13px] shadow-sm shadow-[#d6d6d6]">
+          <h3 className="text-black font-[600]">Loại hàng</h3>
+          <div className="relative">
+            <input
+              value={searchCategories}
+              onChange={e => setSearchCategories(e.target.value)}
+              type="text"
+              className="outline-none border-b border-[#9d9d9d] w-[230px] py-2 pl-5 focus:border-[var(--room-empty-color-)] focus:border-b-2"
+              placeholder="Tìm kiếm loại hàng" />
+            <IoIosSearch size={19} className="absolute top-1/2 left-0 -translate-y-1/2 fill-[#9d9d9d]" />
+          </div>
+          {catetories?.data?.length > 0 ? (
+            <div className="flex flex-col">
+              {!searchCategories
+                && (
+                  <button
+                    className={`group flex items-center justify-between px-2 py-1 duration-50 
+              ${category === "all" && 'text-black font-[600]'}`}
+                    onClick={() => setCategory('all')}
+                  >
+                    Tất cả
+                    <span className="invisible p-1 w-[25px] h-[25px]">
+                    </span>
+                  </button>
+                )}
+              {catetories?.data?.map((item: Category) => (
+                <button
+                  key={item.id}
+                  className={`group flex items-center justify-between hover:bg-[#f9f9f9] px-2 py-1 duration-50 
+                ${category === item.name && 'text-black font-[600]'}`}
+                  onClick={() => setCategory(item.name)}
+                >
+                  {item.name}
+                  <span className="invisible group-hover:visible hover:bg-[#ebebeb] duration-50 rounded-full p-1 w-[25px] h-[25px] flex items-center justify-center">
+                    <LuPencil size={15} />
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : 'Không tìm thấy kết quả...'}
         </section>
         <section className="mb-4 bg-white p-3 pb-4 rounded-md flex flex-col gap-3 text-[13px] shadow-sm shadow-[#d6d6d6]">
           <h3 className="text-black font-[600]">Trạng thái</h3>
@@ -188,27 +240,27 @@ const Users = () => {
             <li className="flex items-center gap-1">
               <input
                 onChange={e => setStatus(e.target.value)}
-                checked={status === 'active'}
+                checked={status === 'in_business'}
                 type="radio"
                 name="userStatus"
-                value="active"
+                value="in_business"
               />
-              {STATUS_USER.ACTIVE}</li>
+              {STATUS_SERVICE.IN_BUSINESS}</li>
             <li className="flex items-center gap-1">
               <input
                 onChange={e => setStatus(e.target.value)}
-                checked={status === 'inactive'}
+                checked={status === 'out_of_business'}
                 type="radio"
                 name="userStatus"
-                value="inactive"
+                value="out_of_business"
               />
-              {STATUS_USER.INACTIVE}</li>
+              {STATUS_SERVICE.OUT_OF_BUSINESS}</li>
           </ul>
         </section>
       </div>
       <div className="flex-1">
         <div className="flex justify-between">
-          <p className="font-[600] text-2xl text-[#323232]">Tài khoản</p>
+          <p className="font-[600] text-2xl text-[#323232]">Dịch vụ</p>
           <div className="flex gap-2">
             {checkedItems.length > 0 &&
               <button
@@ -221,9 +273,9 @@ const Users = () => {
               </button>
             }
             <button
-              onClick={() => setShowModalAddUser(true)}
+              onClick={() => setShowModalAddService(true)}
               className="flex gap-2 border-none py-[6px] px-4 text-white bg-[#4bac4d] hover:bg-[#419543] rounded-sm duration-200">
-              <IoMdAdd size={20} />  Tài khoản
+              <IoMdAdd size={20} />  Thêm mới
             </button>
           </div>
         </div>
@@ -233,16 +285,17 @@ const Users = () => {
               <td className="p-2 w-[5%]" onClick={() => handleSetCheckedAll(!checkedAll)}>
                 <input type="checkbox" onChange={() => { }} checked={checkedAll} />
               </td>
-              <td className="p-2 w-[20%]">Tên đăng nhập</td>
-              <td className="p-2 w-[20%]">Số điện thoại</td>
-              <td className="p-2 w-[35%]">Ghi chú</td>
+              <td className="p-2 w-[15%]">Mã dịch vụ</td>
+              <td className="p-2 w-[20%]">Tên dịch vụ</td>
+              <td className="p-2 w-[15%]">Giá bán</td>
+              <td className="p-2 w-[25%]">Mô tả</td>
               <td className="p-2 w-[20%]">Trạng thái</td>
             </tr>
           </thead>
           <tbody>
-            {userList?.map((item: UserAdmin, index: number) => (
+            {serviceList?.map((item: Services, index: number) => (
               <React.Fragment key={item.id}>
-                <UserInfo
+                <ServiceInfo
                   data={item}
                   index={index}
                   itemActive={itemActive}
@@ -250,16 +303,16 @@ const Users = () => {
                   checkedItems={checkedItems}
                   setCheckedItems={handleSetCheckedItem}
                 />
-                <UserDetail
+                <ServiceDetail
                   data={item}
                   itemActive={itemActive}
-                  setShowModalUpdateUser={setShowModalUpdateUser}
+                  setShowModalUpdateService={setShowModalUpdateService}
                   refreshData={refreshData}
                 />
               </React.Fragment>
             ))}
-            {userList?.length === 0 &&
-              <tr><td colSpan={6} className="p-2">Không tìm thấy nhân viên...</td></tr>
+            {serviceList?.length === 0 &&
+              <tr><td colSpan={6} className="p-2">Không tìm thấy dịch vụ...</td></tr>
             }
           </tbody>
         </table>
@@ -268,17 +321,18 @@ const Users = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage} />
       </div >
-      <ModalAddAndUpdateUser
-        data={data?.data?.users?.find((item: UserAdmin) => item.id === itemActive)}
-        showModalAddAndUpdateUser={showModalUpdateUser}
-        setShowModalAddAndUpdateUser={setShowModalUpdateUser}
+      <ModalAddAndUpdateService
+        data={data?.data?.services?.find((item: UserAdmin) => item.id === itemActive)}
+        showModalAddAndUpdateService={showModalUpdateService}
+        setShowModalAddAndUpdateService={setShowModalUpdateService}
         refreshData={refreshData}
+        serviceList={catetories?.data}
       />
-      <ModalAddAndUpdateUser
-        showModalAddAndUpdateUser={showModalAddUser}
-        setShowModalAddAndUpdateUser={setShowModalAddUser}
+      <ModalAddAndUpdateService
+        showModalAddAndUpdateService={showModalAddService}
+        setShowModalAddAndUpdateService={setShowModalAddService}
         refreshData={refreshData}
-        roleList={roles?.data} />
+        serviceList={catetories?.data} />
       <ModalConfirm
         showModalConfirm={showModalConfirmDeletes}
         setShowModalConfirm={setShowModalConfirmDeletes}
@@ -290,4 +344,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default ServicesAdmin;

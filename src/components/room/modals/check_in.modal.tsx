@@ -7,32 +7,33 @@ import axios from "axios";
 import { useAuth } from "@/context/auth.context";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ROOM_STATUS } from "@/constants/constants";
 
 interface IProps {
     showModal: boolean;
     closeModal: () => void;
     checkOutAt: string;
     bookingId: number | undefined;
+    roomId: number | undefined
     onCreateCheckInDate: (createCheckIn: string, createCheckOut: string) => void;
 }
 
 const CheckInModal = (props: IProps) => {
-
-    const { showModal, closeModal, checkOutAt, bookingId, onCreateCheckInDate } = props;
+    const { showModal, closeModal, checkOutAt, bookingId, onCreateCheckInDate, roomId } = props;
 
     const { token } = useAuth(); // Lấy token từ context
     const [isLoading, setIsLoading] = useState(false);
 
     const getCurrentDateTimeISO = () => {
         const now = new Date();
-      
+
         const year = now.getFullYear(); // Năm
         const month = String(now.getMonth() + 1).padStart(2, '0'); // Tháng
         const day = String(now.getDate()).padStart(2, '0'); // Ngày
-      
+
         const hours = String(now.getHours()).padStart(2, '0'); // Giờ
         const minutes = String(now.getMinutes()).padStart(2, '0'); // Phút
-      
+
         // Định dạng thành YYYY-MM-DDTHH:mm
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     };
@@ -52,6 +53,7 @@ const CheckInModal = (props: IProps) => {
                 {
                     check_in_at: currentDateTime,
                     check_out_at: checkOutAt,
+                    status: "CheckedIn",
                 },
                 {
                     headers: {
@@ -62,9 +64,10 @@ const CheckInModal = (props: IProps) => {
             );
 
             if (response.status === 200) {
-                toast.success("Nhận phòng thành công!");
+                handleUpdateRoomStatus();
                 onCreateCheckInDate(currentDateTime, checkOutAt);
                 closeModal(); // Đóng modal sau khi hoàn thành
+                toast.success("Nhận phòng thành công!");
             } else {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
@@ -78,6 +81,29 @@ const CheckInModal = (props: IProps) => {
             setIsLoading(false);
         }
     };
+
+    const handleUpdateRoomStatus = async () => {
+        try {
+            const response = await axios.put(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/room/${roomId}`,
+                {
+                    status: ROOM_STATUS.OCCUPIED,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+        } catch (error) {
+            console.error("Failed to create payment:", error);
+            alert("Đã xảy ra lỗi khi thực hiện cập nhật phòng.");
+        } finally {
+            closeModal();
+        }
+    }
 
     return (
         <Dialog open={showModal} onOpenChange={closeModal}>
@@ -99,19 +125,19 @@ const CheckInModal = (props: IProps) => {
 
                         <footer className="modal-footer">
                             <div className="flex items-center justify-end gap-x-5 py-3 font-semibold">
-                                <button 
+                                <button
                                     className="text-[#d147a3] w-28 py-1 rounded-md border border-[#d147a3] hover:bg-[#d147a3] hover:text-white duration-200"
                                     onClick={closeModal}
                                     disabled={isLoading}
-                                    >
+                                >
                                     Bỏ qua
                                 </button>
 
-                                <button 
+                                <button
                                     className="w-28 py-1 bg-white border border-[var(--navbar-color-)] text-[var(--navbar-color-)]  rounded-md hover:bg-[var(--navbar-color-)] hover:text-white duration-200"
                                     onClick={handleCheckIn}
                                     disabled={isLoading}
-                                    >
+                                >
                                     {isLoading ? "Đang xử lý..." : "Nhận phòng"}
                                 </button>
                             </div>
