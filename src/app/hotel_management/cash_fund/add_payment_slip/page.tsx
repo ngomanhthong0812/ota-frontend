@@ -1,5 +1,6 @@
 "use client";
 import UserSelect from "@/components/room_admin/Userbyhotel";
+import { useAuth } from "@/context/auth.context";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";
@@ -10,7 +11,8 @@ const cookies = parseCookies();
 const token = cookies.access_token;
 const AddPaymentSlipPage: React.FC<IProps> = () => {
   const router = useRouter();
-
+  const { user } = useAuth();
+  const user_id = user?.id;
   const [formData, setFormData] = useState({
     amount: "",
     reason: "",
@@ -34,7 +36,7 @@ const AddPaymentSlipPage: React.FC<IProps> = () => {
           transactionType: "expense",
           amount: formData.amount,
           content: reason,
-          user_id: formData.creator,
+          user_id: formData.creator || user_id,
           note: formData.notes,
           created_at: formData.created_at,
           paymentType: "cash",
