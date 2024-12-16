@@ -60,7 +60,7 @@ const Users = () => {
   );
 
   const { data: roles } = useSWR(
-    token ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/roles/getRolesNotAdmin` : null,
+    user?.hotel_id ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/roles/getRolesByHotelIdNotAdmin/${user?.hotel_id}` : null,
     (url: string) => fetcher(url, token),
     {
       revalidateIfStale: false,
