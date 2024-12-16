@@ -350,7 +350,7 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData, roomData }) => {
                     cleanStatus={cleanStatus} />
             }
             {/* Điều kiện hiển thị BookingForm */}
-            {showBookingForm && <BookingForm closeBookingForm={closeBookingForm}  data={data}/>}
+            {showBookingForm && <BookingForm closeBookingForm={closeBookingForm} data={data} dataResponses={[]}/>}
 
         </section>
     )
