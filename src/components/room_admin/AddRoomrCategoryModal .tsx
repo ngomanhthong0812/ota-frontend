@@ -20,10 +20,12 @@ import { callApi } from "@/utils/api";
 interface RoomManagerDialogProps {
   open: boolean;
   onClose: () => void;
+  onAddSuccess: () => void;
 }
 const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
   open,
   onClose,
+  onAddSuccess,
 }) => {
   const [tabValue, setTabValue] = useState(0);
 
@@ -101,6 +103,7 @@ const RoomManagerDialog: React.FC<RoomManagerDialogProps> = ({
 
       if (response.success) {
         toast.success("Thêm thành công!");
+        onAddSuccess();
         onClose(); // Đóng dialog sau khi gửi thành công
       } else {
         toast.error(response.message || "Có lỗi xảy ra vui lòng thử lại sau.");

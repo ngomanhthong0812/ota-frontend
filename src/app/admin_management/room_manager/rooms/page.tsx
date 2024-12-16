@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import AreaComponent from "@/components/room_admin/Area";
 import RoomTable from "@/components/room_admin/RoomTable";
 import UpdateRoomModel from "@/components/room_admin/UpdateRoomModel";
@@ -9,7 +9,9 @@ import { IoMdSearch } from "react-icons/io";
 import { toast } from "react-toastify";
 
 // Định nghĩa các kiểu dữ liệu cần dùng
-interface IProps {}
+interface IProps {
+  reloadTrigger: number;
+}
 interface roomType {
   code: string;
   name: string;
@@ -41,7 +43,7 @@ interface Room {
   status: string;
 }
 
-const RoomsPage: React.FC<IProps> = () => {
+const RoomsPage: React.FC<IProps> = ({ reloadTrigger }) => {
   // State để quản lý danh sách phòng và trạng thái liên quan
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,8 +76,10 @@ const RoomsPage: React.FC<IProps> = () => {
   // Gọi API khi component mount
   useEffect(() => {
     fetchRooms();
-  }, []);
-
+  }, [reloadTrigger]);
+  const handleUpdateSuccess = () => {
+    fetchRooms(); // Gọi lại API để cập nhật danh sách
+  };
   // Xóa phòng
   const deleteRoom = async (id: number, name: string) => {
     try {
@@ -165,6 +169,7 @@ const RoomsPage: React.FC<IProps> = () => {
               <option value="Có khách">Có khách</option>
               <option value="Đang đến">Đang đến</option>
               <option value="Trống">Trống</option>
+              <option value="Đã đặt">Đã đặt</option>
             </select>
           </div>
         </div>
@@ -181,6 +186,7 @@ const RoomsPage: React.FC<IProps> = () => {
 
       {/* Dialog cập nhật thông tin phòng */}
       <UpdateRoomModel
+        handleUpdateSuccess={handleUpdateSuccess}
         open={isUpdateDialogOpen}
         onClose={handleCloseUpdateDialog}
         idRoom={idRoom}

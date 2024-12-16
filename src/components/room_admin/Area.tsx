@@ -51,7 +51,9 @@ const AreaComponent: React.FC<IProps> = ({}) => {
   useEffect(() => {
     getApiFloor();
   }, []);
-
+  const handleUpdateSuccess = () => {
+    getApiFloor();
+  };
   return (
     <div className="flex w-1/5 h-44 flex-col bg-white cash-fund_content border !border-[var(--ht-neutral-100-)] rounded-md p-3">
       <div className="flex justify-between items-center border-b">
@@ -86,13 +88,14 @@ const AreaComponent: React.FC<IProps> = ({}) => {
         </ul>
       </div>
       {popupType === "add" && (
-        <AddAreaPopUp open={openAreaPopup} onClose={handleCloseAreaPopup} />
+        <AddAreaPopUp open={openAreaPopup} onClose={handleCloseAreaPopup} handleUpdateSuccess={handleUpdateSuccess} />
       )}
       {popupType === "update" && selectedFloorId && (
         <UpdateAreaPopUp
           open={openAreaPopup}
           onClose={handleCloseAreaPopup}
           idAre={selectedFloorId} // Truyền ID của tầng vào UpdateAreaPopUp
+          handleUpdateSuccess={handleUpdateSuccess}
         />
       )}
     </div>
