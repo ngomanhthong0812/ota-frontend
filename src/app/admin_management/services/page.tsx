@@ -8,6 +8,7 @@ import useSWR from "swr";
 import axios from "axios";
 
 import { IoMdAdd } from "react-icons/io";
+import { IoIosAddCircleOutline } from "react-icons/io";
 import { BiMenuAltLeft, BiChevronDown } from "react-icons/bi";
 import { CgTrash } from "react-icons/cg";
 import { toast } from "react-toastify";
@@ -19,6 +20,7 @@ import ServiceInfo from "@/components/service/admin/service_info";
 import ModalConfirm from "@/components/modal_confirm";
 import ModalAddAndUpdateService from "@/components/service/admin/modals/modal_add_update_service";
 import PaginationGlobal from "@/components/pagination_global";
+import ModalAddAndUpdateCategory from "@/components/service/admin/modals/modal_add_update_category";
 
 const fetcher = (url: string, token: string | null) =>
   fetch(url,
@@ -33,6 +35,10 @@ const ServicesAdmin = () => {
   const [showModalUpdateService, setShowModalUpdateService] = useState<boolean>(false);
   const [showModalAddService, setShowModalAddService] = useState<boolean>(false);
   const [showModalConfirmDeletes, setShowModalConfirmDeletes] = useState<boolean>(false);
+
+  const [showModalUpdateCategory, setShowModalUpdateCategory] = useState<boolean>(false);
+  const [showModalAddCategory, setShowModalAddCategory] = useState<boolean>(false);
+  const [categoryActiveUpdate, setCategoryActiveUpdate] = useState<Category | null>(null);
 
   const [serviceList, setServiceList] = useState<Services[]>([]);
   const [checkedItems, setCheckedItems] = useState<number[]>([]);
@@ -66,7 +72,7 @@ const ServicesAdmin = () => {
     }
   );
 
-  const { data: catetories } = useSWR(
+  const { data: catetories, mutate: mutateCategories } = useSWR(
     user?.hotel_id
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories/getCategoriesByHotelIdAdmin` +
       `?hotel_id=${user.hotel_id}` +
@@ -94,6 +100,9 @@ const ServicesAdmin = () => {
 
   const refreshData = async () => {
     await mutate(); // Re-fetch lại dữ liệu
+    if (showModalAddCategory || showModalUpdateCategory) {
+      await mutateCategories();
+    }
   };
 
   useEffect(() => {
@@ -165,6 +174,12 @@ const ServicesAdmin = () => {
     setSearchQuery(search);
   };
 
+  const handleShowUpdateCategory = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, category: Category) => {
+    e.stopPropagation();
+    setShowModalUpdateCategory(true);
+    setCategoryActiveUpdate(category);
+  }
+
   if (error) return "An error has occurred.";
 
   return (
@@ -185,7 +200,14 @@ const ServicesAdmin = () => {
             placeholder="Theo tên dịch vụ" />
         </section>
         <section className="mb-4 bg-white p-3 pb-4 rounded-md flex flex-col gap-3 text-[13px] shadow-sm shadow-[#d6d6d6]">
-          <h3 className="text-black font-[600]">Loại hàng</h3>
+          <h3 className="text-black font-[600] flex justify-between items-center">
+            Loại dịch vụ
+            <span
+              onClick={() => setShowModalAddCategory(true)}
+              className="hover:bg-[#ebebeb] duration-50 rounded-full p-[2px] flex items-center justify-center cursor-pointer">
+              <IoIosAddCircleOutline size={18} className="fill-[#9d9d9d]" />
+            </span>
+          </h3>
           <div className="relative">
             <input
               value={searchCategories}
@@ -217,7 +239,9 @@ const ServicesAdmin = () => {
                   onClick={() => setCategory(item.name)}
                 >
                   {item.name}
-                  <span className="invisible group-hover:visible hover:bg-[#ebebeb] duration-50 rounded-full p-1 w-[25px] h-[25px] flex items-center justify-center">
+                  <span
+                    onClick={(e) => handleShowUpdateCategory(e, item)}
+                    className="invisible group-hover:visible hover:bg-[#ebebeb] duration-50 rounded-full p-1 w-[25px] h-[25px] flex items-center justify-center">
                     <LuPencil size={15} />
                   </span>
                 </button>
@@ -333,6 +357,18 @@ const ServicesAdmin = () => {
         setShowModalAddAndUpdateService={setShowModalAddService}
         refreshData={refreshData}
         serviceList={catetories?.data} />
+
+      <ModalAddAndUpdateCategory
+        data={categoryActiveUpdate}
+        showModalAddAndUpdateCategory={showModalUpdateCategory}
+        setShowModalAddAndUpdateCategory={setShowModalUpdateCategory}
+        refreshData={refreshData}
+      />
+      <ModalAddAndUpdateCategory
+        showModalAddAndUpdateCategory={showModalAddCategory}
+        setShowModalAddAndUpdateCategory={setShowModalAddCategory}
+        refreshData={refreshData} />
+
       <ModalConfirm
         showModalConfirm={showModalConfirmDeletes}
         setShowModalConfirm={setShowModalConfirmDeletes}
