@@ -1,39 +1,59 @@
-import { TypeRoomCard } from "@/types/backend";
+import { RoomAPIResponse, TypeRoomCard } from "@/types/backend";
 import React, { useEffect, useState } from "react";
+import { useFormContext } from "../BookingForm";
+import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
+import { PriceProvider, usePrice } from "@/context/PriceContext.context";
+import { useAuth } from "@/context/auth.context";
+import { callApi } from "@/utils/api";
+import { toast } from "react-toastify";
 
 interface IPutRoom {
   data: TypeRoomCard;
-  defaultPrice?: number;
-  roomType?: string;
-  setRoomType?: (value: string) => void;
-  roomNumber?: string;
-  setRoomNumber: (value: string) => void;
-  source?: string;
-  setSource?: (value: string) => void;
-  adults?: number;
-  setAdults?: (value: number) => void;
-  children?: number;
-  setChildren?: (value: number) => void;
-  roomId?: number;  // Optional: roomId can be number or undefined
-  setRoomId: (value: number) => void;
+  dataResponses: RoomTypes[];
 }
 
-const InputRoom: React.FC<IPutRoom> = ({
-  data,
-  defaultPrice,
-  roomType,
-  setRoomType,
-  roomNumber,
-  setRoomNumber,
-  adults,
-  setAdults,
-  children,
-  setChildren,
-  source,
-  setSource,
-  roomId,
-  setRoomId
-}) => {
+interface Room {
+  room_id: number;
+  room_name: string;
+  room_clean_status: number;
+  room_status: string;
+  room_price: number;
+  room_notes: string;
+  room_start_date_use: string;
+  room_room_type_id: number;
+  room_floor_id: number;
+  room_hotel_id: number;
+}
+
+interface RoomTypes {
+  id: number;
+  name: string;
+  standard_capacity: number;
+  max_capacity: number;
+  standard_children: number;
+  max_children: number;
+  hourly_rate: number;
+  daily_rate: number;
+  overnight_rate: number;
+  total_rooms: number;
+  available_rooms: number;
+  rooms: Room[];
+}
+
+
+const InputRoom: React.FC<IPutRoom> = ({data, dataResponses}) => {
+  const {room,setRoom,} = useFormContext();
+  const {roomType, roomNumber, source, adults, children, roomId, defaultPrice } = room;
+  const { formatPrice } = useFormatPriceWithCommas();
+
+
+  const roomTypeMap: Record<number, string> = {
+    1: "Stardar",
+    2: "Sea view",
+    3: "City view",
+    4: "Familys",
+  };
+
   const roomTypeDescriptions: Record<string, string> = {
     Stardar: "(Phòng cơ bản)",
     "Sea View": "(Phòng view Biển)",
@@ -44,47 +64,67 @@ const InputRoom: React.FC<IPutRoom> = ({
   // Set the initial values of roomType and roomNumber when the component is mounted
   useEffect(() => {
     console.log('Dữ liệu của data:', data);  // Log dữ liệu data
-    if (data?.room_type && setRoomType) {
-      setRoomType(data.room_type);
+    console.log('Dữ liệu của aroom:', dataResponses);  // Log dữ liệu data
+    if (data?.room_type && setRoom) {
+      setRoom((prev) => ({ ...prev, roomType: data.room_type }));
     }
-    if (data?.name && setRoomNumber) {
-      setRoomNumber(data.name);
+    if (data?.name && setRoom) {
+      setRoom((prev) => ({ ...prev, roomNumber: Number(data.name) }));
     }
-    if (data?.id !== undefined && setRoomId) { // Chỉ gọi setRoomId nếu data.id có giá trị
-      setRoomId(data.id);
+    if (data?.id !== undefined && setRoom) { 
+      setRoom((prev) => ({ ...prev, roomId: data.id }));
     }
-  }, [data, setRoomType, setRoomNumber, setRoomId]);
+
+       // So sánh theo ánh xạ và chọn phòng tương ứng từ dataResponses
+       const selectedRoomType = dataResponses.find((roomType) => {
+        return roomType.name === roomTypeMap[Number(data.room_type)]; // Kiểm tra nếu name của roomType trùng với ánh xạ
+      });
+  
+      // Nếu tìm thấy phòng tương ứng, gán giá trị defaultPrice
+      if (selectedRoomType && setRoom) {
+        setRoom((prev) => ({ ...prev, defaultPrice: selectedRoomType.overnight_rate }));
+        console.log('defaultPrice:', selectedRoomType.overnight_rate); // Log giá phòng
+      }
+    
+
+  }, [data, setRoom,dataResponses]);
+
+  
+
 
   // Hàm xử lý khi người dùng chọn loại phòng
   const handleRoomTypeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setRoomType && setRoomType(event.target.value);
+    setRoom((prev) => ({ ...prev, room_type: event.target.value }));
   };
 
   // Hàm xử lý khi người dùng chọn số phòng
   const handleRoomNumberChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setRoomNumber(event.target.value);
+    setRoom((prev) => ({ ...prev, roomId: Number(event.target.value) }));
   };
 
   // Hàm xử lý chọn nguồn
   const handleSourceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSource && setSource(event.target.value);
+    setRoom((prev) => ({ ...prev, source: event.target.value }));
   };
 
   // Hàm xử lý khi người dùng chọn số người lớn
   const handleAdultsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAdults && setAdults(Number(event.target.value));
+    setRoom && setRoom((prev) => ({ ...prev, adults: Number(event.target.value) }));
   };
   // Hàm xử lý khi người dùng chọn số trẻ em
   const handleChildrenChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChildren && setChildren(Number(event.target.value));
+    setRoom && setRoom((prev) => ({ ...prev, children: Number(event.target.value) }));
   };
+
+  
 
 
   return (
+    <PriceProvider >
     <div>
       {/* Loại phòng */}
       <div className="flex my-2 gap-2">
@@ -100,6 +140,8 @@ const InputRoom: React.FC<IPutRoom> = ({
               {data.room_type}{" "}
               {roomTypeDescriptions[data.room_type] || "(Ghi chú không có)"}
             </option>
+            
+            
           </select>
         </div>
 
@@ -109,10 +151,11 @@ const InputRoom: React.FC<IPutRoom> = ({
             id="room"
             name="room"
             className="btn"
-            value={roomNumber}
+            value={roomNumber ?? ''}
             onChange={handleRoomNumberChange}
           >
             <option value={data.id}>{data.name}</option>
+          
           </select>
         </div>
       </div>
@@ -125,8 +168,11 @@ const InputRoom: React.FC<IPutRoom> = ({
           </select>
         </div>
         {/* Giá phòng*/}
-        <div className="w-1/2 flex justify-end items-center text-center">
-          <p className=" text-xz ">Tổng {defaultPrice} $</p>
+        <div className="w-1/2 flex justify-end items-center text-center">{}
+          <p className=" text-xz ">  {formatPrice(String(defaultPrice ?? ''))} VNĐ</p>
+
+        
+      
         </div>
       </div>
       {/* Nguồn đặt phòng */}
@@ -191,6 +237,7 @@ const InputRoom: React.FC<IPutRoom> = ({
         </div>
       </div>
     </div>
+    </PriceProvider>
   );
 };
 

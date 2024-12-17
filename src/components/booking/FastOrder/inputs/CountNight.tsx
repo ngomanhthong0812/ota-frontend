@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { useFormContext } from "../BookingForm";
 
-interface ICountNight {
-  startDate: string;
-  endDate: string;
-  CountNights?: number;
-  setCountNights?: (value: number) => void; 
-}
+const CountNight = () => {
+  const {
+    countNight: countNights,
+    setCountNight: setCountNights,
+    date,setDate
+  } = useFormContext();
+  const { startDate, endDate } = date;
 
-const CountNight: React.FC<ICountNight> = ({startDate, endDate, CountNights, setCountNights}) => {
-  
-  
-
-   // Hàm tính số ngày giữa hai ngày
-   const calculateNights = (start: string, end: string): number => {
-
-      // Kiểm tra nếu một trong hai ngày không được cung cấp
-      if (!start || !end) {
-        return 0;
-      } 
+  // Hàm tính số ngày giữa hai ngày
+  const calculateNights = (start: string, end: string): number => {
+    // Kiểm tra nếu một trong hai ngày không được cung cấp
+    if (!start || !end) {
+      return 0;
+    }
     const startDate = new Date(start);
     const endDate = new Date(end);
 
@@ -32,24 +29,45 @@ const CountNight: React.FC<ICountNight> = ({startDate, endDate, CountNights, set
     return Math.max(0, diffTime / (1000 * 3600 * 24)); // Đảm bảo không có giá trị âm
   };
 
+  const countNightsCalculated = calculateNights(startDate, endDate); // Tổng số đêm lưu vào countNightsCalculated
 
- const countNights = calculateNights(startDate, endDate);
-     // Hàm xử lý  giá mặc định
- useEffect(() => {
-  if (countNights !== undefined) {
-    if (setCountNights) {
-      setCountNights(countNights);
+  // Hàm xử lý CountNight
+  useEffect(() => {
+    if (countNights !== undefined) {
+      if (setCountNights) {
+        setCountNights(countNightsCalculated);
+      }
     }
-  }
-}, [countNights]); // Chạy khi data.price thay đổi
+  }, [countNightsCalculated]); // Chạy khi data.price thay đổi
 
- 
+   // Hàm tăng endDate lên một ngày
+   const increaseEndDate = () => {
+    const newEndDate = new Date(endDate);
   
+    // Đặt giờ, phút, giây về 00:00:00 để tránh sự thay đổi không mong muốn
+    newEndDate.setHours(0, 0, 0, 0);
+  
+    // Cộng thêm 1 ngày
+    newEndDate.setDate(newEndDate.getDate() + 1);
+  
+    // Tạo lại chuỗi ngày theo định dạng YYYY-MM-DDTHH:mm để giữ nguyên giờ, phút
+    const newEndDateStr = `${newEndDate.getFullYear()}-${(newEndDate.getMonth() + 1).toString().padStart(2, '0')}-${newEndDate.getDate().toString().padStart(2, '0')}T${newEndDate.getHours().toString().padStart(2, '0')}:${newEndDate.getMinutes().toString().padStart(2, '0')}`;
+  
+    setDate((prev) => ({ ...prev, endDate: newEndDateStr }));
+  };
+  
+    // Hàm giảm số đêm
+    const decrementNights = () => {
+      if (setCountNights) {
+        setCountNights((prev) => Math.max(0, prev - 1)); // Không giảm xuống âm
+      }
+    };
 
   return (
     <div>
       <div className="flex items-center justify-center">
-        <button>
+        {/* Button trừ */}
+        <button onClick={decrementNights}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             height="17"
@@ -63,9 +81,11 @@ const CountNight: React.FC<ICountNight> = ({startDate, endDate, CountNights, set
             <path d="M184 232h144c13.3 0 24 10.7 24 24s-10.7 24-24 24H184c-13.3 0-24-10.7-24-24s10.7-24 24-24z" />
           </svg>
         </button>
-        <p className="text-[var(--room-empty-color-)] px-2">{CountNights  } đêm</p>
-
-        <button>
+        <p className="text-[var(--room-empty-color-)] px-3">
+          {countNights} đêm
+        </p>
+        {/* Button cộng */}
+        <button onClick={increaseEndDate}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             height="17"

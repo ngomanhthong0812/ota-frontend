@@ -36,7 +36,7 @@ interface CreatOrderTableProps {
   handlebookingRoomsChange: (selectedRooms: Room[]) => void;
 }
 const creatOrderTable: React.FC<CreatOrderTableProps> = ({
-  startDate,
+  startDate, 
   endDate,
   roomData, // Nhận roomData từ props
   onOrderData,
@@ -248,6 +248,8 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
     onOrderData,
   ]);
 
+  
+
   return (
     <div className="">
       <section className="">
@@ -257,7 +259,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
               {formatDateTime(startDate)} - {formatDateTime(endDate)}
             </div>
             <div className="flex col-span-2 justify-end items-center">
-              <p className="flex items-center">{totalDays} đêm</p>
+              <p className="flex items-center">{roomData?.overnight_rate} đêm</p>
             </div>
           </div>
 
@@ -265,7 +267,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
             <div className=" gap-2 flex justify-between items-center">
               <div>
                 <p className="text-black font-medium items-center ">
-                  {roomData?.name}
+                  {roomData?.name}{}
                 </p>
               </div>
               <div>

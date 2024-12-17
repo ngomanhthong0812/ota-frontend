@@ -1,49 +1,40 @@
 import { useState } from "react";
-interface IInputGuest {
-  guestName?: string;
-  guestID?: string;
-  guestEmail?: string;
-  guestPhone?: string;
-  gender?: string;
-  setGuestName?: (value: string) => void;
-  setGuestID?: (value: string) => void;
-  setGuestEmail?: (value: string) => void;
-  setGuestPhone?: (value: string) => void;
-  setGender?: (value: string) => void;
-}
+import { useFormContext } from "../BookingForm";
 
-const InputGuest: React.FC<IInputGuest> = ({guestEmail,guestID,guestName,guestPhone,gender,setGuestEmail,setGuestID,setGuestName,setGuestPhone,setGender}) => {
 
-     
+const InputGuest = () => {
+  const {customer,setCustomer} = useFormContext();
+  const {guestName, guestID, guestEmail, guestPhone, gender} = customer;
+    
 
      // Hàm xử lý khi người dùng chọn tên khách
      const handleGuestNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (setGuestName) {
-        setGuestName(event.target.value);
+      if (setCustomer) {
+        setCustomer((prev) => ({ ...prev, guestName: event.target.value }));
       }
     };
     // Hàm xử lý khi người dùng chọn CCCD/Hộ chiếu
     const handleGuestIDChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (setGuestID) {
-        setGuestID(event.target.value);
+      if (setCustomer) {
+        setCustomer((prev) => ({ ...prev, guestID: event.target.value }));
       }
     };
       // Hàm xử lý khi người dùng chọn Email
     const handleGuestEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (setGuestEmail) {
-        setGuestEmail(event.target.value);
+      if (setCustomer) {
+        setCustomer((prev) => ({ ...prev, guestEmail: event.target.value }));
       }
     };
     // Hàm xử lý khi người dùng chọn số điện thoại
     const handleGuestPhoneChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (setGuestPhone) {
-        setGuestPhone(event.target.value);
+      if (setCustomer) {
+        setCustomer((prev) => ({ ...prev, guestPhone: (event.target.value) }));
       }
     };
      // Hàm xử lý khi người dùng chọn giới tính
   const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (setGender) {
-      setGender(event.target.value);
+    if (setCustomer) {
+      setCustomer((prev) => ({ ...prev, gender: event.target.value as "male" | "female" | null }));
     }
   };
 
@@ -207,7 +198,7 @@ const InputGuest: React.FC<IInputGuest> = ({guestEmail,guestID,guestName,guestPh
               id="SĐT"
               name="SĐT"
               placeholder="SĐT"
-              value={guestPhone}
+              value={guestPhone ?? ''}
               onChange={handleGuestPhoneChange}
               className="flex w-full pl-6 pr-2 py-[8px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--room-empty-color-)] focus:border-[var(--room-empty-color-)] "
             />
