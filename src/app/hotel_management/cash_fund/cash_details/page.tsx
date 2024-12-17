@@ -36,10 +36,12 @@ const CashDetailsPage: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-
+    const today = new Date().toISOString().split("T")[0];
     try {
       const response = await apiClient.get(
-        `/api/transaction/details/cash?page=${page}&fromDate=${startDate}&toDate=${endDate}`
+        `/api/transaction/details/cash?page=${page}&fromDate=${
+          startDate || today
+        }&toDate=${endDate || today}`
       );
 
       // Kiểm tra phản hồi từ API

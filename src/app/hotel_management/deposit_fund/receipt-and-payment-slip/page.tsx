@@ -1,14 +1,7 @@
-"use client"
+"use client";
 import { callApi } from "@/utils/api";
-import axios from "axios";
-import { NextPage } from "next";
-import { GiCancel } from "react-icons/gi";
-import Link from "next/link";
-import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
-import { FaDeleteLeft } from "react-icons/fa6";
 import { toast } from "react-toastify";
-import useSWR from "swr";
 import Pagination from "@/components/fund/Pagination";
 import DateFilter from "@/components/fund/DateFilter";
 import apiClient from "@/utils/apiClient";
@@ -21,23 +14,8 @@ interface Transaction {
   date: Date;
   receiverAccount: string;
   status: string;
+  transactionType: string;
 }
-const cookies = parseCookies();
-const token = cookies.access_token;
-const fetcher = (url: string) =>
-  fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => {
-      console.log(res);
-      return res.json();
-    })
-    .catch((error) => {
-      console.error("Fetch error:", error);
-    });
 const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   const [page, setPage] = useState(1);
   const [startDate, setStartDate] = useState("");
@@ -55,23 +33,21 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
 
   const fetchTransactions = async () => {
     setIsLoading(true);
+    const today = new Date().toISOString().split("T")[0];
     try {
       const response = await apiClient.get(`/api/transaction/bank`, {
         params: {
-          fromDate: startDate,
-          toDate: endDate,
+          fromDate: startDate || today,
+          toDate: endDate || today,
           page: page,
           type: transactionType,
         },
       });
-      console.log(response.data.data);
-
       setTransactions(response.data.data.transactions || []);
       setTotalPages(response.data.totalPages || 1);
       setTransactions(response.data.data.transactions);
       setTotalPages(response.data.data.totalPages);
     } catch (error) {
-      console.error("Error fetching transactions:", error);
       toast.error("Không thể tải danh sách giao dịch.");
     } finally {
       setIsLoading(false);
@@ -137,6 +113,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
           deleteTransaction={deleteTransaction}
           tableData={transactions}
           isLoading={isLoading}
+          categoty="deposit_fund"
         />
         <Pagination page={page} totalPages={totalPages} setPage={setPage} />
       </div>

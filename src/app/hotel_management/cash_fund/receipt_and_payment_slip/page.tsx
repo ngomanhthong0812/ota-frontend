@@ -51,13 +51,14 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
   // Gọi API để lấy danh sách transactions
   const fetchTransactions = async () => {
     setIsLoading(true);
+    const today = new Date().toISOString().split("T")[0];
     try {
       const response = await apiClient.get(
         `/api/transaction/cash_fund/cash_fund`,
         {
           params: {
-            fromDate: startDate,
-            toDate: endDate,
+            fromDate: startDate || today,
+            toDate: endDate || today,
             page: page,
             type: transactionType,
           },
@@ -126,6 +127,7 @@ const ReceiptAndPaymentSlipPage: React.FC = ({}) => {
           deleteTransaction={deleteTransaction}
           tableData={transactions}
           isLoading={isLoading}
+          categoty="cash_fund"
         />
         <Pagination page={page} totalPages={totalPages} setPage={setPage} />
       </div>

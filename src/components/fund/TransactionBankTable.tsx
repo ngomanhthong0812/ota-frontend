@@ -10,17 +10,20 @@ interface Transaction {
   date: Date;
   receiverAccount: string;
   status: string;
+  transactionType: string;
 }
 interface IProps {
   tableData: Transaction[];
   deleteTransaction: (id: number) => void;
   isLoading: boolean;
+  categoty: string;
 }
 
 const TransactionBankTable: React.FC<IProps> = ({
   tableData,
   deleteTransaction,
   isLoading,
+  categoty,
 }) => {
   const formatter = new Intl.NumberFormat("en-US");
   return (
@@ -156,8 +159,18 @@ const TransactionBankTable: React.FC<IProps> = ({
 
               <td className="p-2">{transaction.receiverAccount}</td>
 
-              <td className="p-2 text-[var(--room-empty-color-)] text-center">
-                {transaction.code}
+              <td
+                className={`p-2  ${
+                  transaction.transactionType === "income"
+                    ? "text-[var(--room-empty-color-)]"
+                    : "text-[var(--room-out-of-service-color-)]"
+                }`}
+              >
+                <Link
+                  href={`/hotel_management/${categoty}/ballot_details/${transaction.id}`}
+                >
+                  {transaction.code}
+                </Link>
               </td>
 
               <td className="p-2 text-center">
