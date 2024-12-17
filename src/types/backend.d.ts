@@ -21,6 +21,8 @@ interface RoomStatus {
 interface TypeRoomCard {
     map(arg0: (item: any, index: any) => JSX.Element): ReactNode;
     id: number,
+    room_type_id: number; // ID loại phòng.
+    overnightRate_price: number | null; // Giá qua đêm (nếu có).
     name: string,
     clean_status: false,
     status: string,

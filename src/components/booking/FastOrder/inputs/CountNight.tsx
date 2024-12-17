@@ -5,7 +5,8 @@ const CountNight = () => {
   const {
     countNight: countNights,
     setCountNight: setCountNights,
-    date,setDate
+    date,
+    setDate,
   } = useFormContext();
   const { startDate, endDate } = date;
 
@@ -40,28 +41,74 @@ const CountNight = () => {
     }
   }, [countNightsCalculated]); // Chạy khi data.price thay đổi
 
-   // Hàm tăng endDate lên một ngày
-   const increaseEndDate = () => {
+  // Hàm tăng endDate lên một ngày
+  const increaseEndDate = () => {
     const newEndDate = new Date(endDate);
-  
-    // Đặt giờ, phút, giây về 00:00:00 để tránh sự thay đổi không mong muốn
-    newEndDate.setHours(0, 0, 0, 0);
-  
-    // Cộng thêm 1 ngày
-    newEndDate.setDate(newEndDate.getDate() + 1);
-  
+
+    newEndDate.setHours(0, 0, 0, 0); // Đặt giờ, phút, giây về 00:00:00 để tránh sự thay đổi không mong muốn
+
+    newEndDate.setDate(newEndDate.getDate() + 1); // Cộng thêm 1 ngày
+
     // Tạo lại chuỗi ngày theo định dạng YYYY-MM-DDTHH:mm để giữ nguyên giờ, phút
-    const newEndDateStr = `${newEndDate.getFullYear()}-${(newEndDate.getMonth() + 1).toString().padStart(2, '0')}-${newEndDate.getDate().toString().padStart(2, '0')}T${newEndDate.getHours().toString().padStart(2, '0')}:${newEndDate.getMinutes().toString().padStart(2, '0')}`;
-  
+    const newEndDateStr = `${newEndDate.getFullYear()}-${(
+      newEndDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}-${newEndDate
+      .getDate()
+      .toString()
+      .padStart(2, "0")}T${newEndDate
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${newEndDate
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}`;
+
     setDate((prev) => ({ ...prev, endDate: newEndDateStr }));
   };
-  
-    // Hàm giảm số đêm
-    const decrementNights = () => {
-      if (setCountNights) {
-        setCountNights((prev) => Math.max(0, prev - 1)); // Không giảm xuống âm
-      }
-    };
+
+  // Hàm giảm endDate xuống một ngày, không giảm qua ngày startDate
+  const decreaseEndDate = () => {
+    const newEndDate = new Date(endDate);
+    const startDateObj = new Date(startDate); // Lấy ngày startDate để so sánh
+
+    // Đặt giờ, phút, giây về 00:00:00 để tránh sự thay đổi không mong muốn
+    newEndDate.setHours(0, 0, 0, 0);
+    startDateObj.setHours(0, 0, 0, 0); // Đảm bảo startDate cũng có giờ là 00:00:00
+
+    // Nếu endDate không nhỏ hơn startDate, mới thực hiện giảm
+    if (newEndDate > startDateObj) {
+      newEndDate.setDate(newEndDate.getDate() - 1); // Giảm đi 1 ngày
+      // Tạo lại chuỗi ngày theo định dạng YYYY-MM-DDTHH:mm để giữ nguyên giờ, phút
+      const newEndDateStr = `${newEndDate.getFullYear()}-${(
+        newEndDate.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}-${newEndDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}T${newEndDate
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${newEndDate
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`;
+
+      setDate((prev) => ({ ...prev, endDate: newEndDateStr }));
+    }
+  };
+
+  // Hàm giảm số đêm
+  const decrementNights = () => {
+    if (setCountNights) {
+      setCountNights((prev) => Math.max(0, prev - 1)); // Không giảm xuống âm
+    }
+
+    // Sau khi giảm số đêm, giảm ngày kết thúc
+    decreaseEndDate();
+  };
 
   return (
     <div>

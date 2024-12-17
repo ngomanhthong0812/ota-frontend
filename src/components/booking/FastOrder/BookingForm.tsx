@@ -1,4 +1,11 @@
-import React, { LegacyRef, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  LegacyRef,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { TypeRoomCard } from "@/types/backend";
 import InputGuest from "./inputs/InputGuest";
 import InputRoom from "./inputs/InputRoom";
@@ -9,44 +16,18 @@ import { toast } from "react-toastify";
 import { callApi } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import { inititalFormContext } from "@/context/form.context";
-import{DateType,  RoomStateType, PaymentType, CustomerType} from "@/types/types";
+import {
+  DateType,
+  RoomStateType,
+  PaymentType,
+  CustomerType,
+} from "@/types/types";
 import DateIput from "./inputs/Date";
-
 
 interface BookingFormProps {
   closeBookingForm: () => void;
   data: TypeRoomCard;
-  dataResponses: RoomTypes[];  // Thêm dataResponse vào props
 }
-interface Room {
-  room_id: number;              // ID của phòng
-  room_name: string;            // Tên phòng
-  room_clean_status: number;    // Trạng thái vệ sinh (1: sạch, 0: bẩn)
-  room_status: string;          // Trạng thái phòng (Trống, Đặt trước, ...)
-  room_price: number;           // Giá phòng
-  room_notes: string;           // Ghi chú về phòng
-  room_start_date_use: string;  // Ngày bắt đầu sử dụng phòng
-  room_room_type_id: number;    // ID loại phòng
-  room_floor_id: number;        // ID tầng
-  room_hotel_id: number;        // ID khách sạn
-}
-
-// Interface cho RoomType (loại phòng)
-interface RoomTypes {
-  id: number;                   // ID loại phòng
-  name: string;                 // Tên loại phòng
-  standard_capacity: number;    // Sức chứa tiêu chuẩn (số người lớn)
-  max_capacity: number;         // Sức chứa tối đa (số người lớn)
-  standard_children: number;    // Sức chứa tiêu chuẩn cho trẻ em
-  max_children: number;         // Sức chứa tối đa cho trẻ em
-  hourly_rate: number;          // Giá theo giờ
-  daily_rate: number;           // Giá theo ngày
-  overnight_rate: number;       // Giá qua đêm
-  total_rooms: number;          // Tổng số phòng
-  available_rooms: number;      // Số phòng còn trống
-  rooms: Room[];                // Mảng phòng thuộc loại phòng này
-}
-
 
 export const FormContext = React.createContext<{
   countNight: number;
@@ -68,16 +49,9 @@ export const useFormContext = () => {
 const BookingForm: React.FC<BookingFormProps> = ({
   closeBookingForm,
   data,
-  dataResponses,
-
-
 }) => {
-
-     const [availableRoom, setAvailableRoom] = useState<RoomTypes | null>(null); // Phòng trống
-
-
   const router = useRouter();
-  
+
   //  State đếm số đêm
   const [countNight, setCountNight] = useState<number>(0);
   // State ngày đên và ngày đi
@@ -117,8 +91,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const { user, token } = useAuth();
   const hotelId = user?.hotel_id;
 
-
-
   // Lấy các field cần thiết từ object truyền vào bookingData
   const { gender, guestEmail, guestID, guestName, guestPhone } = customer;
   const {
@@ -130,7 +102,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
     roomType,
     source,
   } = room;
-  const { paidAmount, remainingAmount, taxFee, totalAmount ,paymentMethod } = payment;
+  const {
+    paidAmount,
+    remainingAmount,
+    taxFee,
+    totalAmount,
+    paymentMethod,
+  } = payment;
   const { startDate, endDate } = date;
 
   // Chuẩn bị dữ liệu gửi đi
@@ -254,7 +232,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
     ]
   );
 
-
   return (
     <FormContext.Provider value={formContextValue}>
       <div className="fixed inset-0 bg-[#0000004c] z-[100] flex justify-end">
@@ -278,12 +255,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
             </button>
           </div>
           <h2 className="uppercase bottom-line font-[500] !py-3 text-xz">
-            đặt phòng nhanh 
+            đặt phòng nhanh
           </h2>
           <div className="flex my-2 justify-between">
             <div>
               <h2 className="text-xz font-[500]">Thông tin phòng</h2>
-              
             </div>
             {/* Số đêm */}
             <CountNight />
@@ -293,12 +269,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
           <DateIput />
 
           {/* Nhập thông tin phòng */}
-          <InputRoom data={data} dataResponses={dataResponses}/> 
-          
+          <InputRoom data={data} />
 
           <h2 className="my-2 text-sm  font-medium">Khách đại diện</h2>
-          <ul>
-      </ul>
+          <ul></ul>
 
           {/* Nhập thông tin khách hàng */}
           <InputGuest />

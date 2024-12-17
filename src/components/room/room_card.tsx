@@ -13,39 +13,10 @@ import { toast } from "react-toastify";
 
 interface IProps {
   data: TypeRoomCard;
-  roomData: RoomAPIResponse;
   refreshData: () => void;
 }
-interface Room {
-  room_id: number; // ID của phòng
-  room_name: string; // Tên phòng
-  room_clean_status: number; // Trạng thái vệ sinh (1: sạch, 0: bẩn)
-  room_status: string; // Trạng thái phòng (Trống, Đặt trước, ...)
-  room_price: number; // Giá phòng
-  room_notes: string; // Ghi chú về phòng
-  room_start_date_use: string; // Ngày bắt đầu sử dụng phòng
-  room_room_type_id: number; // ID loại phòng
-  room_floor_id: number; // ID tầng
-  room_hotel_id: number; // ID khách sạn
-}
 
-// Interface cho RoomType (loại phòng)
-interface RoomTypes {
-  id: number; // ID loại phòng
-  name: string; // Tên loại phòng
-  standard_capacity: number; // Sức chứa tiêu chuẩn (số người lớn)
-  max_capacity: number; // Sức chứa tối đa (số người lớn)
-  standard_children: number; // Sức chứa tiêu chuẩn cho trẻ em
-  max_children: number; // Sức chứa tối đa cho trẻ em
-  hourly_rate: number; // Giá theo giờ
-  daily_rate: number; // Giá theo ngày
-  overnight_rate: number; // Giá qua đêm
-  total_rooms: number; // Tổng số phòng
-  available_rooms: number; // Số phòng còn trống
-  rooms: Room[]; // Mảng phòng thuộc loại phòng này
-}
-
-const RoomCard: React.FC<IProps> = ({ data, refreshData, roomData }) => {
+const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showPopupStatusClean, setShowPopupStatusClean] = useState(false);
   const [popupPosition, setPopupPosition] = useState<{ x: number; y: number }>({
@@ -60,7 +31,6 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData, roomData }) => {
   );
   const [cleanStatus, setCleanStatus] = useState<boolean>(data.clean_status);
   const [showBookingForm, setShowBookingForm] = useState(false); // State hiển thị form đặt phòng
-  const [dataResponsess, setDataResponses] = useState<RoomTypes[]>([]);
 
   const { token, user } = useAuth();
   const hotelId = user?.hotel_id;
@@ -201,27 +171,6 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData, roomData }) => {
     }
   };
 
-  useEffect(() => {
-    // Gọi API ngay khi component render
-    const fetchData = async () => {
-      try {
-        const response = await callApi<any>("/api/bookings/rooms/types", "GET");
-        console.log("API Response1:", response); // Log API response để kiểm tra
-        console.log("Dữ liệu từ API:", response.data);
-        setDataResponses(response?.data?.data);
-      } catch (err) {
-        console.error("Error fetching room types:", err);
-        toast.error("Có lỗi xảy ra. Vui lòng thử lại!");
-      }
-    };
-
-    fetchData();
-  }, []); // Chạy một lần khi component mount
-
-  useEffect(() => {
-    console.log("Dữ liệu dataResponse đã cập nhật data  :", dataResponsess);
-  }, [dataResponsess]);
-
   // Hàm hiển thị form đặt phòng
   const toggleBookingForm = () => {
     setShowBookingForm(!showBookingForm);
@@ -330,30 +279,32 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData, roomData }) => {
         )}
       </div>
 
-            {data.status === "Trống"
-                ?
-                <UnusedRoomPopup
-                    ref={popupRef}
-                    showPopup={showPopup}
-                    position={popupPosition}
-                    data={data}
-                    handleSetStatusClean={handleSetStatusClean}
-                    toggleBookingForm={toggleBookingForm} // Truyền hàm vào đây
-                    cleanStatus={cleanStatus} />
-                :
-                <InusedRoomPopup
-                    ref={popupRef}
-                    showPopup={showPopup}
-                    position={popupPosition}
-                    data={data}
-                    handleSetStatusClean={handleSetStatusClean}
-                    cleanStatus={cleanStatus} />
-            }
-            {/* Điều kiện hiển thị BookingForm */}
-            {showBookingForm && <BookingForm closeBookingForm={closeBookingForm} data={data} dataResponses={[]}/>}
-
-        </section>
-    )
-}
+      {data.status === "Trống" ? (
+        <UnusedRoomPopup
+          ref={popupRef}
+          showPopup={showPopup}
+          position={popupPosition}
+          data={data}
+          handleSetStatusClean={handleSetStatusClean}
+          toggleBookingForm={toggleBookingForm} // Truyền hàm vào đây
+          cleanStatus={cleanStatus}
+        />
+      ) : (
+        <InusedRoomPopup
+          ref={popupRef}
+          showPopup={showPopup}
+          position={popupPosition}
+          data={data}
+          handleSetStatusClean={handleSetStatusClean}
+          cleanStatus={cleanStatus}
+        />
+      )}
+      {/* Điều kiện hiển thị BookingForm */}
+      {showBookingForm && (
+        <BookingForm closeBookingForm={closeBookingForm} data={data} />
+      )}
+    </section>
+  );
+};
 
 export default RoomCard;
