@@ -232,3 +232,18 @@ interface RoomAPIResponse {
     available_rooms: number;
     rooms: { id: number; name: string }[]; // Danh sách phòng chưa được đặt
   }
+
+  interface RoomType {
+    id: number;
+    name: string;
+    standard_capacity: number;
+    max_capacity: number;
+    standard_children: number;
+    max_children: number;
+    hourly_rate: number;
+    daily_rate: number;
+    overnight_rate: number;
+    total_rooms: number;
+    available_rooms: number;
+    rooms: Room[];
+  }

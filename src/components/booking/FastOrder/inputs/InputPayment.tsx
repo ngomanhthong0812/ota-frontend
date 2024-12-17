@@ -1,42 +1,46 @@
 import React, { useEffect, useState } from "react";
+import { useFormContext } from "../BookingForm";
+import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 
-interface IPutPayment {
-  defaultPrice?: number;
-  CountNights?: number;
-  setCountNights?: (value: number) => void;
-  totalAmount?: number;
-  taxFee?: number;
-  paidAmount?: number;
-  remainingAmount?: number;
-  setTotalAmount?: (value: number) => void;
-  setTaxFee?: (value: number) => void;
-  setPaidAmount ?: (value: number) => void;
-  setRemainingAmount?: (value: number) => void;
-}
 
-const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAmount,taxFee,paidAmount,remainingAmount,setTotalAmount,setCountNights,setPaidAmount,setRemainingAmount,setTaxFee }) => {
+
+const InputPayment = () => {
+  const {payment, setPayment,countNight, room} = useFormContext();
+  const {totalAmount, taxFee, remainingAmount, paidAmount, subTotal, paymentMethod} = payment;
+  const {defaultPrice} = room;
+  const CountNights = countNight;
   
   
-  const [paymentMethod, setPaymentMethod] = useState(""); // Hình thức thanh toán (VNĐ, thẻ,...)
   const [isChecked, setIsChecked] = useState(false); // Kiểm tra checkbox
+  const { formatPrice } = useFormatPriceWithCommas();
+  
+
+    
 
   useEffect(() => {
     if (defaultPrice && CountNights) {
-      const tempTotal = defaultPrice * CountNights;
-      const tempTax = tempTotal * 0.1; // 10% thuế/phí
-      setTotalAmount && setTotalAmount(tempTotal + tempTax); // Tổng tiền = thành tiền + thuế/phí
-      setTaxFee && setTaxFee(tempTax); // Cập nhật thuế/phí
+      const tempSubTotal = defaultPrice * CountNights;
+      const tempTax = isChecked ? tempSubTotal * 0.1 : 0; // Chỉ tính thuế/phí khi isChecked = true
+      setPayment &&
+        setPayment((prev: any) => ({
+          ...prev,
+          totalAmount: tempSubTotal + tempTax,
+          taxFee: tempTax,
+          subTotal: tempSubTotal,
+        })); // Cập nhật các giá trị
     }
-  }, [defaultPrice, CountNights]);
+  }, [defaultPrice, CountNights, isChecked]);
 
-  // Hàm xử lý khi người dùng chọn thuế/phí
-  const handleTaxFeeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setTaxFee && setTaxFee(parseFloat(event.target.value) || 0);
-  };
+  // Hàm xử lý khi người dùng thay đổi checkbox
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setIsChecked(event.target.checked); // Cập nhật trạng thái checkbox
+    };
 
-  // Cập nhật số tiền còn lại khi số tiền thanh toán hoặc tổng tiền thay đổi
   useEffect(() => {
-    setRemainingAmount && setRemainingAmount((totalAmount || 0) - (paidAmount || 0));
+    return setPayment && setPayment((prev: any) => ({
+      ...prev,
+      remainingAmount: Math.max((totalAmount || 0) - (paidAmount || 0), 0) // Đảm bảo không có giá trị âm
+    }));
   }, [totalAmount, paidAmount]);
 
   // Hàm xử lý khi người dùng nhập số tiền thanh toán
@@ -44,15 +48,14 @@ const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAm
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = parseFloat(event.target.value) || 0; // Nếu không nhập gì, mặc định là 0
-    setPaidAmount && setPaidAmount(value);
+    setPayment && setPayment((prev: any) => ({ ...prev, paidAmount: value }));
   };
 
-  // Hàm xử lý khi người dùng chọn hình thức thanh toán
-  const handlePaymentMethodChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setPaymentMethod(event.target.value);
-  };
+    const handlePaymentMethodChange = (
+      e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+      setPayment && setPayment((prev: any) => ({ ...prev, paymentMethod: e.target.value })); // Cập nhật phương thức thanh toán
+    };
 
   return (
     <div>
@@ -62,7 +65,7 @@ const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAm
           <p className="text-xz">Thành tiền</p>
         </div>
         <div className="flex justify-end">
-          <span className=" text-xz ">{totalAmount} $</span>
+          <span className=" text-xz "> {formatPrice(String(subTotal))}</span>
         </div>
       </div>
       {/* Thuế/Phí */}
@@ -73,9 +76,9 @@ const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAm
               type="checkbox"
               id="subscribe"
               name="subscribe"
-              checked={true}
               readOnly
-              onChange={(e) => setIsChecked(e.target.checked)}
+              checked={isChecked}
+              onChange={handleCheckboxChange}
               className="checkbox-thuephi"
             />
             <span className="text-xz">Thuế/Phí</span>
@@ -83,7 +86,7 @@ const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAm
         </div>
         <div>
           <span className="flex justify-end text-xz">
-            {(taxFee || 0).toLocaleString()} $
+             {formatPrice(String(taxFee || 0))}
           </span>
         </div>
       </div>
@@ -94,30 +97,37 @@ const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAm
         </div>
         <div>
           <span className="flex justify-end text-sm font-medium">
-            {(totalAmount || 0).toLocaleString()} $
+             {formatPrice(String(totalAmount || 0))}
           </span>
         </div>
       </div>
 
-      <p className="text-xz text-black font-medium py-3">Thanh toán</p>
+      <p className="text-xz text-black font-medium">Thanh toán</p>
       {/* Chọn loại tiền */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 ">
         <select id="VND" name="VND" className="btn !w-auto">
           <option value="FR">VNĐ</option>
           <option value="US">USD</option>
           <option value="JP">EUR</option>
         </select>
         {/* Chọn hình thức thanh toán */}
-        <select id="a" name="a" className="btn !w-auto">
-          <option value="FR">Tiền mặt</option>
-          <option value="US">Chuyển khoản</option>
-        </select>
+            <select
+              id="a"
+              name="a"
+              className="btn !w-auto"
+              value={String(paymentMethod) || ''} // Liên kết với state
+              onChange={handlePaymentMethodChange} // Xử lý sự kiện khi thay đổi
+            >
+              <option value="Cash">Cash</option>
+              <option value="Bank_transfer">Bank_transfer</option>
+              <option value="Credit_card">Credit_card</option>
+            </select>
         {/* nhập số tiền thanh toán */}
         <input
           type="text "
           id="paidAmount"
           name="paidAmount"
-          value={paidAmount}
+          value={paidAmount} 
           onChange={handlePaidAmountChange}
           className="flex flex-1 px-2 py-[8px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--room-empty-color-)] focus:border-[var(--room-empty-color-)]"
         />
@@ -129,7 +139,7 @@ const InputPayment: React.FC<IPutPayment> = ({ defaultPrice, CountNights,totalAm
         </div>
         <div>
           <span className="flex justify-end text-xz font-medium text-red-600 ">
-            {(remainingAmount || 0).toLocaleString()} $
+             {formatPrice(String(remainingAmount || 0))}
           </span>
         </div>
       </div>
