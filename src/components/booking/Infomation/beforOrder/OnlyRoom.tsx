@@ -16,15 +16,13 @@ const OnlyRoom: React.FC<IProps> = ({ onCustomerData }) => {
     source: "",
     market: "",
     guestName: "",
-    gender: "",
+    gender: "male",
     passport: "",
     email: "",
     phone: "",
     birtday: "",
     address: "",
-  });
-
-  // Hàm xử lý thay đổi giá trị
+  }); // Hàm xử lý thay đổi giá trị
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
