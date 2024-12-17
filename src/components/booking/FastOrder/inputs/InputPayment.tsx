@@ -2,24 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "../BookingForm";
 import useFormatPriceWithCommas from "@/hook/useFormatPriceWithCommas";
 
-
-
 const InputPayment = () => {
-  const {payment, setPayment,countNight, room} = useFormContext();
-  const {totalAmount, taxFee, remainingAmount, paidAmount, subTotal, paymentMethod} = payment;
-  const {defaultPrice} = room;
+  const { payment, setPayment, countNight, room } = useFormContext();
+  const {
+    totalAmount,
+    taxFee,
+    remainingAmount,
+    paidAmount,
+    subTotal,
+    paymentMethod,
+  } = payment;
+  const { defaultPrice } = room;
   const CountNights = countNight;
-  
-  
+
   const [isChecked, setIsChecked] = useState(false); // Kiểm tra checkbox
   const { formatPrice } = useFormatPriceWithCommas();
-  
-
-    
 
   useEffect(() => {
-    if (defaultPrice && CountNights) {
-      const tempSubTotal = defaultPrice * CountNights;
+    if (defaultPrice && CountNights !== undefined && CountNights >= 0) {
+      const tempSubTotal = CountNights > 0 ? defaultPrice * CountNights : 0; // Nếu CountNights là 0, tempSubTotal sẽ = 0
       const tempTax = isChecked ? tempSubTotal * 0.1 : 0; // Chỉ tính thuế/phí khi isChecked = true
       setPayment &&
         setPayment((prev: any) => ({
@@ -27,20 +28,23 @@ const InputPayment = () => {
           totalAmount: tempSubTotal + tempTax,
           taxFee: tempTax,
           subTotal: tempSubTotal,
-        })); // Cập nhật các giá trị
+        }));
+    } else {
+      console.log("CountNights is zero or undefined", CountNights); // Kiểm tra xem CountNights có giá trị hợp lệ không
     }
   }, [defaultPrice, CountNights, isChecked]);
 
   // Hàm xử lý khi người dùng thay đổi checkbox
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setIsChecked(event.target.checked); // Cập nhật trạng thái checkbox
-    };
+    setIsChecked(event.target.checked); // Cập nhật trạng thái checkbox
+  };
 
   useEffect(() => {
-    return setPayment && setPayment((prev: any) => ({
-      ...prev,
-      remainingAmount: Math.max((totalAmount || 0) - (paidAmount || 0), 0) // Đảm bảo không có giá trị âm
-    }));
+    return (
+      setPayment && setPayment((prev: any) => ({ ...prev,
+        remainingAmount: Math.max((totalAmount || 0) - (paidAmount || 0), 0), // Đảm bảo không có giá trị âm
+      }))
+    );
   }, [totalAmount, paidAmount]);
 
   // Hàm xử lý khi người dùng nhập số tiền thanh toán
@@ -51,11 +55,12 @@ const InputPayment = () => {
     setPayment && setPayment((prev: any) => ({ ...prev, paidAmount: value }));
   };
 
-    const handlePaymentMethodChange = (
-      e: React.ChangeEvent<HTMLSelectElement>
-    ) => {
-      setPayment && setPayment((prev: any) => ({ ...prev, paymentMethod: e.target.value })); // Cập nhật phương thức thanh toán
-    };
+  const handlePaymentMethodChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setPayment &&
+      setPayment((prev: any) => ({ ...prev, paymentMethod: e.target.value })); // Cập nhật phương thức thanh toán
+  };
 
   return (
     <div>
@@ -86,7 +91,7 @@ const InputPayment = () => {
         </div>
         <div>
           <span className="flex justify-end text-xz">
-             {formatPrice(String(taxFee || 0))}
+            {formatPrice(String(taxFee || 0))}
           </span>
         </div>
       </div>
@@ -97,7 +102,7 @@ const InputPayment = () => {
         </div>
         <div>
           <span className="flex justify-end text-sm font-medium">
-             {formatPrice(String(totalAmount || 0))}
+            {formatPrice(String(totalAmount || 0))}
           </span>
         </div>
       </div>
@@ -111,23 +116,23 @@ const InputPayment = () => {
           <option value="JP">EUR</option>
         </select>
         {/* Chọn hình thức thanh toán */}
-            <select
-              id="a"
-              name="a"
-              className="btn !w-auto"
-              value={String(paymentMethod) || ''} // Liên kết với state
-              onChange={handlePaymentMethodChange} // Xử lý sự kiện khi thay đổi
-            >
-              <option value="Cash">Cash</option>
-              <option value="Bank_transfer">Bank_transfer</option>
-              <option value="Credit_card">Credit_card</option>
-            </select>
+        <select
+          id="a"
+          name="a"
+          className="btn !w-auto"
+          value={String(paymentMethod) || ""} // Liên kết với state
+          onChange={handlePaymentMethodChange} // Xử lý sự kiện khi thay đổi
+        >
+          <option value="Cash">Cash</option>
+          <option value="Bank_transfer">Bank_transfer</option>
+          <option value="Credit_card">Credit_card</option>
+        </select>
         {/* nhập số tiền thanh toán */}
         <input
           type="text "
           id="paidAmount"
           name="paidAmount"
-          value={paidAmount} 
+          value={paidAmount}
           onChange={handlePaidAmountChange}
           className="flex flex-1 px-2 py-[8px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[var(--room-empty-color-)] focus:border-[var(--room-empty-color-)]"
         />
@@ -139,7 +144,7 @@ const InputPayment = () => {
         </div>
         <div>
           <span className="flex justify-end text-xz font-medium text-red-600 ">
-             {formatPrice(String(remainingAmount || 0))}
+            {formatPrice(String(remainingAmount || 0))}
           </span>
         </div>
       </div>
