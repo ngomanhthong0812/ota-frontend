@@ -1,7 +1,5 @@
 import { v4 as uuid } from "uuid";
-import {
-  BiUserPlus,
-} from "react-icons/bi";
+import { BiUserPlus } from "react-icons/bi";
 import { MdBedroomParent } from "react-icons/md";
 import { FaUserGroup } from "react-icons/fa6";
 import { MdSettings } from "react-icons/md";
@@ -11,6 +9,8 @@ import { RiUser4Fill } from "react-icons/ri";
 import { GiStoneBlock } from "react-icons/gi";
 
 import { MenuItem } from "@/types/backend";
+import { GrTransaction } from "react-icons/gr";
+import { LiaFileInvoiceSolid } from "react-icons/lia";
 
 export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
   {
@@ -91,6 +91,31 @@ export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
         name: "Hàng hoá",
         href: "/admin_management/services",
         icon: <GiStoneBlock size={18} />,
+        active: false,
+        subMenus: [],
+      },
+    ],
+  },
+  {
+    id: uuid(),
+    name: "Giao dịch",
+    href: "/admin_management/order_room",
+    icon: <GrTransaction size={18} />,
+    active: false,
+    subMenus: [
+      {
+        id: uuid(),
+        name: "Đặt phòng",
+        href: "/admin_management/order_room",
+        icon: <MdBedroomParent size={18} />,
+        active: false,
+        subMenus: [],
+      },
+      {
+        id: uuid(),
+        name: "Hóa đơn",
+        href: "/admin_management/invoices",
+        icon: <LiaFileInvoiceSolid size={18} />,
         active: false,
         subMenus: [],
       },

@@ -58,4 +58,10 @@ export const STATUS_SERVICE = {
     IN_BUSINESS: 'Hàng đang kinh doanh',
     OUT_OF_BUSINESS: 'Hàng ngừng kinh doanh',
 }
-
+export const STATUS_BOOKINGS = {
+    BOOKED: 'Đã đặt',
+    CANCELLED: 'Đã ngừng ',
+    CHECKED_IN: 'Đã checkin',
+    CHECKED_OUT: 'Đã checkout',
+    NO_SHOW: 'KHÔNG CÓ MẶT',
+  };
