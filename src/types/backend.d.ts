@@ -267,3 +267,39 @@ interface BookingHistory {
   total_amount_to_pay: number;
   rooms: Roomss[];
 }
+
+interface CashTransaction {
+  cashAmount: number;
+}
+
+interface BankTransaction {
+  receiverAccount: string;
+  receiverName: string;
+  bankAmount: number;
+}
+
+interface Transaction {
+  id: number;
+  code: string;
+  content: string;
+  amount: number;
+  transactionType: "income" | "expense";
+  paymentType: "cash" | "bank";
+  isHandedOver: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  status: "active" | "cancelled";
+  user: User;
+  bankTransaction: BankTransaction | null;
+  cashTransaction: CashTransaction | null;
+}
+
+interface Totals {
+  cashIncome: number;
+  cashExpense: number;
+  bankIncome: number;
+  bankExpense: number;
+  totalIncome: number;
+  totalExpense: number;
+  totalNet: number;
+}
