@@ -119,27 +119,27 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
     const formattedDateCheckIn = `${(dateCheckIn.getMonth() + 1)
       .toString()
       .padStart(2, "0")}/${dateCheckIn
-      .getDate()
-      .toString()
-      .padStart(2, "0")} ${dateCheckIn
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${dateCheckIn
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
+        .getDate()
+        .toString()
+        .padStart(2, "0")} ${dateCheckIn
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${dateCheckIn
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
     const formattedDateCheckOut = `${(dateCheckOut.getMonth() + 1)
       .toString()
       .padStart(2, "0")}/${dateCheckOut
-      .getDate()
-      .toString()
-      .padStart(2, "0")} ${dateCheckOut
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${dateCheckOut
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
+        .getDate()
+        .toString()
+        .padStart(2, "0")} ${dateCheckOut
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${dateCheckOut
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
 
     return formattedDateCheckIn + " - " + formattedDateCheckOut;
   };
@@ -301,7 +301,11 @@ const RoomCard: React.FC<IProps> = ({ data, refreshData }) => {
       )}
       {/* Điều kiện hiển thị BookingForm */}
       {showBookingForm && (
-        <BookingForm closeBookingForm={closeBookingForm} data={data} />
+        <BookingForm
+          closeBookingForm={closeBookingForm}
+          data={data}
+          refreshData={refreshData}
+        />
       )}
     </section>
   );

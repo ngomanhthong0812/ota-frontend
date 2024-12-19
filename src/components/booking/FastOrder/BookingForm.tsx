@@ -27,6 +27,7 @@ import DateIput from "./inputs/Date";
 interface BookingFormProps {
   closeBookingForm: () => void;
   data: TypeRoomCard;
+  refreshData: () => void;
 }
 
 export const FormContext = React.createContext<{
@@ -49,6 +50,7 @@ export const useFormContext = () => {
 const BookingForm: React.FC<BookingFormProps> = ({
   closeBookingForm,
   data,
+  refreshData,
 }) => {
   const router = useRouter();
 
@@ -75,7 +77,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     guestID: "",
     guestEmail: "",
     guestPhone: "",
-    gender: null,
+    gender: 'male',
   });
   // State thông tin thanh toán
   const [payment, setPayment] = useState<PaymentType>({
@@ -193,8 +195,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công
+        refreshData();
         toast.success(`Đặt phòng thành công`);
-        router.push("/hotel_management/room_layout");
+        closeBookingForm();
       } else {
         toast.error(
           response.data.message || "Có lỗi xảy ra vui lòng thử lại sau."

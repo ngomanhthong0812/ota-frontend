@@ -11,7 +11,6 @@ import { CgTrash } from "react-icons/cg";
 import { MdOutlineCheckBox } from "react-icons/md";
 import { FaCheck } from "react-icons/fa6";
 import { GoLock } from "react-icons/go";
-import { BsCopy } from "react-icons/bs";
 
 import { STATUS_USER } from "@/constants/constants";
 
