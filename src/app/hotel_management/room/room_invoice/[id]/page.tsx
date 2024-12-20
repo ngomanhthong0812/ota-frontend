@@ -90,16 +90,6 @@ const RoomInvoicePage = ({ params }: { params: Promise<{ id: number }> }) => {
     }
   );
 
-  const { data: invoiceItemBooking } = useSWR(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoiceItems/invoiceItemBookingInvoiceId/${id}`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-
   useEffect(() => {
     mutate(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/invoicePayments/id/${id}`);
   }, [services])

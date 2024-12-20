@@ -288,6 +288,8 @@ const OnlyRoom: React.FC<IProps> = ({ onCustomerData }) => {
                 </svg>
                 <input
                   type="date"
+                  name="birtday"
+                  id="birtday"
                   value={formData.birtday}
                   onChange={handleChange}
                   className="btn-border-info !py-[7px]"
@@ -321,8 +323,8 @@ const OnlyRoom: React.FC<IProps> = ({ onCustomerData }) => {
               </svg>
               <input
                 type="text"
-                id="SĐT"
-                name="SĐT"
+                id="address"
+                name="address"
                 placeholder="Địa chỉ"
                 value={formData.address}
                 onChange={handleChange}

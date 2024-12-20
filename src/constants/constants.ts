@@ -60,8 +60,8 @@ export const STATUS_SERVICE = {
 }
 export const STATUS_BOOKINGS = {
     BOOKED: 'Đã đặt',
-    CANCELLED: 'Đã ngừng ',
-    CHECKED_IN: 'Đã checkin',
-    CHECKED_OUT: 'Đã checkout',
-    NO_SHOW: 'KHÔNG CÓ MẶT',
-  };
+    CANCELLED: 'Đã huỷ',
+    CHECKED_IN: 'Đã nhận phòng',
+    CHECKED_OUT: 'Đã trả phòng',
+    NO_SHOW: 'Không đến',
+};

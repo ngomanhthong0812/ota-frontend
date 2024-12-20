@@ -36,7 +36,7 @@ interface CreatOrderTableProps {
   handlebookingRoomsChange: (selectedRooms: Room[]) => void;
 }
 const creatOrderTable: React.FC<CreatOrderTableProps> = ({
-  startDate, 
+  startDate,
   endDate,
   roomData, // Nhận roomData từ props
   onOrderData,
@@ -100,41 +100,34 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   };
 
   // Hàm tính số ngày giữa startDate và endDate
-  const calculateDaysBetweenDates = (
+  const calculateDifferenceBetweenDates = (
     startDate: string,
     endDate: string
-  ): number => {
+  ): string => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    // Đặt thời gian của cả hai ngày về 00:00:00 để không tính thời gian
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
+    // Đặt thời gian của cả hai ngày về 00:00:00
+    const startMidnight = new Date(start);
+    const endMidnight = new Date(end);
+    startMidnight.setHours(0, 0, 0, 0);
+    endMidnight.setHours(0, 0, 0, 0);
 
-    // Tính toán sự khác biệt giữa hai ngày
+    // Tính toán sự khác biệt về thời gian (milliseconds)
     const diffTime = end.getTime() - start.getTime();
 
-    // Chuyển đổi sự khác biệt thành số ngày
-    return diffTime / (1000 * 3600 * 24);
+    if (startMidnight.getTime() === endMidnight.getTime()) {
+      // Cùng ngày: Trả về số giờ
+      const diffHours = Math.round(diffTime / (1000 * 3600));
+      return `${diffHours} giờ`;
+    } else {
+      // Khác ngày: Trả về số ngày và số đêm
+      const diffDays = (endMidnight.getTime() - startMidnight.getTime()) / (1000 * 3600 * 24);
+      return `${diffDays} ngày`;
+    }
   };
 
-  // Hàm cập nhật số lượng cho input 1
-  const handleQuantityChangeCapaciti = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = Math.min(Math.max(parseInt(e.target.value), 0), 5); // Giới hạn số lượng từ 0 đến 5
-    setQuantityCapaciti(value);
-  };
-
-  // Hàm cập nhật số lượng cho input 2
-  const handleQuantityChangeChildren = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = Math.min(Math.max(parseInt(e.target.value), 0), 5); // Giới hạn số lượng từ 0 đến 5
-    setQuantityChildren(value);
-  };
-
-  const totalDays = calculateDaysBetweenDates(startDate, endDate); // Tính số ngày giữa startDate và endDate
+  const totalDays = calculateDifferenceBetweenDates(startDate, endDate); // Tính số ngày giữa startDate và endDate
   const taxRate = 0.1; // 10% thuế/phí
   let priceRoomType = 0;
   switch (priceTypeDad) {
@@ -173,7 +166,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   // Sử dụng hàm
   const { subTotal, tax, totalAmount } = calculateTotalAmount(
     priceRoomType, // Giá tiền mỗi phòng
-    totalDays, // Tổng số ngày
+    Number(totalDays.split(' ')[0]),// số ngày hoặc giờ
     taxRate, // Tỉ lệ thuế
     roomCountDad // Số lượng phòng
   );
@@ -248,8 +241,6 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
     onOrderData,
   ]);
 
-  
-
   return (
     <div className="">
       <section className="">
@@ -259,7 +250,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
               {formatDateTime(startDate)} - {formatDateTime(endDate)}
             </div>
             <div className="flex col-span-2 justify-end items-center">
-              <p className="flex items-center">{roomData?.overnight_rate} đêm</p>
+              <p className="flex items-center">{totalDays}</p>
             </div>
           </div>
 
@@ -267,7 +258,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
             <div className=" gap-2 flex justify-between items-center">
               <div>
                 <p className="text-black font-medium items-center ">
-                  {roomData?.name}{}
+                  {roomData?.name}{ }
                 </p>
               </div>
               <div>
@@ -328,7 +319,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                   min="0"
                   max={roomData?.max_capacity}
                   value={quantityCapaciti}
-                  onChange={handleQuantityChangeCapaciti}
+                  onChange={e => setQuantityCapaciti(Number(e.target.value))}
                   name="country"
                   className="btn-soluong"
                 />
@@ -354,7 +345,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                   min="0"
                   max={roomData?.max_children}
                   value={quantityChildren}
-                  onChange={handleQuantityChangeChildren}
+                  onChange={e => setQuantityChildren(Number(e.target.value))}
                   name="country"
                   className="btn-soluong"
                 />
@@ -462,7 +453,6 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
             <select id="VND" name="VND" className="btn !w-auto">
               <option value="FR">VNĐ</option>
               <option value="US">USD</option>
-              <option value="JP">EUR</option>
             </select>
 
             <select
