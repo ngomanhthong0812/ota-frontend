@@ -64,6 +64,8 @@ const CreateBookingPage: React.FC = () => {
       price_type: priceTypeDad || "daily_rate",
     }));
 
+    console.log("fix bug", updatedRooms);
+
     // Cập nhật state với mảng đã chuyển đổi
     setBookingRooms(updatedRooms);
   };
@@ -182,8 +184,11 @@ const CreateBookingPage: React.FC = () => {
       // Kiểm tra mã trạng thái trả về
       if (response.data.statusCode === 200) {
         // Nếu thành công, thông báo thành công
+
         toast.success(`Đặt phòng thành công `);
-        router.push("/hotel_management/room_layout");
+
+        const booking_id = response.data.data;
+        router.push(`/hotel_management/room/room_details/${booking_id}`);
       } else {
         toast.error(
           response.data.message || "Có lỗi xảy ra vui lòng thử lại sau."
