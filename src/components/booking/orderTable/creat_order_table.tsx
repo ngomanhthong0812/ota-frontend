@@ -56,7 +56,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
     if (roomData?.rooms[0]?.room_id) {
       setSelectedRoomId(roomData.rooms[0].room_id);
     }
-  }, [roomData?.rooms])
+  }, [roomData?.rooms]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\./g, ""); // Xóa dấu chấm
@@ -122,7 +122,8 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
       return `${diffHours} giờ`;
     } else {
       // Khác ngày: Trả về số ngày và số đêm
-      const diffDays = (endMidnight.getTime() - startMidnight.getTime()) / (1000 * 3600 * 24);
+      const diffDays =
+        (endMidnight.getTime() - startMidnight.getTime()) / (1000 * 3600 * 24);
       return `${diffDays} ngày`;
     }
   };
@@ -166,7 +167,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   // Sử dụng hàm
   const { subTotal, tax, totalAmount } = calculateTotalAmount(
     priceRoomType, // Giá tiền mỗi phòng
-    Number(totalDays.split(' ')[0]),// số ngày hoặc giờ
+    Number(totalDays.split(" ")[0]), // số ngày hoặc giờ
     taxRate, // Tỉ lệ thuế
     roomCountDad // Số lượng phòng
   );
@@ -179,12 +180,14 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
   );
 
   // Gửi dữ liệu phòng về cha khi roomCountDad > 1
+  // Gửi dữ liệu phòng về cha khi roomCountDad > 1
   const prevRoomCountDad = useRef(roomCountDad);
   const prevRoomData = useRef(roomData);
   const prevPriceTypeDad = useRef(priceTypeDad);
   const prevSelectedRoomId = useRef(selectedRoomId);
+
   useEffect(() => {
-    // Kiểm tra nếu giá trị thay đổi thực sự
+    // Kiểm tra nếu giá trị thay đổi thực sự (khi roomCountDad > 1)
     if (
       roomCountDad > 1 &&
       (roomCountDad !== prevRoomCountDad.current ||
@@ -198,6 +201,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
           room_name: room.room_name,
           room_price: priceRoomType, // Lấy giá theo priceTypeDad hoặc default là hourly_rate
         }));
+      console.log(selectedRooms);
       handlebookingRoomsChange(selectedRooms ?? []); // Gửi mảng phòng đã chọn về cha
 
       // Lưu lại giá trị cũ để so sánh trong lần sau
@@ -206,23 +210,37 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
       prevPriceTypeDad.current = priceTypeDad;
     }
 
-    // Kiểm tra nếu chỉ có 1 phòng được chọn và selectedRoomId thay đổi
-    if (roomCountDad === 1 && selectedRoomId !== prevSelectedRoomId.current) {
+    // Kiểm tra nếu chỉ có 1 phòng được chọn và selectedRoomId thay đổi, hoặc priceTypeDad thay đổi
+    if (
+      roomCountDad === 1 &&
+      (selectedRoomId !== prevSelectedRoomId.current ||
+        priceTypeDad !== prevPriceTypeDad.current)
+    ) {
       const selectedRoom = roomData?.rooms.find(
         (room) => room.room_id === selectedRoomId
       );
       if (selectedRoom) {
+        console.log(selectedRoom);
+
         handlebookingRoomsChange([
           {
             room_id: selectedRoom.room_id,
             room_name: selectedRoom.room_name,
-            room_price: priceRoomType,
+            room_price: priceRoomType, // Lấy giá mới theo priceTypeDad
           },
         ]);
       }
       prevSelectedRoomId.current = selectedRoomId; // Cập nhật selectedRoomId
+      prevPriceTypeDad.current = priceTypeDad; // Cập nhật priceTypeDad
     }
-  }, [roomCountDad, roomData, priceTypeDad, handlebookingRoomsChange]);
+  }, [
+    roomCountDad,
+    roomData,
+    priceTypeDad,
+    selectedRoomId,
+    handlebookingRoomsChange,
+  ]);
+
   // ------------------------
   useEffect(() => {
     onOrderData(
@@ -258,7 +276,8 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
             <div className=" gap-2 flex justify-between items-center">
               <div>
                 <p className="text-black font-medium items-center ">
-                  {roomData?.name}{ }
+                  {roomData?.name}
+                  {}
                 </p>
               </div>
               <div>
@@ -319,7 +338,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                   min="0"
                   max={roomData?.max_capacity}
                   value={quantityCapaciti}
-                  onChange={e => setQuantityCapaciti(Number(e.target.value))}
+                  onChange={(e) => setQuantityCapaciti(Number(e.target.value))}
                   name="country"
                   className="btn-soluong"
                 />
@@ -345,7 +364,7 @@ const creatOrderTable: React.FC<CreatOrderTableProps> = ({
                   min="0"
                   max={roomData?.max_children}
                   value={quantityChildren}
-                  onChange={e => setQuantityChildren(Number(e.target.value))}
+                  onChange={(e) => setQuantityChildren(Number(e.target.value))}
                   name="country"
                   className="btn-soluong"
                 />
