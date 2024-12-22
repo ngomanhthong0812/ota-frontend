@@ -3,16 +3,20 @@ import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import { Scheduler } from "@bitnoi.se/react-scheduler";
-import "@bitnoi.se/react-scheduler/dist/style.css";
+import dynamic from "next/dynamic";  // Import dynamic từ Next.js
 import { callApi } from "@/utils/api";
 import { useAuth } from "@/context/auth.context";
 import enDayjsTranslations from "dayjs/locale/en";
 import InusedRoomPopup from "@/components/room/inused_room_popup";
 
+// Sử dụng dynamic import đúng cách cho component
+const Scheduler = dynamic(() => import("@bitnoi.se/react-scheduler").then((mod) => mod.Scheduler), {
+  ssr: false
+});
+
 dayjs.extend(isBetween); // Kích hoạt plugin isBetween
 
-interface Props {}
+interface Props { }
 
 // Định nghĩa interface cho sự kiện trong lịch
 interface Event {
@@ -90,7 +94,7 @@ const langs: LocaleType[] = [
   },
 ];
 
-const CalendarSchedulerPage: NextPage<Props> = ({}) => {
+const CalendarSchedulerPage: NextPage<Props> = ({ }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [responseData, setResponseData] = useState<SchedulerData[]>([]); // State để lưu trữ dữ liệu đã lọc
 
