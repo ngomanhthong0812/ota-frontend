@@ -70,11 +70,10 @@ const TransactionDetail: React.FC<IProps> = ({
   return (
     <>
       <tr
-        className={`${
-          itemActive === data?.id
+        className={`${itemActive === data?.id
             ? "border border-t-0 border-[#0090da] "
             : "hidden"
-        }`}
+          }`}
       >
         <td colSpan={8} className="bg-[#ebf5ea] m-0 p-0">
           <div className="toolbar px-8 flex">
@@ -96,7 +95,7 @@ const TransactionDetail: React.FC<IProps> = ({
                 </p>
                 <p className="py-3 border-b flex gap-5 justify-between items-center w-full">
                   <span>Người tạo:</span>
-                  <span>{data.user.name}</span>
+                  <span>{data.user?.name}</span>
                 </p>
                 <p className="py-3 border-b flex gap-5 justify-between items-center w-full">
                   <span>Nội dung:</span>

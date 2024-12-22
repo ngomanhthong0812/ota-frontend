@@ -95,11 +95,13 @@ const InvoicesPage = () => {
   };
 
   const removeVietnameseTones = (str: string): string => {
+    if (!str) return '';
     return str
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
   };
+
 
   const filterHistoryTransaction = (): Transaction[] => {
     return historyTransaction.filter((Transaction) => {
@@ -108,7 +110,7 @@ const InvoicesPage = () => {
         Transaction.code.toLowerCase()
       );
       const normalizedName = removeVietnameseTones(
-        Transaction.user.name.toLowerCase()
+        Transaction.user?.name?.toLowerCase()
       );
 
       const matchesSearchQuery =
@@ -237,7 +239,7 @@ const InvoicesPage = () => {
               >
                 <input
                   type="checkbox"
-                  onChange={() => {}}
+                  onChange={() => { }}
                   checked={checkedAll}
                 />
               </td>

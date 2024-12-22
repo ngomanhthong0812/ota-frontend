@@ -62,7 +62,7 @@ const TransactionInfo: React.FC<IProps> = ({
         {data.paymentType === "cash" ? "Tiền mặt" : "Chuyển khoản"}
       </td>
       <td className="p-2">{formatCurrency(data.amount)}</td>
-      <td className="p-2">{data.user.name}</td>
+      <td className="p-2">{data.user?.name}</td>
       <td className="p-2">
         {data.status === "active" ? "Hoạt động" : "Đã hủy"}
       </td>
