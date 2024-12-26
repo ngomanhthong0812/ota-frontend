@@ -22,12 +22,14 @@ import { useAuth } from "@/context/auth.context";
 
 export function DropdownMenuHotel() {
     const router = useRouter();
+    const { user } = useAuth();
     const { clearToken } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const logout = () => {
         router.push('/');
         clearToken();
     }
+
     return (
         <DropdownMenu
             onOpenChange={(open) => setIsOpen(open)}
@@ -49,14 +51,16 @@ export function DropdownMenuHotel() {
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56  -translate-x-3">
-                <DropdownMenuGroup>
-                    <Link href={'/admin_management'}>
-                        <DropdownMenuItem>
-                            <User />
-                            <span>Quản lý</span>
-                        </DropdownMenuItem>
-                    </Link>
-                </DropdownMenuGroup>
+                {user?.role === 'Admin' &&
+                    <DropdownMenuGroup>
+                        <Link href={'/admin_management'}>
+                            <DropdownMenuItem>
+                                <User />
+                                <span>Quản lý</span>
+                            </DropdownMenuItem>
+                        </Link>
+                    </DropdownMenuGroup>
+                }
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem>

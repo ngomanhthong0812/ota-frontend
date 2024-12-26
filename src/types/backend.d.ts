@@ -56,6 +56,7 @@ interface User {
   name: string;
   hotel_id: number;
   isActive: boolean;
+  role: string,
 }
 
 interface UserAdmin {

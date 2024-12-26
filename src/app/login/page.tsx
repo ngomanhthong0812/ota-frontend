@@ -69,6 +69,7 @@ const LoginPage: React.FC<IProps> = () => {
                         email: responseData.user.email,
                         hotel_id: responseData.user.hotel_id,
                         isActive: responseData.user.isActive,
+                        role:responseData.user.role,
                     }
                     setUserInfo(newUserInfo);
                     if (responseData.user.isActive) {
