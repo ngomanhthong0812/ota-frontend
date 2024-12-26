@@ -52,7 +52,7 @@ const GeneralInformationTable: React.FC<IProps> = ({ data }) => {
                 </tbody>
             </table>
             <div className="pagination center !justify-end p-4 gap-3">
-                <span>1-10 trên 15</span>
+                <span>0-0 trên 0</span>
                 <div
                     className="group center border p-[7px] rounded-[3px] cursor-pointer duration-75 hover:bg-[var(--room-empty-color-)]">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"

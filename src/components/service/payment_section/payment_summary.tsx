@@ -100,7 +100,7 @@ const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo, 
                     <select className="btn" onChange={(e) => setPaymentInfo(prev => ({ ...prev, paymentMethod: e.target.value }))}>
                         <option value="Tiền mặt">{PAYMENT_METHODS.CASH}</option>
                         <option value="Thẻ tín dụng">{PAYMENT_METHODS.CREDIT_CARD}</option>
-                        <option value="Chuyển khoản NH">{PAYMENT_METHODS.BANK_TRANSFER}</option>
+                        <option value="Chuyển khoản">{PAYMENT_METHODS.BANK_TRANSFER}</option>
                     </select>
                 </div>
                 <div className="flex flex-col">
@@ -156,7 +156,7 @@ const PaymentSummary: React.FC<IProps> = ({ token, user, handleSavePaymentInfo, 
                                     ) {
                                         setInvoiceId(selectedItem.bookings[0].invoice[0].id);
                                         console.log(selectedItem.bookings[0].invoice[0].id);
-                                        
+
                                     } else {
                                         console.warn('Không tìm thấy invoice ID.');
                                     }
