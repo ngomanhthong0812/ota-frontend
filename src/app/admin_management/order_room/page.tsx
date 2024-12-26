@@ -88,6 +88,7 @@ const OrderRoomPage = () => {
   };
 
   const removeVietnameseTones = (str: string): string => {
+    if (!str) { return '' }
     return str
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -108,7 +109,7 @@ const OrderRoomPage = () => {
       );
 
       const matchesRoomName = booking.rooms.some((room) =>
-        removeVietnameseTones(room.room_name.toLowerCase()).includes(
+        removeVietnameseTones(room.room_name?.toLowerCase()).includes(
           normalizedSearchQuery
         )
       );
@@ -236,7 +237,7 @@ const OrderRoomPage = () => {
               >
                 <input
                   type="checkbox"
-                  onChange={() => {}}
+                  onChange={() => { }}
                   checked={checkedAll}
                 />
               </td>

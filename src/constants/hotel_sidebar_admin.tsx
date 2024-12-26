@@ -99,7 +99,7 @@ export const HOTELSIDEBARADMIN_NAV: MenuItem[] = [
   {
     id: uuid(),
     name: "Giao dịch",
-    href: "/admin_management/order_room",
+    href: "",
     icon: <GrTransaction size={18} />,
     active: false,
     subMenus: [
